@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('slave_credit_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('dealer_id')->constrained('dealers');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('file_request_id')->nullable()->constrained('file_requests')->nullOnDelete();
+            $table->enum('type', ['top_up', 'deduction', 'manual_credit', 'refund']);
+            $table->decimal('amount', 10, 2);
+            $table->string('reason')->nullable();
+            $table->decimal('balance_after', 10, 2);
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('slave_credit_transactions');
+    }
+};
