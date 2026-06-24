@@ -12,15 +12,13 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen flex flex-col items-center justify-center" style="background-color: #111827;">
-            <div class="mb-6">
-                <x-application-logo class="w-16 h-16 fill-current text-white" />
+    <body class="font-sans antialiased min-h-screen bg-gray-900 flex items-center justify-center">
+        <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-6">
+                <span class="text-2xl font-bold" style="color: #e63012;">Surrey Tuning Services</span>
             </div>
 
-            <div class="w-full sm:max-w-md px-6 py-8 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
+            {{ $slot }}
         </div>
     </body>
 </html>

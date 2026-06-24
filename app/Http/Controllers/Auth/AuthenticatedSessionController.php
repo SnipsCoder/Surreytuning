@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+
+        $user->updateLastLogin();
+
+        $redirect = in_array($user->role, [UserRole::DealerOwner, UserRole::DealerUser], true)
+            ? '/my/dashboard'
+            : '/dashboard';
+
+        // Do NOT use redirect()->intended() here. If the guest was bounced to /login
+        // from a protected route, Laravel stashes that URL as `url.intended` in the
+        // session and intended() will silently redirect there instead of $redirect,
+        // ignoring the role check above. Always redirect to the role-based path.
+        return redirect($redirect);
     }
 
     /**

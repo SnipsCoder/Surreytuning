@@ -1,5 +1,89 @@
 # Surrey Tuning Services Portal — Claude Code Build Plan
-## Senior Developer Specification | v1.0 | June 2026
+## Senior Developer Specification | v1.1 | June 2026
+
+---
+
+## ⚠️ ARCHITECTURE OVERRIDE — READ THIS FIRST (Added after Phase 1)
+
+The architecture was updated during Phase 1 to support **multi-tenancy via Stancl/Tenancy (database-per-tenant)**. This portal is a white-label SaaS product. Every section of this document must be interpreted in light of the following. These rules override any conflicting instructions in the phase prompts below.
+
+### Multi-Tenancy Facts
+- Package: `stancl/tenancy` (already installed)
+- Each business customer is a **tenant** with their own isolated database
+- The Surrey Tuning instance: tenant ID = `surrey-tuning`, domain = `surreytuning.test`, tenant DB = `tenantsurrey-tuning`
+- Central DB (`surreytuning`): contains only `tenants`, `domains`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`, `migrations` — **no application tables**
+- Tenant DB (`tenantsurrey-tuning`): contains all 24+ Surrey Tuning application tables
+
+### Migration Rules
+- **Tenant migrations** (application tables) go in: `database/migrations/tenant/`
+- **Central migrations** (tenancy infrastructure only) go in: `database/migrations/`
+- To run tenant migrations: `php artisan tenants:migrate --tenants=surrey-tuning`
+- To fresh migrate + reseed a tenant: `php artisan tenants:migrate-fresh --tenants=surrey-tuning` then `php artisan tenants:seed --tenants=surrey-tuning`
+- **NEVER run** `php artisan migrate:fresh --seed` — this wipes the central tenants/domains tables
+
+### Routing & Middleware
+- All portal routes (`routes/web.php`) are served under the tenant domain `surreytuning.test`
+- `InitializeTenancyByDomain` and `PreventAccessFromCentralDomains` middleware run globally before all web routes
+- By the time any controller runs, the tenant DB connection is already active — no manual tenancy initialization needed in controllers
+- Middleware aliases (`owner`, `client`, `dealer_approved`) are registered in `bootstrap/app.php`
+
+### Authentication
+- The `users` table is in the **tenant DB** — Breeze auth queries the tenant connection automatically
+- Sessions table is in the tenant DB
+- Cache table is in the tenant DB (added during Phase 1 fix)
+- Password reset tokens are in the tenant DB
+
+### Artisan Commands for Tenant Context
+- List tenants: `php artisan tenants:list`
+- Run any command in tenant context: `php artisan tenants:run --tenants=surrey-tuning -- {command}`
+- Tinker in tenant context: start `php artisan tinker`, then run `tenancy()->initialize(App\Models\Tenant::find('surrey-tuning'));`
+
+### Phase Completion Status
+- **Phase 0** ✅ Complete (commit: initial setup)
+- **Phase 1** ✅ Complete (commit: e1526b6 — database and models, multi-tenant)
+- **Phase 2** ✅ Complete (auth & routing, middleware, tenant routes)
+- **Phase 3** ✅ Complete (core services: CreditService, InvoiceService, FileStorageService, StripeService)
+- **Phase 4** 🔄 In progress
+- **Phase 5–10** ⏳ Pending
+
+---
+
+## 🎨 UI DESIGN SPECIFICATIONS (Added after Phase 1)
+
+Custom UI designs have been provided for the portal. These must be followed during Phase 4 (owner portal) and Phase 6 (client portal). Do not use generic Breeze styling for these sections.
+
+### Design Decisions (non-negotiable)
+- **Dark theme is the default** — build dark-first throughout. Do not add dark mode as an afterthought in Phase 10. All layouts, components, and views must render correctly in dark mode from the start.
+- **Primary accent colour**: `#e63012` (already set in Settings seeder as `theme_colour`)
+- **Background**: deep dark (`#0f172a` / `#1e293b` range)
+- **Sidebar**: dark navy with red active state highlight
+- **Cards**: dark surface (`#1e293b`) with subtle borders
+
+### Phase 4 — Owner Portal UI
+The owner file requests view must include:
+- **Kanban board** as the default view with columns: Pending, In Progress, Completed, On Hold (and other statuses)
+- Each kanban card shows: vehicle make logo, make/model, stage, job reference number, time since created
+- **List view** toggle (table layout) as an alternative
+- Red/amber/green status dot indicators on kanban column headers
+- "+ N more" pagination within kanban columns
+
+### Phase 6 — Client Portal UI
+The client dashboard must include:
+- Welcome banner with dealer name and business status badge
+- Four stat cards: Pending Files, In Progress, Completed (this year), Credit Balance
+- **Spend over time chart** — use Chart.js (already available via CDN). Line chart showing monthly spend with red gradient fill.
+- Recent file requests table with status badges, vehicle logos, job references, and Open buttons
+- Right panel: Recent Notifications list, Account Summary (Slave Credits balance + Top Up button, EVC Credits + Buy button, Total Spent)
+- Sidebar sections grouped: FILE SERVICE, FINANCIAL, TOOLS & DATA, ACCOUNT
+
+### Chart.js Usage
+- Load Chart.js from CDN: `https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js`
+- Spend chart: type line, red (`#e63012`) stroke, red gradient fill, smooth curves, dark background
+- Pass chart data from controller as a JSON-encoded PHP array (monthly totals from invoices)
+
+### Vehicle Make Logos
+- Use `https://logo.clearbit.com/{brand}.com` as a fallback for make logos on kanban cards and file request lists (e.g. `bmw.com`, `audi.com`, `ford.com`)
+- Wrap in a fallback `<img onerror>` that shows a generic car icon SVG if the logo fails to load
 
 ---
 
@@ -17,8 +101,32 @@ C:\Users\Dean PC\Herd\surreytuning
 - Start each session by reading this file.
 - Complete one phase fully before starting the next.
 - Run `php artisan test` and `php artisan route:list` at the end of each phase.
-- Commit to git after each phase: `git add . && git commit -m "Phase X complete: [description]"`
 - Never skip the success criteria at the bottom of each phase.
+
+## ⚠️ GIT COMMIT REQUIRED AFTER EVERY PHASE
+
+**This is mandatory. Do not skip it.**
+
+At the end of every phase (and every sub-phase like Part A / Part B), once all tests pass, run:
+
+```
+git add .
+git commit -m "Phase X complete: [short description of what was built]"
+```
+
+Examples:
+```
+git commit -m "Phase 4A complete: owner file requests, kanban/list views, charge/credit/void actions"
+git commit -m "Phase 4B complete: dealer management, applications, approve/reject flow"
+git commit -m "Phase 5 complete: owner configuration, settings, CRUD pages"
+```
+
+**Why this matters:** Each commit is a restore point. If a later phase breaks something, we can roll back cleanly. Without commits, there is no safety net.
+
+If the phase involved tenant migrations, also note that in the commit message:
+```
+git commit -m "Phase X complete: [description] — includes tenant migration"
+```
 
 ---
 

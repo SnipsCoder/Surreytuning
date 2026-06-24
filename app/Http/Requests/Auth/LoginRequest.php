@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\DealerStatus;
+use App\Enums\UserRole;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -51,6 +53,26 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        $user = Auth::user();
+
+        if (in_array($user->role, [UserRole::DealerOwner, UserRole::DealerUser], true) && $user->dealer) {
+            if ($user->dealer->status === DealerStatus::Suspended) {
+                Auth::logout();
+
+                throw ValidationException::withMessages([
+                    'email' => 'Your account has been suspended. Please contact us.',
+                ]);
+            }
+
+            if ($user->dealer->status === DealerStatus::Pending) {
+                Auth::logout();
+
+                throw ValidationException::withMessages([
+                    'email' => 'Your account is pending approval.',
+                ]);
+            }
+        }
     }
 
     /**

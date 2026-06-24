@@ -86,4 +86,9 @@ class User extends Authenticatable
     {
         return $query->whereIn('role', [UserRole::DealerOwner, UserRole::DealerUser]);
     }
+
+    public function updateLastLogin(): void
+    {
+        $this->forceFill(['last_login_at' => now()])->save();
+    }
 }

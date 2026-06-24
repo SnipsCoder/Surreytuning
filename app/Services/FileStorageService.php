@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\AttachmentType;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+
+class FileStorageService
+{
+    public function storeFile(UploadedFile $file, string $dealerId, string $requestNumber, AttachmentType $type): array
+    {
+        $this->validateFile($file);
+
+        $originalFilename = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $sanitisedFilename = Str::slug(pathinfo($originalFilename, PATHINFO_FILENAME)).'-'.Str::random(8).'.'.$extension;
+
+        $path = "files/{$dealerId}/{$requestNumber}/{$type->value}/{$sanitisedFilename}";
+
+        Storage::disk('r2')->put($path, file_get_contents($file->getRealPath()));
+
+        return [
+            'path' => $path,
+            'stored_filename' => $sanitisedFilename,
+            'original_filename' => $originalFilename,
+            'file_size_bytes' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+        ];
+    }
+
+    public function getTemporaryUrl(string $path, int $minutes = 30): string
+    {
+        return Storage::disk('r2')->temporaryUrl($path, now()->addMinutes($minutes));
+    }
+
+    public function deleteFile(string $path): bool
+    {
+        return Storage::disk('r2')->delete($path);
+    }
+
+    public function getAllowedMimeTypes(): array
+    {
+        return ['application/octet-stream', 'application/x-binary', 'text/plain'];
+    }
+
+    public function getAllowedExtensions(): array
+    {
+        return ['bin', 'hex', 'ori', 'mod', 'kp', 'frf', 'ols'];
+    }
+
+    public function validateFile(UploadedFile $file): void
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if (! in_array($extension, $this->getAllowedExtensions(), true)) {
+            throw new InvalidArgumentException("File extension '{$extension}' is not allowed.");
+        }
+
+        if ($file->getSize() > 52428800) {
+            throw new InvalidArgumentException('File exceeds the maximum allowed size of 50MB.');
+        }
+    }
+}

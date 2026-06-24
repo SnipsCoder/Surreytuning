@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ApplicationStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DealerApplication extends Model
 {
@@ -28,5 +29,10 @@ class DealerApplication extends Model
             'reviewed_at' => 'datetime',
             'terms_accepted_at' => 'datetime',
         ];
+    }
+
+    public function reviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

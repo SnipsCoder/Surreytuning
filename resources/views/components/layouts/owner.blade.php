@@ -26,7 +26,7 @@
                         $ownerNavLinks = [
                             ['label' => 'Dashboard', 'route' => 'dashboard'],
                             ['label' => 'File Requests', 'route' => 'file-requests.index'],
-                            ['label' => 'File Archive', 'route' => 'file-archive.index'],
+                            ['label' => 'File Archive', 'route' => 'owner.file-requests.archive'],
                             ['label' => 'Dealers', 'route' => 'dealers.index'],
                             ['label' => 'Dealer Applications', 'route' => 'dealer-applications.index'],
                             ['label' => 'Invoices', 'route' => 'invoices.index'],
@@ -61,10 +61,10 @@
                 <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center gap-3">
                         @php
-                            $portalStatus = \Illuminate\Support\Facades\Cache::get('portal_status');
+                            $portalStatus = \App\Models\PortalStatus::find(1);
                         @endphp
                         @if ($portalStatus)
-                            <x-status-badge :status="$portalStatus->label()" :colour="$portalStatus->colour()" />
+                            <x-status-badge :status="$portalStatus->status->label()" :colour="$portalStatus->status->colour()" />
                         @endif
                     </div>
 
