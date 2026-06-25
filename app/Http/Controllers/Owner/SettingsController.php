@@ -26,7 +26,9 @@ class SettingsController extends Controller
 
         Setting::get()->update($data);
 
-        return back()->with('success', 'Settings updated.');
+        return back()
+            ->with('success', 'Settings updated.')
+            ->with('active_tab', $request->input('active_tab', 'account'));
     }
 
     public function updateHours(UpdateOpeningHoursRequest $request)
@@ -39,7 +41,9 @@ class SettingsController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Opening hours updated.');
+        return back()
+            ->with('success', 'Opening hours updated.')
+            ->with('active_tab', 'hours');
     }
 
     public function updateBranding(UpdateBrandingRequest $request)
@@ -57,6 +61,8 @@ class SettingsController extends Controller
 
         $settings->update($data);
 
-        return back()->with('success', 'Branding updated.');
+        return back()
+            ->with('success', 'Branding updated.')
+            ->with('active_tab', 'branding');
     }
 }

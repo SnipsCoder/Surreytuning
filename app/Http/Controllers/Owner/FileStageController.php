@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Owner;
 
-use App\Enums\FileRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\StoreFileStageRequest;
 use App\Models\FileStage;
@@ -33,12 +32,8 @@ class FileStageController extends Controller
 
     public function destroy(FileStage $fileStage): RedirectResponse
     {
-        $activeJobs = $fileStage->fileRequests()
-            ->whereNotIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void])
-            ->exists();
-
-        if ($activeJobs) {
-            return back()->with('error', 'Cannot delete this file stage: it has active file requests.');
+        if ($fileStage->fileRequests()->exists()) {
+            return back()->with('error', 'Cannot delete this stage — it is referenced by existing file requests.');
         }
 
         if ($fileStage->fileOptions()->exists()) {

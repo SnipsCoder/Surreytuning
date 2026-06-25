@@ -25,6 +25,6 @@ class TuningTool extends Model
 
     public function fileRequests(): HasMany
     {
-        return $this->hasMany(FileRequest::class);
+        return $this->hasMany(FileRequest::class, 'tool_id');
     }
 }

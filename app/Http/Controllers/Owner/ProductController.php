@@ -22,6 +22,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         unset($data['image']);
+        $data['sort_order'] = $data['sort_order'] ?? 0;
 
         if ($request->hasFile('image')) {
             $data['image_path'] = $request->file('image')->store('products', 'public');
@@ -36,6 +37,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         unset($data['image']);
+        $data['sort_order'] = $data['sort_order'] ?? 0;
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {

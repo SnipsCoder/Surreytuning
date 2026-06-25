@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    <div x-data="{ tab: 'account' }">
+    <div x-data="{ tab: '{{ session('active_tab', 'account') }}' }">
         <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
             <nav class="-mb-px flex space-x-6 overflow-x-auto">
                 @foreach ([
@@ -35,6 +35,7 @@
             <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
+                <input type="hidden" name="active_tab" value="account">
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Address</label>
@@ -169,6 +170,7 @@
                 <input type="hidden" name="invoice_start_number" value="{{ $settings->invoice_start_number }}">
                 <input type="hidden" name="invoice_reference_prefix" value="{{ $settings->invoice_reference_prefix }}">
                 <input type="hidden" name="terms_and_conditions" value="{{ $settings->terms_and_conditions }}">
+                <input type="hidden" name="active_tab" value="dealer">
 
                 <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input type="checkbox" name="dealer_auto_onboard" value="1" {{ $settings->dealer_auto_onboard ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-[#e63012] focus:ring-[#e63012]">
@@ -196,6 +198,7 @@
                 <input type="hidden" name="company_number" value="{{ $settings->company_number }}">
                 <input type="hidden" name="dealer_auto_onboard" value="{{ $settings->dealer_auto_onboard ? 1 : 0 }}">
                 <input type="hidden" name="terms_and_conditions" value="{{ $settings->terms_and_conditions }}">
+                <input type="hidden" name="active_tab" value="invoice">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -235,6 +238,7 @@
                 <input type="hidden" name="dealer_auto_onboard" value="{{ $settings->dealer_auto_onboard ? 1 : 0 }}">
                 <input type="hidden" name="invoice_start_number" value="{{ $settings->invoice_start_number }}">
                 <input type="hidden" name="invoice_reference_prefix" value="{{ $settings->invoice_reference_prefix }}">
+                <input type="hidden" name="active_tab" value="terms">
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Terms &amp; Conditions</label>

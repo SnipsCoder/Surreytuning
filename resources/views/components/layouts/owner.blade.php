@@ -62,7 +62,7 @@
                 <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center gap-3" x-data="{ open: false }">
                         @php
-                            $portalStatus = \Illuminate\Support\Facades\Cache::remember('portal_status', 300, fn () => \App\Models\PortalStatus::current());
+                            $portalStatus = \App\Models\PortalStatus::find(1);
                         @endphp
                         @if ($portalStatus)
                             <div class="relative">

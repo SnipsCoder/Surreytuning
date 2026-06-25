@@ -21,6 +21,7 @@ class FileStage extends Model
     protected function casts(): array
     {
         return [
+            'vehicle_type' => \App\Enums\VehicleType::class,
             'price_net' => 'decimal:2',
             'vat_applicable' => 'boolean',
             'is_active' => 'boolean',
