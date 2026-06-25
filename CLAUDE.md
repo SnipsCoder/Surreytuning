@@ -43,8 +43,9 @@ The architecture was updated during Phase 1 to support **multi-tenancy via Stanc
 - **Phase 1** ✅ Complete (commit: e1526b6 — database and models, multi-tenant)
 - **Phase 2** ✅ Complete (auth & routing, middleware, tenant routes)
 - **Phase 3** ✅ Complete (core services: CreditService, InvoiceService, FileStorageService, StripeService)
-- **Phase 4** 🔄 In progress
-- **Phase 5–10** ⏳ Pending
+- **Phase 4** ✅ Complete (owner file requests, dealer management, kanban/list views)
+- **Phase 5** ✅ Complete (commit: b7f7ba2 — owner configuration, settings, all CRUD pages)
+- **Phase 6–10** ⏳ Pending
 
 ---
 

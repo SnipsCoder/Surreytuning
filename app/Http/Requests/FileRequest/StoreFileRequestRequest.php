@@ -31,6 +31,10 @@ class StoreFileRequestRequest extends FormRequest
             'engine_code' => ['nullable', 'string', 'max:50'],
             'bhp_before' => ['nullable', 'numeric', 'min:0'],
             'client_notes' => ['nullable', 'string', 'max:2000'],
+            'file_options' => ['nullable', 'array'],
+            'file_options.*' => ['integer', 'exists:file_options,id'],
+            'dtc_codes' => ['nullable', 'array'],
+            'dtc_codes.*' => ['string', 'max:20'],
         ];
     }
 }
