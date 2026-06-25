@@ -58,6 +58,9 @@ class FileUploadController extends Controller
                 'fuel' => $request->input('fuel'),
                 'transmission' => $request->input('transmission'),
                 'bhp_before' => $request->input('bhp_before'),
+                'file_type' => $request->input('file_type'),
+                'torque_before_nm' => $request->input('torque_before_nm'),
+                'ecu_model_no' => $request->input('ecu_model_no'),
                 'file_stage_id' => $request->input('file_stage_id'),
                 'tool_id' => $request->input('tool_id'),
                 'client_notes' => $request->input('client_notes'),
@@ -102,6 +105,7 @@ class FileUploadController extends Controller
 
             FileRequestMessage::create([
                 'file_request_id' => $fileRequest->id,
+                'sender_user_id' => $request->user()->id,
                 'type' => MessageType::System,
                 'body' => 'File request submitted by '.$request->user()->first_name.' '.$request->user()->last_name.'.',
                 'is_internal' => false,

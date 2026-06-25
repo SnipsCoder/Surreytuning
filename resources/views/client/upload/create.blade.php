@@ -121,6 +121,29 @@
                     <x-input-error :messages="$errors->get('bhp_before')" class="mt-1" />
                 </div>
 
+                <div>
+                    <x-input-label for="file_type" value="File Type" />
+                    <select id="file_type" name="file_type" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <option value="ecu" @selected(old('file_type', 'ecu') === 'ecu')>ECU</option>
+                        <option value="tcu" @selected(old('file_type') === 'tcu')>TCU</option>
+                        <option value="other" @selected(old('file_type') === 'other')>Other</option>
+                    </select>
+                    <x-input-error :messages="$errors->get('file_type')" class="mt-1" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <x-input-label for="torque_before_nm" value="Torque Before (Nm, optional)" />
+                        <x-text-input id="torque_before_nm" name="torque_before_nm" type="number" step="0.1" min="0" class="mt-1 block w-full" :value="old('torque_before_nm')" />
+                        <x-input-error :messages="$errors->get('torque_before_nm')" class="mt-1" />
+                    </div>
+                    <div>
+                        <x-input-label for="ecu_model_no" value="ECU Model No (optional)" />
+                        <x-text-input id="ecu_model_no" name="ecu_model_no" type="text" class="mt-1 block w-full" :value="old('ecu_model_no')" />
+                        <x-input-error :messages="$errors->get('ecu_model_no')" class="mt-1" />
+                    </div>
+                </div>
+
                 <div class="flex justify-end pt-2">
                     <button type="button" x-on:click="next()" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700">
                         Next: Service Selection
