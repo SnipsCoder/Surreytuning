@@ -3,38 +3,38 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreWhatsNewRequest;
+use App\Models\WhatsNew;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class WhatsNewController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        return response("WhatsNewController@index placeholder");
+        $whatsNews = WhatsNew::orderByDesc('published_at')->orderByDesc('created_at')->get();
+
+        return view('owner.whats-new.index', compact('whatsNews'));
     }
 
-    public function create(Request $request)
+    public function store(StoreWhatsNewRequest $request): RedirectResponse
     {
-        return response("WhatsNewController@create placeholder");
+        WhatsNew::create($request->validated());
+
+        return back()->with('success', 'Update posted.');
     }
 
-    public function store(Request $request)
+    public function update(StoreWhatsNewRequest $request, WhatsNew $whatsNew): RedirectResponse
     {
-        return back();
+        $whatsNew->update($request->validated());
+
+        return back()->with('success', 'Update saved.');
     }
 
-    public function edit(Request $request)
+    public function destroy(WhatsNew $whatsNew): RedirectResponse
     {
-        return response("WhatsNewController@edit placeholder");
-    }
+        $whatsNew->delete();
 
-    public function update(Request $request)
-    {
-        return back();
+        return back()->with('success', 'Update deleted.');
     }
-
-    public function destroy(Request $request)
-    {
-        return back();
-    }
-
 }

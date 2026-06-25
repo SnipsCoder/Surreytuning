@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductPaymentType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -29,5 +30,10 @@ class Product extends Model
             'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(ProductOrder::class);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NoticePriority;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,6 +24,7 @@ class Noticeboard extends Model
     protected function casts(): array
     {
         return [
+            'priority' => NoticePriority::class,
             'show_from' => 'date',
             'show_until' => 'date',
             'is_active' => 'boolean',

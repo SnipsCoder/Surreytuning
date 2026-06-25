@@ -2,39 +2,51 @@
 
 namespace App\Http\Controllers\Owner;
 
+use App\Enums\FileRequestStatus;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreFileStageRequest;
+use App\Models\FileStage;
+use Illuminate\Http\RedirectResponse;
 
 class FileStageController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        return response("FileStageController@index placeholder");
+        return view('owner.file-stages.index', [
+            'fileStages' => FileStage::orderBy('sort_order')->orderBy('name')->get(),
+        ]);
     }
 
-    public function create(Request $request)
+    public function store(StoreFileStageRequest $request): RedirectResponse
     {
-        return response("FileStageController@create placeholder");
+        FileStage::create($request->validated());
+
+        return back()->with('success', 'File stage created.');
     }
 
-    public function store(Request $request)
+    public function update(StoreFileStageRequest $request, FileStage $fileStage): RedirectResponse
     {
-        return back();
+        $fileStage->update($request->validated());
+
+        return back()->with('success', 'File stage updated.');
     }
 
-    public function edit(Request $request)
+    public function destroy(FileStage $fileStage): RedirectResponse
     {
-        return response("FileStageController@edit placeholder");
-    }
+        $activeJobs = $fileStage->fileRequests()
+            ->whereNotIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void])
+            ->exists();
 
-    public function update(Request $request)
-    {
-        return back();
-    }
+        if ($activeJobs) {
+            return back()->with('error', 'Cannot delete this file stage: it has active file requests.');
+        }
 
-    public function destroy(Request $request)
-    {
-        return back();
-    }
+        if ($fileStage->fileOptions()->exists()) {
+            return back()->with('error', 'Cannot delete this file stage: it has file options attached.');
+        }
 
+        $fileStage->delete();
+
+        return back()->with('success', 'File stage deleted.');
+    }
 }

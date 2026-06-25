@@ -24,7 +24,7 @@
                 <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                     @php
                         $ownerNavLinks = [
-                            ['label' => 'Dashboard', 'route' => 'dashboard'],
+                            ['label' => 'Dashboard', 'route' => 'owner.dashboard'],
                             ['label' => 'File Requests', 'route' => 'file-requests.index'],
                             ['label' => 'File Archive', 'route' => 'owner.file-requests.archive'],
                             ['label' => 'Dealers', 'route' => 'dealers.index'],
@@ -35,12 +35,13 @@
                             ['label' => 'File Options', 'route' => 'file-options.index'],
                             ['label' => 'Tools', 'route' => 'tools.index'],
                             ['label' => 'Portal Users', 'route' => 'portal-users.index'],
-                            ['label' => 'Noticeboard', 'route' => 'noticeboard.index'],
+                            ['label' => 'Noticeboard', 'route' => 'noticeboards.index'],
+                            ['label' => 'Products', 'route' => 'products.index'],
                             ['label' => 'Vehicle Stats', 'route' => 'vehicle-stats.index'],
-                            ['label' => 'Bosch ECU', 'route' => 'bosch-ecu.index'],
-                            ['label' => 'DTC Search', 'route' => 'dtc-search.index'],
+                            ['label' => 'Bosch ECU', 'route' => 'owner.bosch-ecu.index'],
+                            ['label' => 'DTC Search', 'route' => 'owner.dtc-search.index'],
                             ["label" => "What's New", 'route' => 'whats-new.index'],
-                            ['label' => 'Settings', 'route' => 'settings.index'],
+                            ['label' => 'Settings', 'route' => 'owner.settings.index'],
                         ];
                     @endphp
 
@@ -59,12 +60,27 @@
             <div class="flex-1 flex flex-col min-w-0">
                 <!-- Header -->
                 <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3" x-data="{ open: false }">
                         @php
-                            $portalStatus = \App\Models\PortalStatus::find(1);
+                            $portalStatus = \Illuminate\Support\Facades\Cache::remember('portal_status', 300, fn () => \App\Models\PortalStatus::current());
                         @endphp
                         @if ($portalStatus)
-                            <x-status-badge :status="$portalStatus->status->label()" :colour="$portalStatus->status->colour()" />
+                            <div class="relative">
+                                <button type="button" x-on:click="open = !open" x-on:click.outside="open = false">
+                                    <x-status-badge :status="$portalStatus->status->label()" :colour="$portalStatus->status->colour()" />
+                                </button>
+                                <div x-show="open" x-cloak class="absolute z-10 mt-2 w-44 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                                    @foreach (\App\Enums\PortalStatusEnum::cases() as $case)
+                                        <form method="POST" action="{{ route('owner.portal-status.update') }}">
+                                            @csrf
+                                            <input type="hidden" name="status" value="{{ $case->value }}">
+                                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                {{ $case->label() }}
+                                            </button>
+                                        </form>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endif
                     </div>
 

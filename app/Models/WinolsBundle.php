@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WinolsBundle extends Model
 {
@@ -19,5 +20,10 @@ class WinolsBundle extends Model
             'price_net' => 'decimal:2',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function creditTransactions(): HasMany
+    {
+        return $this->hasMany(EvcCreditTransaction::class);
     }
 }

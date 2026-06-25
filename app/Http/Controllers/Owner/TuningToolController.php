@@ -3,38 +3,42 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreTuningToolRequest;
+use App\Models\TuningTool;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class TuningToolController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        return response("TuningToolController@index placeholder");
+        $tuningTools = TuningTool::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('owner.tools.index', compact('tuningTools'));
     }
 
-    public function create(Request $request)
+    public function store(StoreTuningToolRequest $request): RedirectResponse
     {
-        return response("TuningToolController@create placeholder");
+        TuningTool::create($request->validated());
+
+        return back()->with('success', 'Tool created.');
     }
 
-    public function store(Request $request)
+    public function update(StoreTuningToolRequest $request, TuningTool $tool): RedirectResponse
     {
-        return back();
+        $tool->update($request->validated());
+
+        return back()->with('success', 'Tool updated.');
     }
 
-    public function edit(Request $request)
+    public function destroy(TuningTool $tool): RedirectResponse
     {
-        return response("TuningToolController@edit placeholder");
-    }
+        if ($tool->fileRequests()->exists()) {
+            return back()->with('error', 'Cannot delete a tool that has file requests.');
+        }
 
-    public function update(Request $request)
-    {
-        return back();
-    }
+        $tool->delete();
 
-    public function destroy(Request $request)
-    {
-        return back();
+        return back()->with('success', 'Tool deleted.');
     }
-
 }

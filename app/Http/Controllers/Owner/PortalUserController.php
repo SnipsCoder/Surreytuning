@@ -2,39 +2,44 @@
 
 namespace App\Http\Controllers\Owner;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\InvitePortalUserRequest;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class PortalUserController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        return response("PortalUserController@index placeholder");
+        $portalUsers = User::ownerTeam()->orderByDesc('created_at')->get();
+
+        return view('owner.portal-users.index', compact('portalUsers'));
     }
 
-    public function create(Request $request)
+    public function store(InvitePortalUserRequest $request): RedirectResponse
     {
-        return response("PortalUserController@create placeholder");
+        $user = User::create([
+            'first_name' => $request->validated('first_name'),
+            'last_name' => $request->validated('last_name'),
+            'email' => $request->validated('email'),
+            'password' => Str::password(32),
+            'role' => UserRole::Owner,
+            'status' => 'active',
+        ]);
+
+        Password::sendResetLink(['email' => $user->email]);
+
+        return back()->with('success', 'Invitation sent.');
     }
 
-    public function store(Request $request)
+    public function destroy(User $portalUser): RedirectResponse
     {
-        return back();
-    }
+        $portalUser->update(['status' => 'inactive']);
 
-    public function edit(Request $request)
-    {
-        return response("PortalUserController@edit placeholder");
+        return back()->with('success', 'User deactivated.');
     }
-
-    public function update(Request $request)
-    {
-        return back();
-    }
-
-    public function destroy(Request $request)
-    {
-        return back();
-    }
-
 }

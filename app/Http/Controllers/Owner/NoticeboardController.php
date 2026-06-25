@@ -3,38 +3,41 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreNoticeboardRequest;
+use App\Models\Noticeboard;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class NoticeboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        return response("NoticeboardController@index placeholder");
+        $noticeboards = Noticeboard::orderByDesc('created_at')->get();
+
+        return view('owner.noticeboards.index', compact('noticeboards'));
     }
 
-    public function create(Request $request)
+    public function store(StoreNoticeboardRequest $request): RedirectResponse
     {
-        return response("NoticeboardController@create placeholder");
+        $data = $request->validated();
+        $data['created_by_user_id'] = auth()->id();
+
+        Noticeboard::create($data);
+
+        return back()->with('success', 'Notice created.');
     }
 
-    public function store(Request $request)
+    public function update(StoreNoticeboardRequest $request, Noticeboard $noticeboard): RedirectResponse
     {
-        return back();
+        $noticeboard->update($request->validated());
+
+        return back()->with('success', 'Notice updated.');
     }
 
-    public function edit(Request $request)
+    public function destroy(Noticeboard $noticeboard): RedirectResponse
     {
-        return response("NoticeboardController@edit placeholder");
-    }
+        $noticeboard->delete();
 
-    public function update(Request $request)
-    {
-        return back();
+        return back()->with('success', 'Notice deleted.');
     }
-
-    public function destroy(Request $request)
-    {
-        return back();
-    }
-
 }

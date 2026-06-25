@@ -3,38 +3,64 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreProductRequest;
+use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(): View
     {
-        return response("ProductController@index placeholder");
+        $products = Product::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('owner.products.index', compact('products'));
     }
 
-    public function create(Request $request)
+    public function store(StoreProductRequest $request): RedirectResponse
     {
-        return response("ProductController@create placeholder");
+        $data = $request->validated();
+        unset($data['image']);
+
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
+
+        return back()->with('success', 'Product created.');
     }
 
-    public function store(Request $request)
+    public function update(StoreProductRequest $request, Product $product): RedirectResponse
     {
-        return back();
+        $data = $request->validated();
+        unset($data['image']);
+
+        if ($request->hasFile('image')) {
+            if ($product->image_path) {
+                Storage::disk('public')->delete($product->image_path);
+            }
+            $data['image_path'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return back()->with('success', 'Product updated.');
     }
 
-    public function edit(Request $request)
+    public function destroy(Product $product): RedirectResponse
     {
-        return response("ProductController@edit placeholder");
-    }
+        if ($product->orders()->exists()) {
+            return back()->with('error', 'Cannot delete a product that has orders.');
+        }
 
-    public function update(Request $request)
-    {
-        return back();
-    }
+        if ($product->image_path) {
+            Storage::disk('public')->delete($product->image_path);
+        }
 
-    public function destroy(Request $request)
-    {
-        return back();
-    }
+        $product->delete();
 
+        return back()->with('success', 'Product deleted.');
+    }
 }

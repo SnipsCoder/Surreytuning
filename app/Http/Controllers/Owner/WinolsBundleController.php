@@ -3,38 +3,41 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Owner\StoreWinolsBundleRequest;
+use App\Models\WinolsBundle;
+use Illuminate\Http\RedirectResponse;
 
 class WinolsBundleController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        return response("WinolsBundleController@index placeholder");
+        return view('owner.winols-bundles.index', [
+            'winolsBundles' => WinolsBundle::orderBy('credits')->get(),
+        ]);
     }
 
-    public function create(Request $request)
+    public function store(StoreWinolsBundleRequest $request): RedirectResponse
     {
-        return response("WinolsBundleController@create placeholder");
+        WinolsBundle::create($request->validated());
+
+        return back()->with('success', 'WinOLS bundle created.');
     }
 
-    public function store(Request $request)
+    public function update(StoreWinolsBundleRequest $request, WinolsBundle $winolsBundle): RedirectResponse
     {
-        return back();
+        $winolsBundle->update($request->validated());
+
+        return back()->with('success', 'WinOLS bundle updated.');
     }
 
-    public function edit(Request $request)
+    public function destroy(WinolsBundle $winolsBundle): RedirectResponse
     {
-        return response("WinolsBundleController@edit placeholder");
-    }
+        if ($winolsBundle->creditTransactions()->exists()) {
+            return back()->with('error', 'Cannot delete this bundle: it has been purchased before.');
+        }
 
-    public function update(Request $request)
-    {
-        return back();
-    }
+        $winolsBundle->delete();
 
-    public function destroy(Request $request)
-    {
-        return back();
+        return back()->with('success', 'WinOLS bundle deleted.');
     }
-
 }

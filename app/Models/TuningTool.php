@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\TuningToolCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TuningTool extends Model
 {
@@ -16,7 +18,13 @@ class TuningTool extends Model
     protected function casts(): array
     {
         return [
+            'category' => TuningToolCategory::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    public function fileRequests(): HasMany
+    {
+        return $this->hasMany(FileRequest::class);
     }
 }
