@@ -98,6 +98,7 @@
                         <select id="fuel" name="fuel" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Select...</option>
                             @foreach (\App\Enums\FuelType::cases() as $fuel)
+                                @continue(in_array($fuel, [\App\Enums\FuelType::Electric, \App\Enums\FuelType::Hybrid]))
                                 <option value="{{ $fuel->value }}" @selected(old('fuel') === $fuel->value)>{{ $fuel->label() }}</option>
                             @endforeach
                         </select>
@@ -126,6 +127,7 @@
                     <select id="file_type" name="file_type" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                         <option value="ecu" @selected(old('file_type', 'ecu') === 'ecu')>ECU</option>
                         <option value="tcu" @selected(old('file_type') === 'tcu')>TCU</option>
+                        <option value="adblue" @selected(old('file_type') === 'adblue')>AdBlue</option>
                         <option value="other" @selected(old('file_type') === 'other')>Other</option>
                     </select>
                     <x-input-error :messages="$errors->get('file_type')" class="mt-1" />

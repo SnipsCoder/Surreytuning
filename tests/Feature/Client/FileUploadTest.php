@@ -94,4 +94,71 @@ class FileUploadTest extends TestCase
         $this->assertEquals(350.5, $fileRequest->torque_before_nm);
         $this->assertSame('EDC17C46', $fileRequest->ecu_model_no);
     }
+
+    public function test_upload_create_excludes_electric_and_hybrid_fuel_options(): void
+    {
+        $user = $this->clientUser();
+
+        $response = $this->actingAs($user)->get('/my/upload');
+
+        $response->assertOk();
+        $response->assertSee('value="petrol"', false);
+        $response->assertSee('value="diesel"', false);
+        $response->assertDontSee('value="electric"', false);
+        $response->assertDontSee('value="hybrid"', false);
+    }
+
+    public function test_upload_store_rejects_electric_fuel_type(): void
+    {
+        Storage::fake('r2');
+
+        $dealer = Dealer::factory()->create();
+        $user = $this->clientUser($dealer);
+        $stage = $this->fileStage();
+        $tool = $this->tuningTool();
+
+        $response = $this->actingAs($user)->post('/my/upload', [
+            'make' => 'Tesla',
+            'model' => 'Model 3',
+            'year' => 2020,
+            'engine' => 'Electric',
+            'fuel' => 'electric',
+            'transmission' => 'automatic',
+            'file_stage_id' => $stage->id,
+            'tool_id' => $tool->id,
+            'file' => UploadedFile::fake()->create('tune.bin', 100),
+            'file_type' => 'ecu',
+        ]);
+
+        $response->assertSessionHasErrors('fuel');
+    }
+
+    public function test_upload_store_persists_adblue_file_type(): void
+    {
+        Storage::fake('r2');
+
+        $dealer = Dealer::factory()->create();
+        $user = $this->clientUser($dealer);
+        $stage = $this->fileStage();
+        $tool = $this->tuningTool();
+
+        $response = $this->actingAs($user)->post('/my/upload', [
+            'make' => 'BMW',
+            'model' => '320d',
+            'year' => 2020,
+            'engine' => '2.0d',
+            'fuel' => 'diesel',
+            'transmission' => 'automatic',
+            'file_stage_id' => $stage->id,
+            'tool_id' => $tool->id,
+            'file' => UploadedFile::fake()->create('tune.bin', 100),
+            'file_type' => 'adblue',
+        ]);
+
+        $fileRequest = FileRequest::where('dealer_id', $dealer->id)->latest('id')->first();
+
+        $this->assertNotNull($fileRequest);
+        $response->assertRedirect(route('client.file-requests.show', $fileRequest));
+        $this->assertSame('adblue', $fileRequest->file_type->value ?? $fileRequest->file_type);
+    }
 }
