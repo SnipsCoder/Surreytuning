@@ -49,21 +49,21 @@
             <div x-show="step === 1" x-cloak class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <x-input-label for="make" value="Make" />
-                        <x-text-input id="make" name="make" type="text" class="mt-1 block w-full" :value="old('make')" required />
+                        <x-input-label for="make" value="Make *" />
+                        <x-text-input id="make" name="make" type="text" class="mt-1 block w-full" :value="old('make')" x-bind:required="step === 1" />
                         <x-input-error :messages="$errors->get('make')" class="mt-1" />
                     </div>
                     <div>
-                        <x-input-label for="model" value="Model" />
-                        <x-text-input id="model" name="model" type="text" class="mt-1 block w-full" :value="old('model')" required />
+                        <x-input-label for="model" value="Model *" />
+                        <x-text-input id="model" name="model" type="text" class="mt-1 block w-full" :value="old('model')" x-bind:required="step === 1" />
                         <x-input-error :messages="$errors->get('model')" class="mt-1" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <x-input-label for="year" value="Year" />
-                        <x-text-input id="year" name="year" type="number" min="1990" max="2030" class="mt-1 block w-full" :value="old('year')" required />
+                        <x-input-label for="year" value="Year *" />
+                        <x-text-input id="year" name="year" type="number" min="1990" max="2030" class="mt-1 block w-full" :value="old('year')" x-bind:required="step === 1" />
                         <x-input-error :messages="$errors->get('year')" class="mt-1" />
                     </div>
                     <div>
@@ -81,8 +81,8 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <x-input-label for="engine" value="Engine" />
-                        <x-text-input id="engine" name="engine" type="text" class="mt-1 block w-full" :value="old('engine')" required />
+                        <x-input-label for="engine" value="Engine *" />
+                        <x-text-input id="engine" name="engine" type="text" class="mt-1 block w-full" :value="old('engine')" x-bind:required="step === 1" />
                         <x-input-error :messages="$errors->get('engine')" class="mt-1" />
                     </div>
                     <div>
@@ -94,8 +94,8 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <x-input-label for="fuel" value="Fuel Type" />
-                        <select id="fuel" name="fuel" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <x-input-label for="fuel" value="Fuel Type *" />
+                        <select id="fuel" name="fuel" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Select...</option>
                             @foreach (\App\Enums\FuelType::cases() as $fuel)
                                 @continue(in_array($fuel, [\App\Enums\FuelType::Electric, \App\Enums\FuelType::Hybrid]))
@@ -105,8 +105,8 @@
                         <x-input-error :messages="$errors->get('fuel')" class="mt-1" />
                     </div>
                     <div>
-                        <x-input-label for="transmission" value="Transmission" />
-                        <select id="transmission" name="transmission" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <x-input-label for="transmission" value="Transmission *" />
+                        <select id="transmission" name="transmission" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Select...</option>
                             @foreach (\App\Enums\TransmissionType::cases() as $transmission)
                                 <option value="{{ $transmission->value }}" @selected(old('transmission') === $transmission->value)>{{ $transmission->label() }}</option>
@@ -123,12 +123,11 @@
                 </div>
 
                 <div>
-                    <x-input-label for="file_type" value="File Type" />
-                    <select id="file_type" name="file_type" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <x-input-label for="file_type" value="File Type *" />
+                    <select id="file_type" name="file_type" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                         <option value="ecu" @selected(old('file_type', 'ecu') === 'ecu')>ECU</option>
                         <option value="tcu" @selected(old('file_type') === 'tcu')>TCU</option>
                         <option value="adblue" @selected(old('file_type') === 'adblue')>AdBlue</option>
-                        <option value="other" @selected(old('file_type') === 'other')>Other</option>
                     </select>
                     <x-input-error :messages="$errors->get('file_type')" class="mt-1" />
                 </div>
@@ -156,8 +155,8 @@
             {{-- STEP 2: SERVICE SELECTION --}}
             <div x-show="step === 2" x-cloak class="space-y-6">
                 <div>
-                    <x-input-label for="file_stage_id" value="File Stage" />
-                    <select id="file_stage_id" name="file_stage_id" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <x-input-label for="file_stage_id" value="File Stage *" />
+                    <select id="file_stage_id" name="file_stage_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                         <option value="">Select...</option>
                         @foreach ($fileStages as $stage)
                             <option value="{{ $stage->id }}" @selected(old('file_stage_id') == $stage->id)>{{ $stage->name }}</option>
@@ -167,8 +166,8 @@
                 </div>
 
                 <div>
-                    <x-input-label for="tool_id" value="Tuning Tool" />
-                    <select id="tool_id" name="tool_id" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <x-input-label for="tool_id" value="Tuning Tool *" />
+                    <select id="tool_id" name="tool_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
                         <option value="">Select...</option>
                         @foreach ($tools as $tool)
                             <option value="{{ $tool->id }}" @selected(old('tool_id') == $tool->id)>{{ $tool->name }}</option>
@@ -223,19 +222,32 @@
             </div>
 
             {{-- STEP 3: FILE UPLOAD --}}
-            <div x-show="step === 3" x-cloak class="space-y-4">
+            <div x-show="step === 3" x-cloak class="space-y-4" x-data="{ dragging: false }">
                 <div>
-                    <x-input-label for="file" value="Tune File" />
-                    <input
-                        id="file"
-                        name="file"
-                        type="file"
-                        accept=".bin,.hex,.ori,.mod,.kp,.frf,.ols"
-                        x-on:change="fileName = $event.target.files.length ? $event.target.files[0].name : ''"
-                        required
-                        class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:uppercase file:bg-orange-50 file:text-orange-700 dark:file:bg-orange-900/30 dark:file:text-orange-300 hover:file:bg-orange-100"
+                    <x-input-label for="file" value="Tune File *" />
+                    <div
+                        x-on:dragover.prevent="dragging = true"
+                        x-on:dragleave.prevent="dragging = false"
+                        x-on:drop.prevent="dragging = false; if ($event.dataTransfer.files.length) { $refs.fileInput.files = $event.dataTransfer.files; fileName = $event.dataTransfer.files[0].name; }"
+                        x-on:click="$refs.fileInput.click()"
+                        :class="dragging ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-gray-300 dark:border-gray-600'"
+                        class="mt-1 flex flex-col items-center justify-center w-full rounded-md border-2 border-dashed px-6 py-8 text-center cursor-pointer transition-colors"
                     >
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Accepted: .bin .hex .ori .mod .kp .frf .ols &mdash; max 50MB</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-semibold text-orange-700 dark:text-orange-300">Click to choose a file</span> or drag and drop it here
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="fileName ? 'Selected: ' + fileName : 'No file chosen'"></p>
+                        <input
+                            id="file"
+                            name="file"
+                            type="file"
+                            x-ref="fileInput"
+                            x-on:change="fileName = $event.target.files.length ? $event.target.files[0].name : ''"
+                            required
+                            class="hidden"
+                        >
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Any binary tune file accepted &mdash; max 50MB</p>
                     <x-input-error :messages="$errors->get('file')" class="mt-1" />
                 </div>
 

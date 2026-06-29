@@ -45,7 +45,8 @@ The architecture was updated during Phase 1 to support **multi-tenancy via Stanc
 - **Phase 3** ✅ Complete (core services: CreditService, InvoiceService, FileStorageService, StripeService)
 - **Phase 4** ✅ Complete (owner file requests, dealer management, kanban/list views)
 - **Phase 5** ✅ Complete (commit: b7f7ba2 — owner configuration, settings, all CRUD pages)
-- **Phase 6–10** ⏳ Pending
+- **Phase 6** ✅ Complete (browser tested — file upload, messaging, kanban/list views, cross-dealer security confirmed)
+- **Phase 7–10** ⏳ Pending
 
 ---
 

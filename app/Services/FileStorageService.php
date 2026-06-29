@@ -46,19 +46,8 @@ class FileStorageService
         return ['application/octet-stream', 'application/x-binary', 'text/plain'];
     }
 
-    public function getAllowedExtensions(): array
-    {
-        return ['bin', 'hex', 'ori', 'mod', 'kp', 'frf', 'ols'];
-    }
-
     public function validateFile(UploadedFile $file): void
     {
-        $extension = strtolower($file->getClientOriginalExtension());
-
-        if (! in_array($extension, $this->getAllowedExtensions(), true)) {
-            throw new InvalidArgumentException("File extension '{$extension}' is not allowed.");
-        }
-
         if ($file->getSize() > 52428800) {
             throw new InvalidArgumentException('File exceeds the maximum allowed size of 50MB.');
         }
