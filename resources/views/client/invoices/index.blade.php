@@ -1,9 +1,22 @@
 <x-layouts.client>
     <x-page-header title="Invoices" subtitle="View and pay your invoices" />
 
+    <div class="flex gap-2 mb-5">
+        <a href="{{ route('client.invoices.index') }}"
+           class="px-3 py-1.5 rounded text-sm font-medium {{ ! $currentStatus ? 'bg-orange-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700' }}">
+            All
+        </a>
+        @foreach (['issued' => 'Issued', 'paid' => 'Paid', 'void' => 'Void'] as $value => $label)
+            <a href="{{ route('client.invoices.index', ['status' => $value]) }}"
+               class="px-3 py-1.5 rounded text-sm font-medium {{ $currentStatus === $value ? 'bg-orange-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700' }}">
+                {{ $label }}
+            </a>
+        @endforeach
+    </div>
+
     @if ($invoices->isEmpty())
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-sm text-gray-500 dark:text-gray-400">
-            You have no invoices yet.
+            No invoices found.
         </div>
     @else
         <x-data-table :headers="['Invoice #', 'Description', 'Amount', 'Status', 'Date', '']">

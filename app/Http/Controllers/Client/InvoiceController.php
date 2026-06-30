@@ -16,10 +16,19 @@ class InvoiceController extends Controller
 
     public function index(Request $request)
     {
-        $invoices = $request->user()->dealer->invoices()->latest()->paginate(15);
+        $status = $request->query('status');
+
+        $query = $request->user()->dealer->invoices()->latest();
+
+        if (in_array($status, ['issued', 'paid', 'void'], true)) {
+            $query->where('status', $status);
+        }
+
+        $invoices = $query->paginate(15)->withQueryString();
 
         return view('client.invoices.index', [
             'invoices' => $invoices,
+            'currentStatus' => $status,
         ]);
     }
 
@@ -49,7 +58,7 @@ class InvoiceController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success'),
+            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'invoice',

@@ -26,6 +26,11 @@ class StripeService
         ]);
     }
 
+    public function retrieveCheckoutSession(string $sessionId): Session
+    {
+        return Session::retrieve($sessionId);
+    }
+
     public function constructWebhookEvent(string $payload, string $sigHeader): Event
     {
         return Webhook::constructEvent($payload, $sigHeader, config('services.stripe.webhook_secret'));

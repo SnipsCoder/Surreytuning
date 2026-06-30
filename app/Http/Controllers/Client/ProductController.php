@@ -85,6 +85,18 @@ class ProductController extends Controller
             return redirect()->route('client.products.index')->with('success', 'Product purchased using slave credits.');
         }
 
+        $order = ProductOrder::create([
+            'dealer_id' => $dealer->id,
+            'user_id' => $request->user()->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'unit_price_net' => $product->price_net,
+            'vat_amount' => $vatAmount,
+            'total_gross' => $totalGross,
+            'payment_method' => 'stripe',
+            'status' => 'pending',
+        ]);
+
         $session = $this->stripeService->createCheckoutSession(
             [[
                 'price_data' => [
@@ -94,16 +106,13 @@ class ProductController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success'),
+            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'product',
                 'dealer_id' => $dealer->id,
                 'user_id' => $request->user()->id,
-                'product_id' => $product->id,
-                'unit_price_net' => $product->price_net,
-                'vat_amount' => $vatAmount,
-                'total_gross' => $totalGross,
+                'product_order_id' => $order->id,
             ]
         );
 

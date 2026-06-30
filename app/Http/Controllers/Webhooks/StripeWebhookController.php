@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Enums\InvoiceType;
+use App\Events\PaymentConfirmed;
 use App\Http\Controllers\Controller;
 use App\Models\Dealer;
 use App\Models\Invoice;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use UnexpectedValueException;
 use Stripe\Exception\SignatureVerificationException;
+use Throwable;
 
 class StripeWebhookController extends Controller
 {
@@ -40,18 +42,32 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
-        if ($event->type === 'checkout.session.completed') {
-            $session = $event->data->object;
-            $metadata = $session->metadata;
-            $paymentIntentId = $session->payment_intent;
+        try {
+            if ($event->type === 'checkout.session.completed') {
+                $session = $event->data->object;
+                $metadata = $session->metadata;
+                $paymentIntentId = $session->payment_intent;
 
-            match ($metadata->type ?? null) {
-                'slave_credits' => $this->handleSlaveCredits($metadata, $paymentIntentId),
-                'evc_bundle' => $this->handleEvcBundle($metadata, $paymentIntentId),
-                'product' => $this->handleProduct($metadata, $paymentIntentId),
-                'invoice' => $this->handleInvoice($metadata, $paymentIntentId),
-                default => Log::warning('Stripe webhook: unrecognised metadata type', ['metadata' => (array) $metadata]),
-            };
+                match ($metadata->type ?? null) {
+                    'slave_credits' => $this->handleSlaveCredits($metadata, $paymentIntentId),
+                    'evc_bundle' => $this->handleEvcBundle($metadata, $paymentIntentId),
+                    'product' => $this->handleProduct($metadata, $paymentIntentId),
+                    'invoice' => $this->handleInvoice($metadata, $paymentIntentId),
+                    default => Log::warning('Stripe webhook: unrecognised metadata type', ['metadata' => (array) $metadata]),
+                };
+            } elseif ($event->type === 'payment_intent.payment_failed') {
+                $paymentIntent = $event->data->object;
+                Log::error('Stripe payment failed', [
+                    'payment_intent_id' => $paymentIntent->id,
+                    'last_error' => $paymentIntent->last_payment_error?->message,
+                ]);
+            }
+        } catch (Throwable $e) {
+            Log::error('Stripe webhook handler threw an exception', [
+                'event_type' => $event->type,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         return response('Webhook handled', 200);
@@ -61,24 +77,31 @@ class StripeWebhookController extends Controller
     {
         $dealer = Dealer::findOrFail($metadata->dealer_id);
         $user = User::findOrFail($metadata->user_id);
-        $amount = (float) $metadata->amount;
+        $product = Product::findOrFail($metadata->product_id);
+        $amount = (float) $product->price_net;
 
         $this->creditService->addSlaveCredits(
             $dealer,
             $amount,
-            'Stripe slave credit top-up',
+            "Slave credit top-up: {$product->name}",
             $user,
         );
 
         $invoice = $this->invoiceService->createInvoice(
             $dealer,
-            'Slave credit top-up',
+            "Slave credit top-up: {$product->name}",
             $amount,
             InvoiceType::CreditTopUp,
             $user,
         );
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
+
+        PaymentConfirmed::dispatch('slave_credits', $paymentIntentId, [
+            'dealer_id' => $dealer->id,
+            'product_id' => $product->id,
+            'amount' => $amount,
+        ]);
     }
 
     private function handleEvcBundle(object $metadata, ?string $paymentIntentId): void
@@ -106,31 +129,29 @@ class StripeWebhookController extends Controller
         );
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
+
+        PaymentConfirmed::dispatch('evc_bundle', $paymentIntentId, [
+            'dealer_id' => $dealer->id,
+            'bundle_id' => $bundle->id,
+        ]);
     }
 
     private function handleProduct(object $metadata, ?string $paymentIntentId): void
     {
-        $dealer = Dealer::findOrFail($metadata->dealer_id);
-        $user = User::findOrFail($metadata->user_id);
-        $product = Product::findOrFail($metadata->product_id);
-
-        $order = ProductOrder::create([
-            'dealer_id' => $dealer->id,
-            'user_id' => $user->id,
-            'product_id' => $product->id,
-            'quantity' => 1,
-            'unit_price_net' => (float) $metadata->unit_price_net,
-            'vat_amount' => (float) $metadata->vat_amount,
-            'total_gross' => (float) $metadata->total_gross,
-            'payment_method' => 'stripe',
-            'stripe_payment_intent_id' => $paymentIntentId,
+        $order = ProductOrder::findOrFail($metadata->product_order_id);
+        $order->update([
             'status' => 'paid',
+            'stripe_payment_intent_id' => $paymentIntentId,
         ]);
+
+        $dealer = Dealer::findOrFail($order->dealer_id);
+        $user = User::findOrFail($order->user_id);
+        $product = $order->product;
 
         $invoice = $this->invoiceService->createInvoice(
             $dealer,
             "Product purchase: {$product->name}",
-            (float) $metadata->unit_price_net,
+            (float) $order->unit_price_net,
             InvoiceType::Product,
             $user,
             $order->id,
@@ -138,6 +159,10 @@ class StripeWebhookController extends Controller
         );
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
+
+        PaymentConfirmed::dispatch('product', $paymentIntentId, [
+            'product_order_id' => $order->id,
+        ]);
     }
 
     private function handleInvoice(object $metadata, ?string $paymentIntentId): void
@@ -145,5 +170,9 @@ class StripeWebhookController extends Controller
         $invoice = Invoice::findOrFail($metadata->invoice_id);
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
+
+        PaymentConfirmed::dispatch('invoice', $paymentIntentId, [
+            'invoice_id' => $invoice->id,
+        ]);
     }
 }

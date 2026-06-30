@@ -48,7 +48,7 @@ class EvcCreditController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success'),
+            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'evc_bundle',
