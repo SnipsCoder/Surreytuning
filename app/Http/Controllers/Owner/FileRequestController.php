@@ -73,6 +73,7 @@ class FileRequestController extends Controller
             'messages.sender',
             'attachments.uploader',
             'fileRequestOptions.fileOption',
+            'dtcCodes',
         ]);
 
         $stages = FileStage::orderBy('sort_order')->get();

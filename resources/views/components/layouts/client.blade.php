@@ -11,14 +11,21 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        @php $settings = \App\Models\Setting::get(); @endphp
+        <style>:root { --brand-colour: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen flex bg-gray-50 dark:bg-gray-900">
             <!-- Sidebar -->
             <aside class="hidden lg:flex lg:flex-col flex-shrink-0" style="width: 256px; background-color: #334155;">
                 <div class="flex items-center h-16 px-6 border-b border-white/10">
-                    <x-application-logo class="w-8 h-8 fill-current text-white" />
-                    <span class="ms-3 text-white font-semibold">Surrey Tuning</span>
+                    @if ($settings->logo_dark)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[140px] object-contain">
+                    @else
+                        <x-application-logo class="w-8 h-8 fill-current text-white" />
+                        <span class="ms-3 text-white font-semibold">Surrey Tuning</span>
+                    @endif
                 </div>
 
                 <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
@@ -89,6 +96,21 @@
                         </form>
                     </div>
                 </header>
+
+                @php
+                    $portalStatus = \App\Models\PortalStatus::find(1);
+                    $portalStatusBannerClasses = match($portalStatus?->status?->value ?? 'available') {
+                        'busy', 'delayed'     => 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300',
+                        'closed'              => 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300',
+                        'support_only', 'files_only' => 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300',
+                        default               => null,
+                    };
+                @endphp
+                @if ($portalStatusBannerClasses && $portalStatus?->status?->value !== 'available')
+                    <div class="border-b px-6 py-3 text-sm font-medium {{ $portalStatusBannerClasses }}">
+                        The portal is currently {{ $portalStatus->status->label() }}. Some services may be limited.
+                    </div>
+                @endif
 
                 <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
                     <x-flash-messages />

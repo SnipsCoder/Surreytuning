@@ -38,7 +38,7 @@ Route::middleware([
 
     // Public dealer registration
     Route::get('/apply', [DealerApplicationController::class, 'create'])->name('apply.create');
-    Route::post('/apply', [DealerApplicationController::class, 'store'])->name('apply.store');
+    Route::post('/apply', [DealerApplicationController::class, 'store'])->name('apply.store')->middleware('throttle:3,60');
     Route::get('/apply/received', fn () => view('auth.application-received'))->name('apply.received');
 
     // Owner/admin portal (no prefix)

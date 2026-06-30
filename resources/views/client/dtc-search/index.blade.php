@@ -62,7 +62,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Code</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Severity</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Severity</th>
                         <th class="px-3 py-3"></th>
                     </tr>
                 </thead>
@@ -92,7 +92,7 @@
                             @click="expanded = expanded === index ? null : index">
                             <td class="px-6 py-4 text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 align-top" x-text="item.code"></td>
                             <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 align-top" x-text="item.description"></td>
-                            <td class="px-6 py-4 align-top">
+                            <td class="px-6 py-4 align-top text-right">
                                 <span x-show="item.severity_estimate"
                                     :class="severityClass(item.severity_estimate)"
                                     class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap"

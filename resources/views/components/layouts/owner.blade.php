@@ -11,14 +11,21 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        @php $settings = \App\Models\Setting::get(); @endphp
+        <style>:root { --brand-colour: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen flex bg-gray-50 dark:bg-gray-900">
             <!-- Sidebar -->
             <aside class="hidden lg:flex lg:flex-col flex-shrink-0" style="width: 256px; background-color: #1e293b;">
                 <div class="flex items-center h-16 px-6 border-b border-white/10">
-                    <x-application-logo class="w-8 h-8 fill-current text-white" />
-                    <span class="ms-3 text-white font-semibold">Surrey Tuning</span>
+                    @if ($settings->logo_dark)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[140px] object-contain">
+                    @else
+                        <x-application-logo class="w-8 h-8 fill-current text-white" />
+                        <span class="ms-3 text-white font-semibold">Surrey Tuning</span>
+                    @endif
                 </div>
 
                 <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
