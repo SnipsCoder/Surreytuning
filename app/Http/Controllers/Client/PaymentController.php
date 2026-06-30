@@ -9,12 +9,11 @@ class PaymentController extends Controller
 {
     public function success(Request $request)
     {
-        return response("PaymentController@success placeholder");
+        return view('client.payment.success');
     }
 
     public function cancel(Request $request)
     {
-        return response("PaymentController@cancel placeholder");
+        return view('client.payment.cancel');
     }
-
 }

@@ -2,24 +2,61 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Enums\InvoiceStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+    public function __construct(private StripeService $stripeService)
+    {
+    }
+
     public function index(Request $request)
     {
-        return response("InvoiceController@index placeholder");
+        $invoices = $request->user()->dealer->invoices()->latest()->paginate(15);
+
+        return view('client.invoices.index', [
+            'invoices' => $invoices,
+        ]);
     }
 
-    public function show(Request $request)
+    public function show(Request $request, Invoice $invoice)
     {
-        return response("InvoiceController@show placeholder");
+        abort_unless($invoice->dealer_id === $request->user()->dealer_id, 403);
+
+        return view('client.invoices.show', [
+            'invoice' => $invoice,
+        ]);
     }
 
-    public function pay(Request $request)
+    public function pay(Request $request, Invoice $invoice)
     {
-        return back();
-    }
+        abort_unless($invoice->dealer_id === $request->user()->dealer_id, 403);
 
+        if ($invoice->status !== InvoiceStatus::Issued) {
+            return back()->with('error', 'This invoice cannot be paid.');
+        }
+
+        $session = $this->stripeService->createCheckoutSession(
+            [[
+                'price_data' => [
+                    'currency' => 'gbp',
+                    'product_data' => ['name' => "Invoice #{$invoice->invoice_number}"],
+                    'unit_amount' => (int) round($invoice->amount_gross * 100),
+                ],
+                'quantity' => 1,
+            ]],
+            route('client.payment.success'),
+            route('client.payment.cancel'),
+            [
+                'type' => 'invoice',
+                'invoice_id' => $invoice->id,
+            ]
+        );
+
+        return redirect($session->url);
+    }
 }
