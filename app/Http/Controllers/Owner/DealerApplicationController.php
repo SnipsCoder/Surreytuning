@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Owner;
 use App\Enums\ApplicationStatus;
 use App\Enums\DealerStatus;
 use App\Enums\UserRole;
+use App\Events\DealerApplicationApproved;
+use App\Events\DealerApplicationRejected;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\RejectApplicationRequest;
 use App\Models\Dealer;
@@ -42,7 +44,7 @@ class DealerApplicationController extends Controller
 
     public function approve(Request $request, DealerApplication $dealerApplication)
     {
-        DB::transaction(function () use ($request, $dealerApplication) {
+        [$dealer, $user] = DB::transaction(function () use ($request, $dealerApplication) {
             $dealerApplication->update([
                 'status' => ApplicationStatus::Approved,
                 'reviewed_by' => $request->user()->id,
@@ -61,7 +63,7 @@ class DealerApplicationController extends Controller
             $firstName = $nameParts[0];
             $lastName = $nameParts[1] ?? '';
 
-            User::create([
+            $user = User::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $dealerApplication->email,
@@ -71,7 +73,11 @@ class DealerApplicationController extends Controller
                 'email_verified_at' => now(),
                 'password' => bcrypt(Str::random(32)),
             ]);
+
+            return [$dealer, $user];
         });
+
+        DealerApplicationApproved::dispatch($dealerApplication, $dealer, $user);
 
         return redirect()->route('dealer-applications.index')->with('success', 'Application approved. Dealer account created.');
     }
@@ -84,6 +90,8 @@ class DealerApplicationController extends Controller
             'reviewed_at' => now(),
             'rejection_reason' => $request->validated('rejection_reason'),
         ]);
+
+        DealerApplicationRejected::dispatch($dealerApplication);
 
         return back()->with('success', 'Application rejected.');
     }

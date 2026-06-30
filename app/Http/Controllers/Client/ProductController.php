@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Enums\InvoiceType;
 use App\Enums\ProductPaymentType;
 use App\Exceptions\InsufficientCreditsException;
 use App\Http\Controllers\Controller;
@@ -9,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductOrder;
 use App\Models\Setting;
 use App\Services\CreditService;
+use App\Services\InvoiceService;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,6 +19,7 @@ class ProductController extends Controller
 {
     public function __construct(
         private CreditService $creditService,
+        private InvoiceService $invoiceService,
         private StripeService $stripeService,
     ) {
     }
@@ -35,6 +38,10 @@ class ProductController extends Controller
     {
         if (! $product->is_active) {
             abort(404);
+        }
+
+        if (! is_null($product->stock) && $product->stock <= 0) {
+            return back()->with('error', 'This product is out of stock.');
         }
 
         $paymentMethod = $request->validate([
@@ -70,7 +77,7 @@ class ProductController extends Controller
                 return back()->with('error', 'Insufficient slave credit balance for this purchase.');
             }
 
-            ProductOrder::create([
+            $order = ProductOrder::create([
                 'dealer_id' => $dealer->id,
                 'user_id' => $request->user()->id,
                 'product_id' => $product->id,
@@ -81,6 +88,17 @@ class ProductController extends Controller
                 'payment_method' => 'slave_credits',
                 'status' => 'paid',
             ]);
+
+            $invoice = $this->invoiceService->createInvoice(
+                $dealer,
+                "Product purchase: {$product->name}",
+                (float) $product->price_net,
+                InvoiceType::Product,
+                $request->user(),
+                $order->id,
+                ProductOrder::class,
+            );
+            $this->invoiceService->markPaid($invoice);
 
             return redirect()->route('client.products.index')->with('success', 'Product purchased using slave credits.');
         }

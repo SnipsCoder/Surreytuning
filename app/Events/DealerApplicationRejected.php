@@ -2,15 +2,15 @@
 
 namespace App\Events;
 
-use App\Models\FileRequest;
+use App\Models\DealerApplication;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class FileRequestSubmitted
+class DealerApplicationRejected
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public FileRequest $fileRequest)
+    public function __construct(public readonly DealerApplication $application)
     {
     }
 }

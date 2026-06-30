@@ -131,6 +131,7 @@ class FileRequestController extends Controller
         $this->authorize('view', $fileRequest);
 
         $status = FileRequestStatus::from($request->validated('status'));
+        $oldStatus = $fileRequest->status;
 
         $fileRequest->update(['status' => $status]);
 
@@ -142,7 +143,7 @@ class FileRequestController extends Controller
             'is_system' => true,
         ]);
 
-        FileRequestStatusChanged::dispatch($fileRequest);
+        FileRequestStatusChanged::dispatch($fileRequest, $oldStatus);
 
         return back()->with('success', 'Status updated.');
     }

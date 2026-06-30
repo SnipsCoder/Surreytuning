@@ -10,6 +10,11 @@ use InvalidArgumentException;
 
 class FileStorageService
 {
+    private function disk(): \Illuminate\Contracts\Filesystem\Filesystem
+    {
+        return Storage::disk(config('filesystems.file_storage_disk', 'r2'));
+    }
+
     public function storeFile(UploadedFile $file, string $dealerId, string $requestNumber, AttachmentType $type): array
     {
         $this->validateFile($file);
@@ -20,7 +25,7 @@ class FileStorageService
 
         $path = "files/{$dealerId}/{$requestNumber}/{$type->value}/{$sanitisedFilename}";
 
-        Storage::disk('r2')->put($path, file_get_contents($file->getRealPath()));
+        $this->disk()->put($path, file_get_contents($file->getRealPath()));
 
         return [
             'path' => $path,
@@ -33,12 +38,18 @@ class FileStorageService
 
     public function getTemporaryUrl(string $path, int $minutes = 30): string
     {
-        return Storage::disk('r2')->temporaryUrl($path, now()->addMinutes($minutes));
+        $disk = $this->disk();
+
+        if (! $disk->providesTemporaryUrls()) {
+            return $disk->url($path);
+        }
+
+        return $disk->temporaryUrl($path, now()->addMinutes($minutes));
     }
 
     public function deleteFile(string $path): bool
     {
-        return Storage::disk('r2')->delete($path);
+        return $this->disk()->delete($path);
     }
 
     public function getAllowedMimeTypes(): array

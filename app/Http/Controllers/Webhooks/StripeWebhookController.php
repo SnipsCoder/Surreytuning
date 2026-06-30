@@ -97,11 +97,7 @@ class StripeWebhookController extends Controller
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
 
-        PaymentConfirmed::dispatch('slave_credits', $paymentIntentId, [
-            'dealer_id' => $dealer->id,
-            'product_id' => $product->id,
-            'amount' => $amount,
-        ]);
+        PaymentConfirmed::dispatch($invoice, $dealer);
     }
 
     private function handleEvcBundle(object $metadata, ?string $paymentIntentId): void
@@ -130,10 +126,7 @@ class StripeWebhookController extends Controller
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
 
-        PaymentConfirmed::dispatch('evc_bundle', $paymentIntentId, [
-            'dealer_id' => $dealer->id,
-            'bundle_id' => $bundle->id,
-        ]);
+        PaymentConfirmed::dispatch($invoice, $dealer);
     }
 
     private function handleProduct(object $metadata, ?string $paymentIntentId): void
@@ -160,19 +153,17 @@ class StripeWebhookController extends Controller
 
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
 
-        PaymentConfirmed::dispatch('product', $paymentIntentId, [
-            'product_order_id' => $order->id,
-        ]);
+        PaymentConfirmed::dispatch($invoice, $dealer);
     }
 
     private function handleInvoice(object $metadata, ?string $paymentIntentId): void
     {
         $invoice = Invoice::findOrFail($metadata->invoice_id);
 
+        $dealer = $invoice->dealer;
+
         $this->invoiceService->markPaid($invoice, $paymentIntentId);
 
-        PaymentConfirmed::dispatch('invoice', $paymentIntentId, [
-            'invoice_id' => $invoice->id,
-        ]);
+        PaymentConfirmed::dispatch($invoice, $dealer);
     }
 }
