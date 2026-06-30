@@ -4,17 +4,94 @@
     </x-slot>
 
     <!-- Welcome banner -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-white">Welcome back, {{ auth()->user()->first_name }}</h1>
-        <p class="text-slate-400 mt-1 text-sm">Here's what's happening with your account.</p>
+    <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div class="flex-1">
+            <h1 class="text-2xl font-bold text-white">Welcome back, {{ auth()->user()->first_name }}</h1>
+            <p class="text-slate-400 mt-1 text-sm">Here's what's happening with your account today.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Business Status -->
+            <div class="bg-[#1e293b] border border-white/10 rounded-xl px-4 py-2.5 text-sm">
+                <p class="text-slate-500 text-xs font-medium mb-1">Business Status</p>
+                <x-status-badge :status="$portalStatus?->status->label() ?? 'Available'" :colour="$portalStatus?->status->colour() ?? 'green'" />
+            </div>
+            <a href="{{ route('client.upload.create') }}"
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e63012] hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Upload New File
+            </a>
+        </div>
     </div>
 
     <!-- Stat cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-stat-card label="Pending"            :value="$stats['pending']"             colour="yellow" />
-        <x-stat-card label="In Progress"        :value="$stats['in_progress']"         colour="blue" />
-        <x-stat-card label="Completed This Year" :value="$stats['completed_this_year']" colour="green" />
-        <x-stat-card label="Total Spent"        :value="'£'.number_format($totalSpent, 2)" colour="red" />
+        <!-- Pending Files -->
+        <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Files</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['pending'] }}</p>
+                    @if ($deltas['pending_yesterday'] > 0)
+                        <p class="text-xs text-[#e63012] mt-1 font-medium">+{{ $deltas['pending_yesterday'] }} from yesterday</p>
+                    @else
+                        <p class="text-xs text-slate-600 mt-1">No new yesterday</p>
+                    @endif
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-[#e63012]/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-[#e63012]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">In Progress</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['in_progress'] }}</p>
+                    @if ($deltas['in_progress_today'] > 0)
+                        <p class="text-xs text-[#e63012] mt-1 font-medium">+{{ $deltas['in_progress_today'] }} from yesterday</p>
+                    @else
+                        <p class="text-xs text-slate-600 mt-1">No change today</p>
+                    @endif
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-[#e63012]/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-[#e63012]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed This Year -->
+        <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completed (This Year)</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['completed_this_year'] }}</p>
+                    @if ($deltas['completed_this_month'] > 0)
+                        <p class="text-xs text-green-400 mt-1 font-medium">+{{ $deltas['completed_this_month'] }} this month</p>
+                    @else
+                        <p class="text-xs text-slate-600 mt-1">None this month</p>
+                    @endif
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credit Balance -->
+        <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Credit Balance</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ number_format($stats['slave_balance']) }}</p>
+                    <p class="text-xs text-slate-500 mt-1">Slave Credits</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -22,15 +99,18 @@
         <div class="lg:col-span-2 space-y-6">
 
             <!-- Spend chart -->
-            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-6">
-                <h2 class="text-sm font-semibold text-slate-300 mb-4">Spend — Last 12 Months</h2>
+            <div class="bg-[#1e293b] border border-white/5 rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-slate-300">Spend Over Time</h2>
+                    <span class="text-xs bg-white/5 border border-white/10 text-slate-400 rounded-lg px-3 py-1">This Year</span>
+                </div>
                 <div class="relative h-48">
                     <canvas id="spendChart"></canvas>
                 </div>
             </div>
 
             <!-- Recent file requests -->
-            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl overflow-hidden">
+            <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
                     <h2 class="text-sm font-semibold text-slate-300">Recent File Requests</h2>
                     <a href="{{ route('client.file-requests.index') }}" class="text-xs text-[#e63012] hover:text-red-400">View all &rarr;</a>
@@ -42,23 +122,22 @@
                     <div class="divide-y divide-white/5">
                         @foreach ($recentFileRequests as $fileRequest)
                             <div class="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors">
+                                <x-status-badge :status="$fileRequest->status->label()" :colour="$fileRequest->status->colour()" />
                                 <x-make-logo :make="$fileRequest->make" size="w-9 h-9" />
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-white truncate">
-                                        {{ $fileRequest->make }} {{ $fileRequest->model }}
-                                        <span class="text-slate-500">({{ $fileRequest->year }})</span>
-                                    </p>
+                                    <p class="text-sm font-semibold text-white truncate">{{ $fileRequest->make }} {{ $fileRequest->model }}</p>
                                     <p class="text-xs text-slate-500 mt-0.5">
+                                        @if ($fileRequest->fileStage) {{ $fileRequest->fileStage->name }} &bull; @endif
                                         {{ $fileRequest->request_number_formatted }}
-                                        @if ($fileRequest->fileStage)
-                                            &bull; {{ $fileRequest->fileStage->name }}
-                                        @endif
                                     </p>
                                 </div>
-                                <div class="flex items-center gap-3 flex-shrink-0">
-                                    <x-status-badge :status="$fileRequest->status->label()" :colour="$fileRequest->status->colour()" />
-                                    <span class="text-xs text-slate-500">{{ $fileRequest->created_at->format('d/m/Y') }}</span>
-                                    <a href="{{ route('client.file-requests.show', $fileRequest) }}" class="text-xs text-[#e63012] hover:text-red-400">View</a>
+                                <div class="flex items-center gap-4 flex-shrink-0">
+                                    <span class="text-xs text-slate-500">{{ $fileRequest->created_at->diffForHumans() }}</span>
+                                    <a href="{{ route('client.file-requests.show', $fileRequest) }}"
+                                       class="inline-flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-medium rounded-lg transition-colors">
+                                        Open
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
                                 </div>
                             </div>
                         @endforeach
@@ -70,10 +149,75 @@
         <!-- Right panel -->
         <div class="space-y-4">
 
-            <!-- Portal status -->
-            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-5">
+            <!-- Notices -->
+            @if ($notices->isNotEmpty())
+                <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Recent Notifications</h3>
+                        <span class="text-xs text-[#e63012]">View all</span>
+                    </div>
+                    <div class="space-y-3">
+                        @foreach ($notices as $notice)
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-slate-200">{{ $notice->title }}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $notice->body }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <!-- Account Summary -->
+            @if ($dealer)
+                <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Account Summary</h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm text-slate-400">Slave Credits</span>
+                                <a href="{{ route('client.credits.slave') }}"
+                                   class="text-xs bg-[#e63012] hover:bg-red-600 text-white px-3 py-1 rounded-lg font-medium transition-colors">
+                                    Top Up
+                                </a>
+                            </div>
+                            <p class="text-2xl font-bold text-white">{{ number_format($stats['slave_balance']) }}</p>
+                        </div>
+
+                        <div class="border-t border-white/5 pt-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm text-slate-400">EVC Credits</span>
+                                <a href="{{ route('client.credits.evc') }}"
+                                   class="text-xs bg-[#e63012] hover:bg-red-600 text-white px-3 py-1 rounded-lg font-medium transition-colors">
+                                    Buy EVC Credits
+                                </a>
+                            </div>
+                            <p class="text-2xl font-bold text-white">{{ number_format($stats['evc_balance']) }}</p>
+                        </div>
+
+                        <div class="border-t border-white/5 pt-4">
+                            <p class="text-sm text-slate-400 mb-1">Total Spent (This Year)</p>
+                            <p class="text-2xl font-bold text-white">£{{ number_format($totalSpentThisYear, 2) }}</p>
+                        </div>
+
+                        <a href="{{ route('client.invoices.index') }}"
+                           class="flex items-center justify-center gap-2 w-full mt-2 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-medium rounded-lg transition-colors">
+                            View All Transactions
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Portal Hours -->
+            <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Portal Status</h3>
-                <x-status-badge :status="$portalStatus->status->label()" :colour="$portalStatus->status->colour()" />
+                <x-status-badge :status="$portalStatus?->status->label() ?? 'Available'" :colour="$portalStatus?->status->colour() ?? 'green'" />
                 @if ($todayHours && $todayHours->is_open)
                     <p class="text-xs text-slate-500 mt-3">
                         Open today
@@ -82,40 +226,6 @@
                     </p>
                 @else
                     <p class="text-xs text-slate-500 mt-3">Closed today</p>
-                @endif
-            </div>
-
-            <!-- Credit balances -->
-            @if ($dealer)
-                <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-5">
-                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Credit Balances</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-slate-400">Slave Credits</span>
-                            <span class="text-sm font-semibold text-white">{{ number_format($stats['slave_balance']) }}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-slate-400">EVC Credits</span>
-                            <span class="text-sm font-semibold text-white">{{ number_format($stats['evc_balance']) }}</span>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Notices -->
-            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-5">
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Notices</h3>
-                @if ($notices->isEmpty())
-                    <p class="text-sm text-slate-500">No current notices.</p>
-                @else
-                    <div class="space-y-4">
-                        @foreach ($notices as $notice)
-                            <div>
-                                <p class="text-sm font-medium text-slate-200">{{ $notice->title }}</p>
-                                <p class="text-xs text-slate-500 mt-1">{{ $notice->body }}</p>
-                            </div>
-                        @endforeach
-                    </div>
                 @endif
             </div>
         </div>
@@ -130,7 +240,7 @@
             const data   = @json($spendData);
 
             const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
-            gradient.addColorStop(0, 'rgba(230, 48, 18, 0.3)');
+            gradient.addColorStop(0, 'rgba(230, 48, 18, 0.25)');
             gradient.addColorStop(1, 'rgba(230, 48, 18, 0)');
 
             new Chart(ctx, {
@@ -146,21 +256,33 @@
                         tension: 0.4,
                         pointRadius: 3,
                         pointBackgroundColor: '#e63012',
+                        pointHoverRadius: 5,
                     }],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f1f5f9',
+                            callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString('en-GB', { minimumFractionDigits: 2 }) },
+                        },
+                    },
                     scales: {
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#94a3b8', font: { size: 11 } },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            ticks: { color: '#64748b', font: { size: 11 } },
                         },
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
                             ticks: {
-                                color: '#94a3b8',
+                                color: '#64748b',
                                 font: { size: 11 },
                                 callback: v => '£' + v.toLocaleString(),
                             },
