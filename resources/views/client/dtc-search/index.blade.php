@@ -1,4 +1,4 @@
-<x-layouts.owner>
+<x-layouts.client>
     <x-page-header title="DTC Search" subtitle="Search diagnostic trouble codes" />
 
     <div
@@ -19,7 +19,7 @@
                         return
                     }
                     this.loading = true
-                    fetch('{{ route('owner.dtc-search.results') }}?q=' + encodeURIComponent(this.query))
+                    fetch('{{ route('client.dtc-search.results') }}?q=' + encodeURIComponent(this.query))
                         .then(response => response.json())
                         .then(data => {
                             this.results = data.data
@@ -129,4 +129,4 @@
             </table>
         </div>
     </div>
-</x-layouts.owner>
+</x-layouts.client>

@@ -44,4 +44,11 @@
             </x-primary-button>
         </div>
     </form>
+
+    <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        Don't have an account?
+        <a href="{{ route('apply.create') }}" class="text-gray-700 dark:text-gray-300 underline hover:text-gray-900 dark:hover:text-gray-100">
+            Apply for access
+        </a>
+    </p>
 </x-auth-layout>

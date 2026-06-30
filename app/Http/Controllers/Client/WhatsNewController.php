@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\WhatsNew;
 
 class WhatsNewController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        return response("WhatsNewController@index placeholder");
-    }
+        $whatsNews = WhatsNew::orderByDesc('published_at')->orderByDesc('created_at')->get();
 
+        return view('client.whats-new.index', compact('whatsNews'));
+    }
 }

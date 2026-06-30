@@ -23,6 +23,7 @@
             <select name="status" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
                 <option value="">All statuses</option>
                 @foreach ($statuses as $status)
+                    @continue(in_array($status, [\App\Enums\FileRequestStatus::Closed, \App\Enums\FileRequestStatus::Void], true))
                     <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
                 @endforeach
             </select>

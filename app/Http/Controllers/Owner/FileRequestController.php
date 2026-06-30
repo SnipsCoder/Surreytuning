@@ -133,7 +133,10 @@ class FileRequestController extends Controller
         $status = FileRequestStatus::from($request->validated('status'));
         $oldStatus = $fileRequest->status;
 
-        $fileRequest->update(['status' => $status]);
+        $fileRequest->update([
+            'status' => $status,
+            'closed_at' => $status === FileRequestStatus::Closed ? now() : $fileRequest->closed_at,
+        ]);
 
         FileRequestMessage::create([
             'file_request_id' => $fileRequest->id,

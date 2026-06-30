@@ -18,7 +18,8 @@
                 <span class="text-2xl font-bold" style="color: #e63012;">Surrey Tuning Services</span>
             </div>
 
-            {{ $slot }}
+            {{ $slot ?? '' }}
+            @yield('content')
         </div>
     </body>
 </html>

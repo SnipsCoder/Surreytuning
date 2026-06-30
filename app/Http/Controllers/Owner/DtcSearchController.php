@@ -28,7 +28,7 @@ class DtcSearchController extends Controller
             })
             ->orderBy('code')
             ->limit(50)
-            ->get(['code', 'description']);
+            ->get(['code', 'description', 'possible_causes', 'possible_remedies', 'severity_estimate']);
 
         return response()->json([
             'data' => $results,

@@ -117,10 +117,9 @@ class FileRequest extends Model
         return $query->whereNotIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void]);
     }
 
-    public function scopeArchived($query, int $days = 90)
+    public function scopeArchived($query)
     {
         return $query
-            ->whereIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void])
-            ->where('closed_at', '<=', now()->subDays($days));
+            ->whereIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void]);
     }
 }

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             FileStagesSeeder::class,
             TuningToolsSeeder::class,
             AdminUserSeeder::class,
+            BoschEcuSeeder::class,
         ]);
     }
 }
