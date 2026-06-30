@@ -34,6 +34,11 @@ class User extends Authenticatable
         'notify_file_requests_sms',
         'whatsapp_number',
         'last_login_at',
+        'two_factor_method',
+        'two_factor_secret',
+        'two_factor_confirmed_at',
+        'email_otp_code',
+        'email_otp_expires_at',
     ];
 
     /**
@@ -54,6 +59,8 @@ class User extends Authenticatable
             'notify_file_requests_email' => 'boolean',
             'notify_file_requests_sms' => 'boolean',
             'last_login_at' => 'datetime',
+            'two_factor_confirmed_at' => 'datetime',
+            'email_otp_expires_at' => 'datetime',
         ];
     }
 

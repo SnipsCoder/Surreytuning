@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ dark: localStorage.getItem('dark') === 'true' }" x-init="$watch('dark', value => localStorage.setItem('dark', value))" :class="{ 'dark': dark }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,14 +12,21 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased min-h-screen bg-gray-900 flex items-center justify-center">
-        <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-            <div class="text-center mb-6">
-                <span class="text-2xl font-bold" style="color: #e63012;">Surrey Tuning Services</span>
+    <body class="font-sans antialiased min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="mb-8 flex justify-center">
+                @php $settings = \App\Models\Setting::first(); @endphp
+                @if ($settings && $settings->logo_dark)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-12 object-contain">
+                @else
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='Surrey Tuning Services';">
+                @endif
             </div>
 
-            {{ $slot ?? '' }}
-            @yield('content')
+            <div class="bg-[#1e293b] border border-gray-700 rounded-xl shadow-2xl p-8">
+                {{ $slot ?? '' }}
+                @yield('content')
+            </div>
         </div>
     </body>
 </html>

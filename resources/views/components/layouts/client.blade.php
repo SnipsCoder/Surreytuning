@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ dark: localStorage.getItem('dark') === 'true' }" x-init="$watch('dark', value => localStorage.setItem('dark', value))" :class="{ 'dark': dark }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,86 +12,96 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        @php $settings = \App\Models\Setting::get(); @endphp
-        <style>:root { --brand-colour: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
+        @php $settings = \App\Models\Setting::first(); @endphp
+        <style>:root { --brand: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
+
+        {{ $head ?? '' }}
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen flex bg-gray-50 dark:bg-gray-900">
+    <body class="font-sans antialiased bg-[#0f172a]">
+        <div class="min-h-screen flex">
             <!-- Sidebar -->
-            <aside class="hidden lg:flex lg:flex-col flex-shrink-0" style="width: 256px; background-color: #334155;">
+            <aside class="hidden lg:flex lg:flex-col flex-shrink-0 w-64 bg-[#1e293b]">
                 <div class="flex items-center h-16 px-6 border-b border-white/10">
-                    @if ($settings->logo_dark)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[140px] object-contain">
+                    @if ($settings && $settings->logo_dark)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[160px] object-contain">
                     @else
-                        <x-application-logo class="w-8 h-8 fill-current text-white" />
-                        <span class="ms-3 text-white font-semibold">Surrey Tuning</span>
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-8 max-w-[160px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <span class="ms-3 text-white font-semibold hidden">Surrey Tuning</span>
                     @endif
                 </div>
 
-                <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                <nav class="flex-1 overflow-y-auto px-3 py-4">
                     @php
-                        $clientNavLinks = [
-                            ['label' => 'Dashboard', 'route' => 'client.dashboard'],
-                            ['label' => 'File Requests', 'route' => 'client.file-requests.index'],
-                            ['label' => 'Upload File', 'route' => 'client.upload.create'],
-                            ['label' => 'File Archive', 'route' => 'client.file-requests.archive'],
-                            ['label' => 'Slave Credits', 'route' => 'client.credits.slave'],
-                            ['label' => 'EVC Credits', 'route' => 'client.credits.evc'],
-                            ['label' => 'Products', 'route' => 'client.products.index'],
-                            ['label' => 'Invoices', 'route' => 'client.invoices.index'],
-                            ['label' => 'DTC Search', 'route' => 'client.dtc-search.index'],
-                            ['label' => 'Vehicle Stats', 'route' => 'client.vehicle-stats.index'],
-                            ['label' => 'Bosch ECU', 'route' => 'client.bosch-ecu.index'],
-                            ['label' => 'Portal Users', 'route' => 'client.portal-users.index'],
-                            ['label' => 'Settings', 'route' => 'client.settings.index'],
-                            ["label" => "What's New", 'route' => 'client.whats-new.index'],
+                        $navSections = [
+                            'FILE SERVICE' => [
+                                ['label' => 'Dashboard',     'route' => 'client.dashboard'],
+                                ['label' => 'File Requests', 'route' => 'client.file-requests.index'],
+                                ['label' => 'Upload File',   'route' => 'client.upload.create'],
+                                ['label' => 'File Archive',  'route' => 'client.file-requests.archive'],
+                            ],
+                            'FINANCIAL' => [
+                                ['label' => 'Slave Credits', 'route' => 'client.credits.slave'],
+                                ['label' => 'EVC Credits',   'route' => 'client.credits.evc'],
+                                ['label' => 'Products',      'route' => 'client.products.index'],
+                                ['label' => 'Invoices',      'route' => 'client.invoices.index'],
+                            ],
+                            'TOOLS & DATA' => [
+                                ['label' => 'DTC Search',    'route' => 'client.dtc-search.index'],
+                                ['label' => 'Vehicle Stats', 'route' => 'client.vehicle-stats.index'],
+                                ['label' => 'Bosch ECU',     'route' => 'client.bosch-ecu.index'],
+                                ["label" => "What's New",    'route' => 'client.whats-new.index'],
+                            ],
+                            'ACCOUNT' => [
+                                ['label' => 'Portal Users',  'route' => 'client.portal-users.index'],
+                                ['label' => 'Settings',      'route' => 'client.settings.index'],
+                            ],
                         ];
                     @endphp
 
-                    @foreach ($clientNavLinks as $link)
-                        @php $isActive = Route::has($link['route']) && request()->routeIs($link['route'].'*'); @endphp
-                        <a
-                            href="{{ Route::has($link['route']) ? route($link['route']) : '#' }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium {{ $isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}"
-                        >
-                            {{ $link['label'] }}
-                        </a>
+                    @foreach ($navSections as $sectionLabel => $links)
+                        <div class="{{ !$loop->first ? 'mt-6' : '' }}">
+                            <p class="px-3 mb-1 text-[10px] font-semibold tracking-widest text-slate-500 uppercase">{{ $sectionLabel }}</p>
+                            @foreach ($links as $link)
+                                @php $isActive = Route::has($link['route']) && request()->routeIs($link['route'].'*'); @endphp
+                                <a
+                                    href="{{ Route::has($link['route']) ? route($link['route']) : '#' }}"
+                                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md mb-0.5 transition-colors
+                                        {{ $isActive
+                                            ? 'border-l-2 border-[#e63012] text-[#e63012] bg-[#e63012]/10 rounded-l-none pl-[10px]'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5' }}"
+                                >
+                                    {{ $link['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
                     @endforeach
                 </nav>
             </aside>
 
+            <!-- Main column -->
             <div class="flex-1 flex flex-col min-w-0">
                 <!-- Header -->
-                <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <header class="h-16 flex items-center justify-between px-6 bg-[#1e293b] border-b border-white/10 flex-shrink-0">
                     <div class="flex items-center gap-3">
-                        @php
-                            $dealer = auth()->user()->dealer ?? null;
-                        @endphp
-
+                        @php $dealer = auth()->user()->dealer ?? null; @endphp
                         @if ($dealer)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                Slave Credits: {{ number_format($dealer->slave_credit_balance ?? 0) }}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-200 border border-slate-600">
+                                Slave: {{ number_format($dealer->slave_credit_balance ?? 0) }}
                             </span>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                EVC Credits: {{ number_format($dealer->evc_credit_balance ?? 0) }}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-200 border border-slate-600">
+                                EVC: {{ number_format($dealer->evc_credit_balance ?? 0) }}
                             </span>
                         @endif
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <button type="button" x-on:click="dark = !dark" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white">
-                            <span x-show="!dark">🌙</span>
-                            <span x-show="dark" x-cloak>☀️</span>
-                        </button>
-
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                        <span class="text-sm font-medium text-slate-300">
                             {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}
                         </span>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="text-sm text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white">
-                                {{ __('Log Out') }}
+                            <button type="submit" class="text-sm text-slate-400 hover:text-white transition-colors">
+                                Log Out
                             </button>
                         </form>
                     </div>
@@ -99,22 +109,22 @@
 
                 @php
                     $portalStatus = \App\Models\PortalStatus::find(1);
-                    $portalStatusBannerClasses = match($portalStatus?->status?->value ?? 'available') {
-                        'busy', 'delayed'     => 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300',
-                        'closed'              => 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300',
-                        'support_only', 'files_only' => 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300',
-                        default               => null,
+                    $statusValue  = $portalStatus?->status?->value ?? 'available';
+                    $bannerClass  = match($statusValue) {
+                        'busy', 'delayed'            => 'bg-amber-900/40 border-amber-700 text-amber-300',
+                        'closed'                     => 'bg-red-900/40 border-red-700 text-red-300',
+                        'support_only', 'files_only' => 'bg-blue-900/40 border-blue-700 text-blue-300',
+                        default                      => null,
                     };
                 @endphp
-                @if ($portalStatusBannerClasses && $portalStatus?->status?->value !== 'available')
-                    <div class="border-b px-6 py-3 text-sm font-medium {{ $portalStatusBannerClasses }}">
+                @if ($bannerClass)
+                    <div class="border-b px-6 py-3 text-sm font-medium {{ $bannerClass }}">
                         The portal is currently {{ $portalStatus->status->label() }}. Some services may be limited.
                     </div>
                 @endif
 
-                <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
+                <main class="flex-1 overflow-y-auto bg-[#0f172a] p-6">
                     <x-flash-messages />
-
                     {{ $slot }}
                 </main>
             </div>

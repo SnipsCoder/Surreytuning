@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureDealerApproved;
+use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Http\Middleware\IsClientUser;
 use App\Http\Middleware\IsOwnerUser;
 use Illuminate\Foundation\Application;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'owner' => IsOwnerUser::class,
             'client' => IsClientUser::class,
             'dealer_approved' => EnsureDealerApproved::class,
+            'two_factor' => EnsureTwoFactorAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

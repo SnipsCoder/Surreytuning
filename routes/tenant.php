@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth;
 use App\Http\Controllers\Client;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\Owner;
@@ -32,6 +33,18 @@ Route::middleware([
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        // Two-factor authentication — exempt from 2FA enforcement itself
+        Route::prefix('two-factor')->name('two-factor.')->group(function () {
+            Route::get('/setup', [Auth\TwoFactorController::class, 'setup'])->name('setup');
+            Route::post('/setup/totp', [Auth\TwoFactorController::class, 'initTotp'])->name('setup.totp');
+            Route::post('/setup/email', [Auth\TwoFactorController::class, 'initEmail'])->name('setup.email');
+            Route::post('/confirm', [Auth\TwoFactorController::class, 'confirm'])->name('confirm');
+            Route::get('/challenge', [Auth\TwoFactorController::class, 'challenge'])->name('challenge');
+            Route::post('/verify', [Auth\TwoFactorController::class, 'verify'])->name('verify');
+            Route::post('/resend', [Auth\TwoFactorController::class, 'resend'])->name('resend');
+            Route::post('/disable', [Auth\TwoFactorController::class, 'disable'])->name('disable');
+        });
     });
 
     require __DIR__.'/auth.php';
@@ -42,7 +55,7 @@ Route::middleware([
     Route::get('/apply/received', fn () => view('auth.application-received'))->name('apply.received');
 
     // Owner/admin portal (no prefix)
-    Route::middleware(['auth', 'owner'])->group(function () {
+    Route::middleware(['auth', 'two_factor', 'owner'])->group(function () {
         Route::get('/dashboard', [Owner\DashboardController::class, 'index'])->name('owner.dashboard');
 
         // File Requests
@@ -103,7 +116,7 @@ Route::middleware([
     });
 
     // Client portal (my prefix)
-    Route::prefix('my')->middleware(['auth', 'client', 'dealer_approved'])->name('client.')->group(function () {
+    Route::prefix('my')->middleware(['auth', 'two_factor', 'client', 'dealer_approved'])->name('client.')->group(function () {
         Route::get('/dashboard', [Client\DashboardController::class, 'index'])->name('dashboard');
 
         // File upload (multi-step)

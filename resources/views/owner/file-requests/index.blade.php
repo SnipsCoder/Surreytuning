@@ -1,97 +1,103 @@
 <x-layouts.owner>
-    <div x-data="{ view: localStorage.getItem('frq-view') || 'board' }" x-init="$watch('view', value => localStorage.setItem('frq-view', value))">
-        <x-page-header title="File Requests" subtitle="Active tuning file requests across all dealers">
-            <div class="flex items-center gap-2">
-                <div class="inline-flex rounded-md border border-gray-300 dark:border-gray-700 overflow-hidden">
-                    <button type="button" x-on:click="view = 'board'" :class="view === 'board' ? 'bg-gray-900 text-white dark:bg-gray-700' : 'bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-300'" class="px-3 py-1.5 text-sm font-medium">
+    <div x-data="{ view: localStorage.getItem('owner-frq-view') || 'board' }"
+         x-init="$watch('view', v => localStorage.setItem('owner-frq-view', v))">
+
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-xl font-bold text-white">File Requests</h1>
+                <p class="text-sm text-slate-400 mt-0.5">Active tuning file requests across all dealers</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="inline-flex rounded-lg overflow-hidden border border-white/10">
+                    <button type="button" x-on:click="view = 'board'"
+                        :class="view === 'board' ? 'bg-[#e63012] text-white' : 'bg-[#1e293b] text-slate-400 hover:text-white'"
+                        class="px-3 py-1.5 text-sm font-medium transition-colors">
                         Board
                     </button>
-                    <button type="button" x-on:click="view = 'list'" :class="view === 'list' ? 'bg-gray-900 text-white dark:bg-gray-700' : 'bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-300'" class="px-3 py-1.5 text-sm font-medium">
+                    <button type="button" x-on:click="view = 'list'"
+                        :class="view === 'list' ? 'bg-[#e63012] text-white' : 'bg-[#1e293b] text-slate-400 hover:text-white'"
+                        class="px-3 py-1.5 text-sm font-medium transition-colors">
                         List
                     </button>
                 </div>
-                <a href="{{ route('owner.file-requests.archive') }}" class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="{{ route('owner.file-requests.archive') }}"
+                   class="inline-flex items-center px-3 py-1.5 bg-[#1e293b] border border-white/10 text-slate-300 text-sm font-medium rounded-lg hover:text-white transition-colors">
                     Archive
                 </a>
             </div>
-        </x-page-header>
+        </div>
 
-        <form method="GET" action="{{ route('file-requests.index') }}" class="mb-6 flex flex-wrap items-center gap-3">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search request #, make, model, dealer..."
-                class="flex-1 min-w-[220px] rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <!-- Search / filter bar -->
+        <form method="GET" action="{{ route('file-requests.index') }}" class="mb-6 flex flex-wrap gap-3">
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Search request #, make, model, dealer..."
+                class="flex-1 min-w-[220px] bg-[#1e293b] border border-white/10 text-white placeholder-slate-500 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#e63012]">
 
-            <select name="status" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
-                <option value="">All statuses</option>
+            <select name="status" onchange="this.form.submit()"
+                class="bg-[#1e293b] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e63012]">
+                <option value="">All Statuses</option>
                 @foreach ($statuses as $status)
                     @continue(in_array($status, [\App\Enums\FileRequestStatus::Closed, \App\Enums\FileRequestStatus::Void], true))
                     <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
                 @endforeach
             </select>
 
-            <select name="assigned_technician_id" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
-                <option value="">All technicians</option>
+            <select name="assigned_technician_id" onchange="this.form.submit()"
+                class="bg-[#1e293b] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e63012]">
+                <option value="">All Technicians</option>
                 @foreach ($technicians as $technician)
                     <option value="{{ $technician->id }}" @selected((string) request('assigned_technician_id') === (string) $technician->id)>{{ $technician->full_name }}</option>
                 @endforeach
             </select>
 
-            <button type="submit" class="px-4 py-2 rounded-md bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-600">
+            <button type="submit"
+                class="px-4 py-2 bg-[#1e293b] border border-white/10 text-slate-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
                 Filter
             </button>
 
             @if (request('search') || request('status') || request('assigned_technician_id'))
-                <a href="{{ route('file-requests.index') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">Clear</a>
+                <a href="{{ route('file-requests.index') }}" class="text-sm text-slate-500 hover:text-slate-300 self-center">Clear</a>
             @endif
         </form>
+
+        @if ($fileRequests->isEmpty())
+            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-8 text-center text-slate-500 text-sm">
+                No file requests found.
+            </div>
+        @else
 
         {{-- Board view --}}
         <div x-show="view === 'board'" x-cloak class="overflow-x-auto pb-4">
             <div class="flex gap-4 min-w-max">
                 @foreach ($statuses as $status)
                     @continue(in_array($status, [\App\Enums\FileRequestStatus::Closed, \App\Enums\FileRequestStatus::Void], true))
-                    @php $columnRequests = $fileRequests->getCollection()->where('status', $status); @endphp
-                    <div class="w-72 flex-shrink-0 bg-gray-100 dark:bg-gray-800/60 rounded-lg p-3">
+                    @php
+                        $grouped = $fileRequests instanceof \Illuminate\Pagination\LengthAwarePaginator
+                            ? $fileRequests->getCollection()->where('status', $status)
+                            : $fileRequests->where('status', $status);
+                    @endphp
+                    <div class="w-72 flex-shrink-0 bg-[#1e293b] border border-white/5 rounded-xl p-3">
                         <div class="flex items-center justify-between mb-3 px-1">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full {{ str($status->colour())->before(' ') }}"></span>
-                                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ $status->label() }}</h3>
-                            </div>
-                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ $columnRequests->count() }}</span>
+                            <x-status-badge :status="$status->label()" :colour="$status->colour()" />
+                            <span class="text-xs font-medium bg-white/5 text-slate-400 rounded-full px-2 py-0.5">{{ $grouped->count() }}</span>
                         </div>
-
                         <div class="space-y-2">
-                            @foreach ($columnRequests->take(5) as $fileRequest)
-                                <a href="{{ route('file-requests.show', $fileRequest) }}" class="block bg-white dark:bg-gray-800 rounded-md p-3 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition">
+                            @forelse ($grouped as $fileRequest)
+                                <a href="{{ route('file-requests.show', $fileRequest) }}"
+                                    class="block bg-[#0f172a] border border-white/5 rounded-lg p-3 hover:border-[#e63012]/40 transition-colors">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <div class="relative w-6 h-6 flex-shrink-0">
-                                            <img
-                                                src="https://logo.clearbit.com/{{ \Illuminate\Support\Str::slug($fileRequest->make) }}.com"
-                                                alt="{{ $fileRequest->make }}"
-                                                class="w-6 h-6 rounded object-contain bg-white"
-                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                            >
-                                            <span style="display:none;" class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700 items-center justify-center absolute inset-0">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17h14M5 17a2 2 0 100 4 2 2 0 000-4zm14 0a2 2 0 100 4 2 2 0 000-4zM5 17l1.5-5h11L19 17M6.5 12l1-3.5A2 2 0 019.4 7h5.2a2 2 0 011.9 1.5l1 3.5" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $fileRequest->make }} {{ $fileRequest->model }}</span>
+                                        <x-make-logo :make="$fileRequest->make" size="w-6 h-6" />
+                                        <span class="text-sm font-medium text-white truncate">{{ $fileRequest->make }} {{ $fileRequest->model }}</span>
                                     </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ $fileRequest->request_number_formatted }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $fileRequest->dealer?->company_name }}</p>
+                                    <p class="text-xs text-slate-500">{{ $fileRequest->request_number_formatted }}</p>
+                                    @if ($fileRequest->dealer)
+                                        <p class="text-xs text-slate-600 mt-0.5 truncate">{{ $fileRequest->dealer->company_name }}</p>
+                                    @endif
+                                    <p class="text-xs text-slate-700 mt-1">{{ $fileRequest->created_at->diffForHumans() }}</p>
                                 </a>
-                            @endforeach
-
-                            @if ($columnRequests->count() > 5)
-                                <a href="{{ route('file-requests.index', array_merge(request()->query(), ['status' => $status->value])) }}" class="block text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline py-1">
-                                    +{{ $columnRequests->count() - 5 }} more
-                                </a>
-                            @endif
-
-                            @if ($columnRequests->isEmpty())
-                                <p class="text-xs text-gray-400 dark:text-gray-500 text-center py-4">No requests</p>
-                            @endif
+                            @empty
+                                <p class="text-xs text-slate-600 text-center py-4">No requests</p>
+                            @endforelse
                         </div>
                     </div>
                 @endforeach
@@ -100,31 +106,51 @@
 
         {{-- List view --}}
         <div x-show="view === 'list'" x-cloak>
-            <x-data-table :headers="['Request #', 'Vehicle', 'Dealer', 'Stage', 'Technician', 'Status', '']">
-                @forelse ($fileRequests as $fileRequest)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $fileRequest->request_number_formatted }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $fileRequest->make }} {{ $fileRequest->model }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $fileRequest->dealer?->company_name }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $fileRequest->fileStage?->name ?? '—' }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $fileRequest->assignedTechnician?->full_name ?? '—' }}</td>
-                        <td class="px-4 py-3 text-sm">
-                            <x-status-badge :status="$fileRequest->status->label()" :colour="$fileRequest->status->colour()" />
-                        </td>
-                        <td class="px-4 py-3 text-sm text-right">
-                            <a href="{{ route('file-requests.show', $fileRequest) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">View</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No file requests found.</td>
-                    </tr>
-                @endforelse
-            </x-data-table>
-
-            <div class="mt-4">
-                {{ $fileRequests->links() }}
+            <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/5">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Vehicle</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Request #</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Dealer</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Stage</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Technician</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        @foreach ($fileRequests as $fileRequest)
+                            <tr class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <x-make-logo :make="$fileRequest->make" size="w-8 h-8" />
+                                        <div>
+                                            <p class="text-sm font-medium text-white">{{ $fileRequest->make }} {{ $fileRequest->model }}</p>
+                                            <p class="text-xs text-slate-500">{{ $fileRequest->year }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-slate-300 font-mono text-xs">{{ $fileRequest->request_number_formatted }}</td>
+                                <td class="px-4 py-3 text-slate-300 text-xs">{{ $fileRequest->dealer?->company_name ?? '—' }}</td>
+                                <td class="px-4 py-3 text-slate-400 text-xs">{{ $fileRequest->fileStage?->name ?? '—' }}</td>
+                                <td class="px-4 py-3 text-slate-400 text-xs">{{ $fileRequest->assignedTechnician?->full_name ?? '—' }}</td>
+                                <td class="px-4 py-3">
+                                    <x-status-badge :status="$fileRequest->status->label()" :colour="$fileRequest->status->colour()" />
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <a href="{{ route('file-requests.show', $fileRequest) }}" class="text-xs text-[#e63012] hover:text-red-400">View</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
+            @if ($fileRequests instanceof \Illuminate\Pagination\LengthAwarePaginator && $fileRequests->hasPages())
+                <div class="mt-4">{{ $fileRequests->links() }}</div>
+            @endif
         </div>
+
+        @endif
     </div>
 </x-layouts.owner>
