@@ -1,6 +1,6 @@
-<div>
+﻿<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">File Stage</label>
-    <select name="file_stage_id" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+    <select name="file_stage_id" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
         @foreach ($fileStages as $stage)
             <option value="{{ $stage->id }}" @selected(old('file_stage_id', $fileOption?->file_stage_id) === $stage->id)>{{ $stage->name }}</option>
         @endforeach
@@ -10,26 +10,26 @@
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
     <input type="text" name="name" value="{{ old('name', $fileOption?->name) }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
 </div>
 
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
     <textarea name="description" rows="2"
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">{{ old('description', $fileOption?->description) }}</textarea>
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">{{ old('description', $fileOption?->description) }}</textarea>
 </div>
 
 <div class="grid grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (Net)</label>
         <input type="number" name="price_net" step="0.01" min="0" value="{{ old('price_net', $fileOption?->price_net) }}" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
         <input type="number" name="sort_order" value="{{ old('sort_order', $fileOption?->sort_order ?? 0) }}"
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 

@@ -109,7 +109,7 @@ class FileRequest extends Model
 
     public function getRequestNumberFormattedAttribute(): string
     {
-        return 'STS-'.$this->created_at->format('Y').'-'.str_pad((string) $this->request_number, 6, '0', STR_PAD_LEFT);
+        return 'STS-'.($this->created_at?->format('Y') ?? now()->year).'-'.str_pad((string) $this->request_number, 6, '0', STR_PAD_LEFT);
     }
 
     public function scopeActive($query)
@@ -117,9 +117,14 @@ class FileRequest extends Model
         return $query->whereNotIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void]);
     }
 
-    public function scopeArchived($query)
+    public function scopeArchived($query, int $days = 0)
     {
-        return $query
-            ->whereIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void]);
+        $query->whereIn('status', [FileRequestStatus::Closed, FileRequestStatus::Void]);
+
+        if ($days > 0) {
+            $query->where('closed_at', '>=', now()->subDays($days));
+        }
+
+        return $query;
     }
 }

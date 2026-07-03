@@ -1,7 +1,4 @@
 <x-layouts.client>
-    <x-slot name="head">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
-    </x-slot>
 
     <!-- Welcome banner -->
     <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
@@ -152,10 +149,7 @@
             <!-- Notices -->
             @if ($notices->isNotEmpty())
                 <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Recent Notifications</h3>
-                        <span class="text-xs text-[#e63012]">View all</span>
-                    </div>
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Notices</h3>
                     <div class="space-y-3">
                         @foreach ($notices as $notice)
                             <div class="flex items-start gap-3">
@@ -164,7 +158,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-slate-200">{{ $notice->title }}</p>
-                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">{{ $notice->body }}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">{{ $notice->body }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -214,7 +208,7 @@
                 </div>
             @endif
 
-            <!-- Portal Hours -->
+            <!-- Portal Status -->
             <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Portal Status</h3>
                 <x-status-badge :status="$portalStatus?->status->label() ?? 'Available'" :colour="$portalStatus?->status->colour() ?? 'green'" />
@@ -231,66 +225,67 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('spendChart');
-            if (!ctx) return;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('spendChart');
+        if (!ctx) return;
 
-            const labels = @json($spendLabels);
-            const data   = @json($spendData);
+        const labels = @json($spendLabels);
+        const data   = @json($spendData);
 
-            const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
-            gradient.addColorStop(0, 'rgba(230, 48, 18, 0.25)');
-            gradient.addColorStop(1, 'rgba(230, 48, 18, 0)');
+        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(230, 48, 18, 0.25)');
+        gradient.addColorStop(1, 'rgba(230, 48, 18, 0)');
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        borderColor: '#e63012',
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#e63012',
-                        pointHoverRadius: 5,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
-                            titleColor: '#94a3b8',
-                            bodyColor: '#f1f5f9',
-                            callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString('en-GB', { minimumFractionDigits: 2 }) },
-                        },
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.04)' },
-                            ticks: { color: '#64748b', font: { size: 11 } },
-                        },
-                        y: {
-                            grid: { color: 'rgba(255,255,255,0.04)' },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 11 },
-                                callback: v => '£' + v.toLocaleString(),
-                            },
-                            beginAtZero: true,
-                        },
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    borderColor: '#e63012',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#e63012',
+                    pointHoverRadius: 5,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        titleColor: '#94a3b8',
+                        bodyColor: '#f1f5f9',
+                        callbacks: { label: ctx => '£' + ctx.parsed.y.toLocaleString('en-GB', { minimumFractionDigits: 2 }) },
                     },
                 },
-            });
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { color: '#64748b', font: { size: 11 } },
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 11 },
+                            callback: v => '£' + v.toLocaleString(),
+                        },
+                        beginAtZero: true,
+                    },
+                },
+            },
         });
-    </script>
+    });
+</script>
 </x-layouts.client>

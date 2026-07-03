@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Settings" subtitle="Manage portal configuration" />
 
     @if (session('success'))
@@ -8,7 +8,7 @@
     @endif
 
     <div x-data="{ tab: '{{ session('active_tab', 'account') }}' }">
-        <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div class="border-b border-gray-200 dark:border-[#2a2a2a] mb-6">
             <nav class="-mb-px flex space-x-6 overflow-x-auto">
                 @foreach ([
                     'account' => 'Account',
@@ -32,7 +32,7 @@
 
         {{-- Account Tab --}}
         <div x-show="tab === 'account'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="active_tab" value="account">
@@ -81,7 +81,7 @@
 
         {{-- Opening Hours Tab --}}
         <div x-show="tab === 'hours'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.hours') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.hours') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
 
@@ -90,7 +90,7 @@
                 @endphp
 
                 @foreach ($openingHours as $i => $hour)
-                    <div class="flex flex-wrap items-center gap-4 py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                    <div class="flex flex-wrap items-center gap-4 py-2 border-b border-gray-100 dark:border-[#2a2a2a] last:border-0">
                         <input type="hidden" name="hours[{{ $i }}][id]" value="{{ $hour->id }}">
                         <div class="w-28 text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ $days[$hour->day_of_week] ?? $hour->day_of_week }}
@@ -115,7 +115,7 @@
 
         {{-- Branding Tab --}}
         <div x-show="tab === 'branding'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.branding') }}" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.branding') }}" enctype="multipart/form-data" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
 
@@ -157,7 +157,7 @@
 
         {{-- Dealer Tab --}}
         <div x-show="tab === 'dealer'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
 
@@ -187,7 +187,7 @@
 
         {{-- Invoice Tab --}}
         <div x-show="tab === 'invoice'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
 
@@ -225,7 +225,7 @@
 
         {{-- T&Cs Tab --}}
         <div x-show="tab === 'terms'" x-cloak>
-            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+            <form method="POST" action="{{ route('owner.settings.update') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
                 @csrf
                 @method('PATCH')
 

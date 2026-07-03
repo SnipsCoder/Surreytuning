@@ -9,9 +9,7 @@ use Throwable;
 
 class PaymentController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
+    public function __construct(private StripeService $stripeService) {}
 
     public function success(Request $request)
     {

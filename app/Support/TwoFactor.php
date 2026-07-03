@@ -13,7 +13,7 @@ class TwoFactor
     {
         $renderer = new ImageRenderer(
             new RendererStyle(200),
-            new SvgImageBackEnd(),
+            new SvgImageBackEnd,
         );
 
         return (new Writer($renderer))->writeString($url);

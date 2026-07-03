@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -31,18 +32,18 @@ class PortalUserController extends Controller
 
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
-            'last_name'  => ['required', 'string', 'max:100'],
-            'email'      => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
         ]);
 
         $user = User::create([
             'first_name' => $data['first_name'],
-            'last_name'  => $data['last_name'],
-            'email'      => $data['email'],
-            'password'   => Str::password(32),
-            'role'       => UserRole::DealerUser,
-            'dealer_id'  => $dealerId,
-            'status'     => 'active',
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+            'password' => Str::password(32),
+            'role' => UserRole::DealerUser,
+            'dealer_id' => $dealerId,
+            'status' => UserStatus::Active,
         ]);
 
         Password::sendResetLink(['email' => $user->email]);
@@ -54,7 +55,7 @@ class PortalUserController extends Controller
     {
         abort_unless($user->dealer_id === $request->user()->dealer_id, 403);
 
-        $user->update(['status' => 'inactive']);
+        $user->update(['status' => UserStatus::Inactive]);
 
         return back()->with('success', 'User removed.');
     }

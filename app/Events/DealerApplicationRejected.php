@@ -10,7 +10,5 @@ class DealerApplicationRejected
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public readonly DealerApplication $application)
-    {
-    }
+    public function __construct(public readonly DealerApplication $application) {}
 }

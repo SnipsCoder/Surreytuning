@@ -1,5 +1,20 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header :title="'Invoice #' . $invoice->invoice_number" :subtitle="$invoice->dealer->company_name">
+        <a href="{{ route('owner.invoices.download', $invoice) }}"
+           class="px-4 py-2 rounded-md bg-slate-700 text-white text-sm font-medium hover:bg-slate-600">
+            Download PDF
+        </a>
+
+        @if ($invoice->status !== \App\Enums\InvoiceStatus::Void)
+            <form method="POST" action="{{ route('owner.invoices.send', $invoice) }}"
+                  onsubmit="return confirm('Email this invoice to the dealer?');">
+                @csrf
+                <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:opacity-90">
+                    Email to client
+                </button>
+            </form>
+        @endif
+
         @if ($invoice->status === \App\Enums\InvoiceStatus::Issued)
             <form method="POST" action="{{ route('owner.invoices.mark-paid', $invoice) }}">
                 @csrf
@@ -17,7 +32,7 @@
         @endif
     </x-page-header>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow divide-y divide-gray-200 dark:divide-gray-700">
+    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow divide-y divide-gray-200 dark:divide-gray-700">
         <div class="px-6 py-4 flex items-center justify-between">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Invoice Details</h2>
             <x-status-badge :status="$invoice->status->label()" :colour="$invoice->status->colour()" />

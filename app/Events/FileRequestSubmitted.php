@@ -10,7 +10,5 @@ class FileRequestSubmitted
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public FileRequest $fileRequest)
-    {
-    }
+    public function __construct(public FileRequest $fileRequest) {}
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\AddChargeRequest;
 use App\Http\Requests\Owner\AddCreditRequest;
 use App\Http\Requests\Owner\UpdateFileRequestStatusRequest;
+use App\Models\AuditLog;
 use App\Models\FileRequest;
 use App\Models\FileRequestAttachment;
 use App\Models\FileRequestMessage;
@@ -21,7 +22,6 @@ use App\Services\CreditService;
 use App\Services\FileStorageService;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class FileRequestController extends Controller
 {
@@ -179,6 +179,7 @@ class FileRequestController extends Controller
             $request->user(),
             $fileRequest->id,
             FileRequest::class,
+            $applyVat,
         );
 
         FileRequestMessage::create([
@@ -188,6 +189,15 @@ class FileRequestController extends Controller
             'body' => "Charge added: {$request->validated('description')} (£".number_format((float) $request->validated('amount_net'), 2).')',
             'is_internal' => false,
         ]);
+
+        AuditLog::record(
+            'file_request.charge_added',
+            $request->user(),
+            $fileRequest,
+            (float) $request->validated('amount_net'),
+            $request->validated('description'),
+            ['invoice_id' => $invoice->id, 'apply_vat' => $applyVat],
+        );
 
         return back()->with('success', 'Charge added.');
     }
@@ -214,6 +224,15 @@ class FileRequestController extends Controller
             'is_internal' => false,
         ]);
 
+        AuditLog::record(
+            'file_request.credit_added',
+            $request->user(),
+            $fileRequest,
+            $amount,
+            $reason,
+            ['credit_type' => $request->validated('credit_type'), 'dealer_id' => $dealer->id],
+        );
+
         return back()->with('success', 'Credit added.');
     }
 
@@ -239,6 +258,14 @@ class FileRequestController extends Controller
             'is_system' => true,
         ]);
 
+        AuditLog::record(
+            'file_request.voided',
+            $request->user(),
+            $fileRequest,
+            null,
+            $validated['void_reason'],
+        );
+
         return back()->with('success', 'File request voided.');
     }
 
@@ -247,8 +274,8 @@ class FileRequestController extends Controller
         $this->authorize('respond', $fileRequest);
 
         $validated = $request->validate([
-            'message' => ['nullable', 'string'],
-            'file' => ['nullable', 'file', 'max:51200'],
+            'message' => ['nullable', 'string', 'max:5000', 'required_without:file'],
+            'file' => ['nullable', 'file', 'max:51200', 'required_without:message'],
         ]);
 
         if ($request->hasFile('file')) {

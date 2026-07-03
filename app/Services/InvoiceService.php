@@ -12,15 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
-    public function createInvoice(Dealer $dealer, string $description, float $amountNet, InvoiceType $type, ?User $raisedBy = null, ?int $relatedId = null, ?string $relatedType = null): Invoice
+    public function createInvoice(Dealer $dealer, string $description, float $amountNet, InvoiceType $type, ?User $raisedBy = null, ?int $relatedId = null, ?string $relatedType = null, bool $applyVat = true): Invoice
     {
-        return DB::transaction(function () use ($dealer, $description, $amountNet, $type, $raisedBy, $relatedId, $relatedType) {
+        return DB::transaction(function () use ($dealer, $description, $amountNet, $type, $raisedBy, $relatedId, $relatedType, $applyVat) {
             $settings = Setting::get();
 
-            $vatAmount = round($amountNet * ($settings->vat_rate / 100), 2);
+            $vatAmount = $applyVat ? round($amountNet * ($settings->vat_rate / 100), 2) : 0;
             $amountGross = $amountNet + $vatAmount;
 
-            $invoiceNumber = $settings->invoice_start_number + (Invoice::max('invoice_number') ?? 0);
+            $invoiceNumber = $settings->invoice_start_number + (Invoice::lockForUpdate()->max('invoice_number') ?? 0);
 
             return Invoice::create([
                 'dealer_id' => $dealer->id,

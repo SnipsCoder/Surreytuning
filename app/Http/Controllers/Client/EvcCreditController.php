@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 
 class EvcCreditController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
+    public function __construct(private StripeService $stripeService) {}
 
     public function index(Request $request)
     {
@@ -48,7 +46,7 @@ class EvcCreditController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            route('client.payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'evc_bundle',

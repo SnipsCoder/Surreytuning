@@ -16,7 +16,7 @@ class CreditService
     public function addSlaveCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): SlaveCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
-            $balanceAfter = $dealer->slave_credit_balance + $amount;
+            $balanceAfter = bcadd((string) $dealer->slave_credit_balance, (string) $amount, 2);
 
             $dealer->update(['slave_credit_balance' => $balanceAfter]);
 
@@ -39,7 +39,7 @@ class CreditService
                 throw new InsufficientCreditsException('Dealer does not have sufficient slave credits.');
             }
 
-            $balanceAfter = $dealer->slave_credit_balance - $amount;
+            $balanceAfter = bcsub((string) $dealer->slave_credit_balance, (string) $amount, 2);
 
             $dealer->update(['slave_credit_balance' => $balanceAfter]);
 
@@ -58,7 +58,7 @@ class CreditService
     public function manualAdjustSlaveCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): SlaveCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
-            $balanceAfter = $dealer->slave_credit_balance + $amount;
+            $balanceAfter = bcadd((string) $dealer->slave_credit_balance, (string) $amount, 2);
 
             $dealer->update(['slave_credit_balance' => $balanceAfter]);
 
@@ -77,7 +77,7 @@ class CreditService
     public function addEvcCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $winolsBundleId = null): EvcCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $winolsBundleId) {
-            $balanceAfter = $dealer->evc_credit_balance + $amount;
+            $balanceAfter = bcadd((string) $dealer->evc_credit_balance, (string) $amount, 2);
 
             $dealer->update(['evc_credit_balance' => $balanceAfter]);
 
@@ -100,7 +100,7 @@ class CreditService
                 throw new InsufficientCreditsException('Dealer does not have sufficient EVC credits.');
             }
 
-            $balanceAfter = $dealer->evc_credit_balance - $amount;
+            $balanceAfter = bcsub((string) $dealer->evc_credit_balance, (string) $amount, 2);
 
             $dealer->update(['evc_credit_balance' => $balanceAfter]);
 
@@ -108,7 +108,7 @@ class CreditService
                 'dealer_id' => $dealer->id,
                 'user_id' => $performedBy->id,
                 'winols_bundle_id' => null,
-                'type' => EvcCreditTransactionType::ManualCredit,
+                'type' => EvcCreditTransactionType::Deduction,
                 'amount' => -$amount,
                 'reason' => $reason,
                 'balance_after' => $balanceAfter,
@@ -119,7 +119,7 @@ class CreditService
     public function manualAdjustEvcCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): EvcCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
-            $balanceAfter = $dealer->evc_credit_balance + $amount;
+            $balanceAfter = bcadd((string) $dealer->evc_credit_balance, (string) $amount, 2);
 
             $dealer->update(['evc_credit_balance' => $balanceAfter]);
 

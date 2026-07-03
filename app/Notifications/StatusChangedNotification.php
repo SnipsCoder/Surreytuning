@@ -16,8 +16,7 @@ class StatusChangedNotification extends Notification implements ShouldQueue
     public function __construct(
         public FileRequest $fileRequest,
         public FileRequestStatus $oldStatus,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -27,7 +26,7 @@ class StatusChangedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $ref = $this->fileRequest->request_number_formatted;
-        $url = url('/file-requests/' . $this->fileRequest->id);
+        $url = url('/file-requests/'.$this->fileRequest->id);
 
         return (new MailMessage)
             ->subject("File Request Status Update — {$ref}")

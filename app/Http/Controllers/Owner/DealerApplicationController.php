@@ -44,6 +44,10 @@ class DealerApplicationController extends Controller
 
     public function approve(Request $request, DealerApplication $dealerApplication)
     {
+        if ($dealerApplication->status !== ApplicationStatus::Pending) {
+            return back()->with('error', 'This application has already been reviewed.');
+        }
+
         [$dealer, $user] = DB::transaction(function () use ($request, $dealerApplication) {
             $dealerApplication->update([
                 'status' => ApplicationStatus::Approved,

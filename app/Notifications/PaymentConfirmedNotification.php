@@ -12,9 +12,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public Invoice $invoice)
-    {
-    }
+    public function __construct(public Invoice $invoice) {}
 
     public function via(object $notifiable): array
     {
@@ -23,7 +21,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('/invoices/' . $this->invoice->id);
+        $url = url('/invoices/'.$this->invoice->id);
 
         return (new MailMessage)
             ->subject("Payment Confirmed — {$this->invoice->invoice_number}")

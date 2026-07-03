@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Tuning Tools" subtitle="Tools used to read/write files">
         <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-tool' }))"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -8,7 +8,7 @@
 
     <x-data-table :headers="['Name', 'Category', 'Sort Order', 'Active', '']">
         @forelse ($tuningTools as $tool)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $tool->name }}</td>
                 <td class="px-4 py-3 text-sm">
                     <x-status-badge :status="$tool->category->label()" colour="bg-blue-100 text-blue-800" />

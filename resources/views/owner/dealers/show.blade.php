@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <a href="{{ route('dealers.index') }}" class="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         Back to Dealers
@@ -25,7 +25,7 @@
     </x-page-header>
 
     <div x-data="{ tab: 'overview' }">
-        <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div class="border-b border-gray-200 dark:border-[#2a2a2a] mb-6">
             <nav class="flex gap-6 -mb-px">
                 <button @click="tab = 'overview'" :class="tab === 'overview' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400'" class="py-3 border-b-2 text-sm font-medium">Overview</button>
                 <button @click="tab = 'users'" :class="tab === 'users' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400'" class="py-3 border-b-2 text-sm font-medium">Users</button>
@@ -53,10 +53,10 @@
 
                 <div>
                     <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                    <textarea id="notes" name="notes" rows="5" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes', $dealer->notes) }}</textarea>
+                    <textarea id="notes" name="notes" rows="5" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes', $dealer->notes) }}</textarea>
                 </div>
 
-                <button type="submit" class="px-4 py-2 rounded-md bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-600">
+                <button type="submit" class="px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a] dark:hover:bg-gray-600">
                     Save Notes
                 </button>
             </form>
@@ -127,14 +127,14 @@
                     </div>
                 </div>
 
-                <button type="button" @click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'adjust-credits' }))" class="px-4 py-2 rounded-md bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-600">
+                <button type="button" @click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'adjust-credits' }))" class="px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a] dark:hover:bg-gray-600">
                     Adjust Credits
                 </button>
             </div>
 
             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-2">Slave Credit Transactions</h3>
             <x-data-table :headers="['Amount', 'Reason', 'Date']">
-                @forelse ($dealer->slaveCreditTransactions as $transaction)
+                @forelse ($slaveTransactions as $transaction)
                     <tr>
                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ number_format((float) $transaction->amount, 2) }}</td>
                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $transaction->reason }}</td>
@@ -146,10 +146,13 @@
                     </tr>
                 @endforelse
             </x-data-table>
+            @if ($slaveTransactions->hasPages())
+                <div class="mt-3">{{ $slaveTransactions->links() }}</div>
+            @endif
 
             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-2">EVC Credit Transactions</h3>
             <x-data-table :headers="['Amount', 'Reason', 'Date']">
-                @forelse ($dealer->evcCreditTransactions as $transaction)
+                @forelse ($evcTransactions as $transaction)
                     <tr>
                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ number_format((float) $transaction->amount, 2) }}</td>
                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $transaction->reason }}</td>
@@ -161,6 +164,9 @@
                     </tr>
                 @endforelse
             </x-data-table>
+            @if ($evcTransactions->hasPages())
+                <div class="mt-3">{{ $evcTransactions->links() }}</div>
+            @endif
         </div>
     </div>
 
@@ -170,7 +176,7 @@
 
             <div>
                 <label for="credit_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Type</label>
-                <select id="credit_type" name="credit_type" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
+                <select id="credit_type" name="credit_type" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm">
                     <option value="slave">Slave Credits</option>
                     <option value="evc">EVC Credits</option>
                 </select>
@@ -178,19 +184,19 @@
 
             <div>
                 <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (use negative to deduct)</label>
-                <input type="number" step="0.01" id="amount" name="amount" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
+                <input type="number" step="0.01" id="amount" name="amount" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm">
             </div>
 
             <div>
                 <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
-                <input type="text" id="reason" name="reason" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm">
+                <input type="text" id="reason" name="reason" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm">
             </div>
 
             <div class="flex justify-end gap-3">
                 <button type="button" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: 'adjust-credits' }))" class="px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300">
                     Cancel
                 </button>
-                <button type="submit" class="px-4 py-2 rounded-md bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-600">
+                <button type="submit" class="px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a] dark:hover:bg-gray-600">
                     Save
                 </button>
             </div>

@@ -19,7 +19,7 @@ class FileRequestController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $fileRequests = $query->latest()->get();
+        $fileRequests = $query->latest()->paginate(25);
 
         return view('client.file-requests.index', [
             'fileRequests' => $fileRequests,
@@ -42,7 +42,7 @@ class FileRequestController extends Controller
             });
         }
 
-        $fileRequests = $query->latest()->get();
+        $fileRequests = $query->latest()->paginate(25);
 
         return view('client.file-requests.archive', [
             'fileRequests' => $fileRequests,

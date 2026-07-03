@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\InvitePortalUserRequest;
 use App\Models\User;
@@ -28,7 +29,7 @@ class PortalUserController extends Controller
             'email' => $request->validated('email'),
             'password' => Str::password(32),
             'role' => UserRole::Owner,
-            'status' => 'active',
+            'status' => UserStatus::Active,
         ]);
 
         Password::sendResetLink(['email' => $user->email]);
@@ -38,7 +39,7 @@ class PortalUserController extends Controller
 
     public function destroy(User $portalUser): RedirectResponse
     {
-        $portalUser->update(['status' => 'inactive']);
+        $portalUser->update(['status' => UserStatus::Inactive]);
 
         return back()->with('success', 'User deactivated.');
     }

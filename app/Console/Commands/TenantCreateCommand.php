@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Tenant;
 use Illuminate\Console\Command;
+use Throwable;
 
 class TenantCreateCommand extends Command
 {
@@ -25,12 +26,34 @@ class TenantCreateCommand extends Command
             return self::FAILURE;
         }
 
-        $tenant = Tenant::create([
-            'id' => $id,
-            'name' => $name,
-        ]);
+        $tenant = null;
 
-        $tenant->domains()->create(['domain' => $domain]);
+        try {
+            // Tenant::create() fires TenantCreated, which runs the
+            // CreateDatabase → MigrateDatabase → SeedDatabase pipeline
+            // synchronously (see TenancyServiceProvider). If any step throws,
+            // we must not leave an orphaned central record or half-built DB.
+            $tenant = Tenant::create([
+                'id' => $id,
+                'name' => $name,
+            ]);
+
+            $tenant->domains()->create(['domain' => $domain]);
+        } catch (Throwable $e) {
+            $this->error("Provisioning failed: {$e->getMessage()}");
+
+            if ($tenant && Tenant::find($id)) {
+                // Deleting the tenant fires TenantDeleted → DeleteDatabase,
+                // dropping any database that was created and cascading the
+                // domain row, leaving the central DB clean for a retry.
+                $this->warn('Rolling back the partially-provisioned tenant...');
+                $tenant->delete();
+            }
+
+            report($e);
+
+            return self::FAILURE;
+        }
 
         $this->info("Tenant [{$name}] provisioned with id [{$id}] on domain [{$domain}].");
         $this->info('Database created, migrated, and seeded automatically.');

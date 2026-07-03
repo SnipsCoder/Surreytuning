@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="DTC Search" subtitle="Search diagnostic trouble codes" />
 
     <div
@@ -38,7 +38,7 @@
             },
         }"
     >
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-4 mb-6">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code or Description</label>
             <input type="text" x-model="query" x-on:input="search"
                 class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]"
@@ -50,7 +50,7 @@
             <span x-show="!loading">Showing <span x-text="results.length"></span> of <span x-text="total"></span> results</span>
         </p>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow overflow-hidden">
             <table class="min-w-full table-fixed">
                 <colgroup>
                     <col class="w-28">
@@ -58,7 +58,7 @@
                     <col class="w-32">
                     <col class="w-10">
                 </colgroup>
-                <thead class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <thead class="bg-gray-50 dark:bg-[#0d0d0d] border-b border-gray-200 dark:border-[#2a2a2a]">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Code</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
@@ -87,7 +87,7 @@
 
                 {{-- Results: one tbody per item so expanded row stays adjacent --}}
                 <template x-for="(item, index) in results" :key="item.code">
-                    <tbody class="border-t border-gray-200 dark:border-gray-700">
+                    <tbody class="border-t border-gray-200 dark:border-[#2a2a2a]">
                         <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
                             @click="expanded = expanded === index ? null : index">
                             <td class="px-6 py-4 text-sm font-mono font-semibold text-gray-900 dark:text-gray-100 align-top" x-text="item.code"></td>
@@ -108,7 +108,7 @@
                         </tr>
 
                         <tr x-show="expanded === index" x-cloak>
-                            <td colspan="4" class="bg-gray-50 dark:bg-gray-900/60 px-6 py-5 border-t border-gray-100 dark:border-gray-700/50">
+                            <td colspan="4" class="bg-gray-50 dark:bg-[#0d0d0d]/60 px-6 py-5 border-t border-gray-100 dark:border-[#2a2a2a]/50">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div x-show="item.possible_causes">
                                         <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Possible Causes</h4>

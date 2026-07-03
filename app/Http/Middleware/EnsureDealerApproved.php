@@ -14,12 +14,16 @@ class EnsureDealerApproved
 
         if (! $dealer || $dealer->status->value === 'suspended') {
             auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
 
             return redirect('/login')->withErrors(['email' => 'Your account has been suspended. Please contact us.']);
         }
 
         if ($dealer->status->value === 'pending') {
             auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
 
             return redirect('/login')->withErrors(['email' => 'Your account is pending approval.']);
         }

@@ -25,6 +25,7 @@ class SettingsController extends Controller
         $data['dealer_auto_onboard'] = $request->boolean('dealer_auto_onboard');
 
         Setting::get()->update($data);
+        Setting::clearCache();
 
         return back()
             ->with('success', 'Settings updated.')
@@ -60,6 +61,7 @@ class SettingsController extends Controller
         }
 
         $settings->update($data);
+        Setting::clearCache();
 
         return back()
             ->with('success', 'Branding updated.')

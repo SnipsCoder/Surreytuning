@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <a href="{{ route('dealer-applications.index') }}" class="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         Back to Applications
@@ -42,7 +42,7 @@
         </div>
 
         @if ($application->status->value !== 'pending')
-            <dl class="grid grid-cols-2 gap-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <dl class="grid grid-cols-2 gap-4 border-t border-gray-200 dark:border-[#2a2a2a] pt-4">
                 <div>
                     <dt class="text-sm text-gray-500 dark:text-gray-400">Reviewed By</dt>
                     <dd class="text-sm text-gray-900 dark:text-gray-100">{{ $application->reviewedBy?->first_name }} {{ $application->reviewedBy?->last_name }}</dd>
@@ -61,7 +61,7 @@
         @endif
 
         @if ($application->status->value === 'pending')
-            <div x-data="{}" class="flex gap-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <div x-data="{}" class="flex gap-3 border-t border-gray-200 dark:border-[#2a2a2a] pt-6">
                 <form method="POST" action="{{ route('owner.dealer-applications.approve', $application) }}" onsubmit="return confirm('Approve this application and create a dealer account?');">
                     @csrf
                     <button type="submit" class="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700">
@@ -83,7 +83,7 @@
 
                 <div>
                     <label for="rejection_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
-                    <textarea id="rejection_reason" name="rejection_reason" rows="4" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    <textarea id="rejection_reason" name="rejection_reason" rows="4" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3">

@@ -1,20 +1,20 @@
-<div>
+﻿<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
     <input type="text" name="title" value="{{ old('title', $noticeboard?->title) }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
 </div>
 
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Body</label>
     <textarea name="body" rows="4"
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">{{ old('body', $noticeboard?->body) }}</textarea>
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">{{ old('body', $noticeboard?->body) }}</textarea>
 </div>
 
 <div class="grid grid-cols-3 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
         <select name="priority" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
             @foreach (\App\Enums\NoticePriority::cases() as $priority)
                 <option value="{{ $priority->value }}" @selected(old('priority', $noticeboard?->priority?->value) === $priority->value)>
                     {{ $priority->label() }}
@@ -26,13 +26,13 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Show From</label>
         <input type="date" name="show_from" value="{{ old('show_from', $noticeboard?->show_from?->format('Y-m-d')) }}"
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Show Until</label>
         <input type="date" name="show_until" value="{{ old('show_until', $noticeboard?->show_until?->format('Y-m-d')) }}"
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 

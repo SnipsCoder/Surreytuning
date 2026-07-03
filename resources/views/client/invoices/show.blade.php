@@ -1,6 +1,16 @@
 <x-layouts.client>
     <x-page-header title="Invoice #{{ $invoice->invoice_number }}" subtitle="{{ $invoice->description }}">
-        @if ($invoice->status->value === 'issued')
+        <a href="{{ route('client.invoices.pdf', $invoice) }}" target="_blank"
+           class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:opacity-90">
+            View PDF
+        </a>
+
+        <a href="{{ route('client.invoices.download', $invoice) }}"
+           class="px-4 py-2 rounded-md bg-slate-700 text-white text-sm font-medium hover:bg-slate-600">
+            Download PDF
+        </a>
+
+        @if ($invoice->status === \App\Enums\InvoiceStatus::Issued)
             <form method="POST" action="{{ route('client.invoices.pay', $invoice) }}">
                 @csrf
                 <x-primary-button type="submit">Pay Now</x-primary-button>

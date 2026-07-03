@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="WinOLS Bundles" subtitle="Credit bundles dealers can purchase">
         <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-winols-bundle' }))"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -8,7 +8,7 @@
 
     <x-data-table :headers="['Name', 'Credits', 'Price (Net)', 'Active', '']">
         @forelse ($winolsBundles as $winolsBundle)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $winolsBundle->name }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $winolsBundle->credits }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">£{{ number_format((float) $winolsBundle->price_net, 2) }}</td>

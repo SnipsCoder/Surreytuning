@@ -40,8 +40,8 @@ class FileUploadController extends Controller
     {
         $dealer = $request->user()->dealer;
 
-        $fileRequest = DB::transaction(function () use ($request, $fileStorageService, $dealer) {
-            $requestNumber = (int) (DB::table('file_requests')->max('request_number') ?? 0) + 1;
+        $fileRequest = DB::transaction(function () use ($request, $dealer) {
+            $requestNumber = (int) (DB::table('file_requests')->lockForUpdate()->max('request_number') ?? 0) + 1;
 
             $fileRequest = FileRequest::create([
                 'request_number' => $requestNumber,
@@ -64,24 +64,6 @@ class FileUploadController extends Controller
                 'file_stage_id' => $request->input('file_stage_id'),
                 'tool_id' => $request->input('tool_id'),
                 'client_notes' => $request->input('client_notes'),
-            ]);
-
-            $stored = $fileStorageService->storeFile(
-                $request->file('file'),
-                (string) $dealer->id,
-                (string) $requestNumber,
-                AttachmentType::Original
-            );
-
-            FileRequestAttachment::create([
-                'file_request_id' => $fileRequest->id,
-                'uploader_user_id' => $request->user()->id,
-                'attachment_type' => AttachmentType::Original,
-                'original_filename' => $stored['original_filename'],
-                'stored_filename' => $stored['stored_filename'],
-                'file_path' => $stored['path'],
-                'file_size_bytes' => $stored['file_size_bytes'],
-                'mime_type' => $stored['mime_type'],
             ]);
 
             foreach ($request->input('file_options', []) as $fileOptionId) {
@@ -114,6 +96,30 @@ class FileUploadController extends Controller
 
             return $fileRequest;
         });
+
+        try {
+            $stored = $fileStorageService->storeFile(
+                $request->file('file'),
+                (string) $dealer->id,
+                (string) $fileRequest->request_number,
+                AttachmentType::Original
+            );
+
+            FileRequestAttachment::create([
+                'file_request_id' => $fileRequest->id,
+                'uploader_user_id' => $request->user()->id,
+                'attachment_type' => AttachmentType::Original,
+                'original_filename' => $stored['original_filename'],
+                'stored_filename' => $stored['stored_filename'],
+                'file_path' => $stored['path'],
+                'file_size_bytes' => $stored['file_size_bytes'],
+                'mime_type' => $stored['mime_type'],
+            ]);
+        } catch (\Throwable $e) {
+            $fileRequest->delete();
+
+            throw $e;
+        }
 
         event(new FileRequestSubmitted($fileRequest));
 

@@ -6,6 +6,7 @@ enum EvcCreditTransactionType: string
 {
     case Purchase = 'purchase';
     case ManualCredit = 'manual_credit';
+    case Deduction = 'deduction';
     case Refund = 'refund';
 
     public function label(): string
@@ -13,6 +14,7 @@ enum EvcCreditTransactionType: string
         return match ($this) {
             self::Purchase => 'Purchase',
             self::ManualCredit => 'Manual Credit',
+            self::Deduction => 'Deduction',
             self::Refund => 'Refund',
         };
     }

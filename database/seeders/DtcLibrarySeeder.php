@@ -15,6 +15,7 @@ class DtcLibrarySeeder extends Seeder
 
         if (! file_exists($path)) {
             $this->command->warn('DTC import file not found: storage/app/dtc-import/DTC_Codes_With_Remedies_Formatted.xlsx — skipping.');
+
             return;
         }
 
@@ -32,23 +33,24 @@ class DtcLibrarySeeder extends Seeder
 
         // Row 1 is headers — data starts at row 2
         for ($row = 2; $row <= $highestRow; $row++) {
-            $code        = trim((string) $sheet->getCell('B' . $row)->getValue());
-            $description = trim((string) $sheet->getCell('C' . $row)->getValue());
-            $causes      = trim((string) $sheet->getCell('Q' . $row)->getValue());
-            $remedies    = trim((string) $sheet->getCell('S' . $row)->getValue());
-            $severity    = trim((string) $sheet->getCell('T' . $row)->getValue());
+            $code = trim((string) $sheet->getCell('B'.$row)->getValue());
+            $description = trim((string) $sheet->getCell('C'.$row)->getValue());
+            $causes = trim((string) $sheet->getCell('Q'.$row)->getValue());
+            $remedies = trim((string) $sheet->getCell('S'.$row)->getValue());
+            $severity = trim((string) $sheet->getCell('T'.$row)->getValue());
 
             if ($code === '' || $description === '') {
                 $skipped++;
+
                 continue;
             }
 
             $batch[] = [
-                'code'             => $code,
-                'description'      => $description,
-                'possible_causes'  => $causes  !== '' ? $causes  : null,
-                'possible_remedies'=> $remedies !== '' ? $remedies : null,
-                'severity_estimate'=> $severity !== '' ? $severity : null,
+                'code' => $code,
+                'description' => $description,
+                'possible_causes' => $causes !== '' ? $causes : null,
+                'possible_remedies' => $remedies !== '' ? $remedies : null,
+                'severity_estimate' => $severity !== '' ? $severity : null,
             ];
 
             if (count($batch) === 500) {

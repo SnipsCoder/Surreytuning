@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -24,11 +23,11 @@ class SettingsController extends Controller
         $tab = $request->input('_tab');
 
         match ($tab) {
-            'account'       => $this->updateAccount($request),
-            'profile'       => $this->updateProfile($request),
-            'security'      => $this->updatePassword($request),
+            'account' => $this->updateAccount($request),
+            'profile' => $this->updateProfile($request),
+            'security' => $this->updatePassword($request),
             'notifications' => $this->updateNotifications($request),
-            default         => null,
+            default => null,
         };
 
         return back()->with('success', 'Settings saved.');
@@ -37,8 +36,8 @@ class SettingsController extends Controller
     private function updateAccount(Request $request): void
     {
         $data = $request->validate([
-            'company_name'    => ['required', 'string', 'max:255'],
-            'country'         => ['required', 'string', 'max:100'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:100'],
             'invoice_address' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -48,9 +47,9 @@ class SettingsController extends Controller
     private function updateProfile(Request $request): void
     {
         $data = $request->validate([
-            'first_name'      => ['required', 'string', 'max:100'],
-            'last_name'       => ['required', 'string', 'max:100'],
-            'email'           => ['required', 'email', 'max:255'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255'],
             'whatsapp_number' => ['nullable', 'string', 'max:30'],
         ]);
 
@@ -61,7 +60,7 @@ class SettingsController extends Controller
     {
         $data = $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         $request->user()->update(['password' => $data['password']]);
@@ -70,15 +69,15 @@ class SettingsController extends Controller
     private function updateNotifications(Request $request): void
     {
         $request->validate([
-            'notify_comments_email'      => ['nullable', 'boolean'],
+            'notify_comments_email' => ['nullable', 'boolean'],
             'notify_file_requests_email' => ['nullable', 'boolean'],
-            'notify_file_requests_sms'   => ['nullable', 'boolean'],
+            'notify_file_requests_sms' => ['nullable', 'boolean'],
         ]);
 
         $request->user()->update([
-            'notify_comments_email'      => $request->boolean('notify_comments_email'),
+            'notify_comments_email' => $request->boolean('notify_comments_email'),
             'notify_file_requests_email' => $request->boolean('notify_file_requests_email'),
-            'notify_file_requests_sms'   => $request->boolean('notify_file_requests_sms'),
+            'notify_file_requests_sms' => $request->boolean('notify_file_requests_sms'),
         ]);
     }
 }

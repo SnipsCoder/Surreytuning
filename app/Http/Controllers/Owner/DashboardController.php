@@ -27,6 +27,11 @@ class DashboardController extends Controller
                 ->sum('amount_gross'),
             'recentFileRequests' => FileRequest::with('dealer')->latest()->take(10)->get(),
             'pendingApplicationsCount' => DealerApplication::where('status', ApplicationStatus::Pending)->count(),
+            'topDealers' => Dealer::withCount('fileRequests')
+                ->whereHas('fileRequests')
+                ->orderByDesc('file_requests_count')
+                ->take(8)
+                ->get(),
         ]);
     }
 }

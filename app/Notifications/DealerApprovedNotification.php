@@ -13,9 +13,7 @@ class DealerApprovedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public DealerApplication $application)
-    {
-    }
+    public function __construct(public DealerApplication $application) {}
 
     public function via(object $notifiable): array
     {

@@ -13,6 +13,7 @@ class BoschEcuSeeder extends Seeder
 
         if (! file_exists($path)) {
             $this->command->warn('Bosch ECU data file not found: database/data/bosch_ecus.csv — skipping.');
+
             return;
         }
 
@@ -31,11 +32,11 @@ class BoschEcuSeeder extends Seeder
 
             $batch[] = [
                 'manufacturer_number' => trim($row[0]),
-                'model'               => trim($row[1]),
-                'car_producer'        => trim($row[2]),
-                'image_path'          => isset($row[3]) ? trim($row[3]) ?: null : null,
-                'created_at'          => now(),
-                'updated_at'          => now(),
+                'model' => trim($row[1]),
+                'car_producer' => trim($row[2]),
+                'image_path' => isset($row[3]) ? trim($row[3]) ?: null : null,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
 
             if (count($batch) === 500) {

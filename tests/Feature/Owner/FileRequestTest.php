@@ -14,7 +14,12 @@ class FileRequestTest extends TestCase
 {
     private function ownerUser(): User
     {
-        return User::factory()->create(['role' => UserRole::Owner]);
+        $this->withSession(['two_factor_verified' => true]);
+
+        return User::factory()->create([
+            'role' => UserRole::Owner,
+            'two_factor_confirmed_at' => now(),
+        ]);
     }
 
     public function test_index_loads_for_owner(): void

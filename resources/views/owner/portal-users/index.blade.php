@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Portal Users" subtitle="Owner and technician accounts">
         <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-portal-user' }))"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -8,7 +8,7 @@
 
     <x-data-table :headers="['Name', 'Email', 'Role', 'Status', '']">
         @forelse ($portalUsers as $portalUser)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $portalUser->first_name }} {{ $portalUser->last_name }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $portalUser->email }}</td>
                 <td class="px-4 py-3 text-sm">
@@ -46,20 +46,20 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
                     <input type="text" name="first_name" value="{{ old('first_name') }}" required
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
                     <input type="text" name="last_name" value="{{ old('last_name') }}" required
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
                 </div>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                 <input type="email" name="email" value="{{ old('email') }}" required
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
             </div>
 
             <div class="flex justify-end gap-3 pt-2">

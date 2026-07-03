@@ -11,6 +11,8 @@ class FileDownloadController extends Controller
 {
     public function download(Request $request, FileRequestAttachment $attachment, FileStorageService $fileStorageService)
     {
+        $attachment->loadMissing('fileRequest');
+
         $this->authorize('view', $attachment->fileRequest);
 
         if (is_null($attachment->first_downloaded_at)) {

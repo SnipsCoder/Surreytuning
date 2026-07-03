@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'two_factor_confirmed_at',
         'email_otp_code',
         'email_otp_expires_at',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -52,7 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
-            'status' => 'string',
+            'status' => UserStatus::class,
             'is_primary_contact' => 'boolean',
             'can_view_pricing' => 'boolean',
             'notify_comments_email' => 'boolean',
@@ -61,6 +63,7 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
             'email_otp_expires_at' => 'datetime',
+            'two_factor_recovery_codes' => 'encrypted:array',
         ];
     }
 

@@ -10,7 +10,5 @@ class NewMessagePosted
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public FileRequestMessage $message)
-    {
-    }
+    public function __construct(public FileRequestMessage $message) {}
 }

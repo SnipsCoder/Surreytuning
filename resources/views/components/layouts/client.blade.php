@@ -12,7 +12,13 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        @php $settings = \App\Models\Setting::first(); @endphp
+        @php
+            try {
+                $settings = \App\Models\Setting::first();
+            } catch (\Throwable $e) {
+                $settings = null;
+            }
+        @endphp
         <style>:root { --brand: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
 
         {{ $head ?? '' }}
@@ -22,7 +28,7 @@
             <!-- Sidebar -->
             <aside class="hidden lg:flex lg:flex-col flex-shrink-0 w-64 bg-[#1e293b] border-r border-white/5">
                 <!-- Logo -->
-                <div class="flex items-center h-16 px-5 border-b border-white/5 flex-shrink-0">
+                <div class="flex items-center h-16 px-5 bg-black border-b border-white/5 flex-shrink-0">
                     @if ($settings && $settings->logo_dark)
                         <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[160px] object-contain">
                     @else
@@ -159,8 +165,20 @@
             <div class="flex-1 flex flex-col min-w-0">
                 <!-- Header -->
                 <header class="h-16 flex items-center justify-between px-6 bg-[#1e293b] border-b border-white/5 flex-shrink-0">
-                    <!-- Left: credit pills -->
-                    <div class="flex items-center gap-2">
+                    <!-- Left: search + credit pills -->
+                    <div class="flex items-center gap-4">
+                        <!-- Search -->
+                        <div class="relative hidden md:block" x-data
+                             @keydown.window.cmd.k.prevent="$refs.globalSearch.focus()"
+                             @keydown.window.ctrl.k.prevent="$refs.globalSearch.focus()">
+                            <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input x-ref="globalSearch" type="text" placeholder="Search anything..."
+                                   class="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-sm rounded-lg bg-[#0f172a] border border-white/10 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#e63012]/50 focus:ring-1 focus:ring-[#e63012]/30 transition-colors">
+                            <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-white/5 border border-white/10 rounded pointer-events-none">⌘K</kbd>
+                        </div>
+
                         @php $dealer = auth()->user()->dealer ?? null; @endphp
                         @if ($dealer)
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#0f172a] text-slate-300 border border-white/10">
@@ -223,7 +241,11 @@
                 </header>
 
                 @php
-                    $portalStatus = \App\Models\PortalStatus::find(1);
+                    try {
+                        $portalStatus = \App\Models\PortalStatus::find(1);
+                    } catch (\Throwable $e) {
+                        $portalStatus = null;
+                    }
                     $statusValue  = $portalStatus?->status?->value ?? 'available';
                     $bannerClass  = match($statusValue) {
                         'busy', 'delayed'            => 'bg-amber-900/40 border-amber-700 text-amber-300',
@@ -238,9 +260,17 @@
                     </div>
                 @endif
 
-                <main class="flex-1 overflow-y-auto bg-[#0f172a] p-6">
+                <main class="flex-1 overflow-y-auto bg-[#0f172a] p-6 flex flex-col">
                     <x-flash-messages />
-                    {{ $slot }}
+                    <div class="flex-1">
+                        {{ $slot }}
+                    </div>
+
+                    <!-- Footer -->
+                    <footer class="mt-8 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600">
+                        <p>&copy; {{ date('Y') }} {{ config('app.name', 'Surrey Tuning Services') }}. All rights reserved.</p>
+                        <p>Dealer Portal v1.0</p>
+                    </footer>
                 </main>
             </div>
         </div>

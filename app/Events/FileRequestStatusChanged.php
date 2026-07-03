@@ -14,6 +14,5 @@ class FileRequestStatusChanged
     public function __construct(
         public FileRequest $fileRequest,
         public FileRequestStatus $oldStatus,
-    ) {
-    }
+    ) {}
 }

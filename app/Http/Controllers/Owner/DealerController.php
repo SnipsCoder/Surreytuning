@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Owner;
 use App\Enums\DealerStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\AdjustCreditsRequest;
+use App\Models\AuditLog;
 use App\Models\Dealer;
 use App\Services\CreditService;
 use Illuminate\Http\Request;
@@ -34,12 +35,22 @@ class DealerController extends Controller
             'users',
             'fileRequests' => fn ($query) => $query->latest()->limit(10),
             'invoices' => fn ($query) => $query->latest()->limit(10),
-            'slaveCreditTransactions' => fn ($query) => $query->latest()->limit(20),
-            'evcCreditTransactions' => fn ($query) => $query->latest()->limit(20),
         ]);
+
+        $slaveTransactions = $dealer->slaveCreditTransactions()
+            ->latest()
+            ->paginate(20, ['*'], 'slave_page')
+            ->withQueryString();
+
+        $evcTransactions = $dealer->evcCreditTransactions()
+            ->latest()
+            ->paginate(20, ['*'], 'evc_page')
+            ->withQueryString();
 
         return view('owner.dealers.show', [
             'dealer' => $dealer,
+            'slaveTransactions' => $slaveTransactions,
+            'evcTransactions' => $evcTransactions,
         ]);
     }
 
@@ -65,6 +76,15 @@ class DealerController extends Controller
             $creditService->manualAdjustEvcCredits($dealer, $amount, $reason, $request->user());
         }
 
+        AuditLog::record(
+            'dealer.credits_adjusted',
+            $request->user(),
+            $dealer,
+            $amount,
+            $reason,
+            ['credit_type' => $request->validated('credit_type')],
+        );
+
         return back()->with('success', 'Credits adjusted successfully.');
     }
 
@@ -72,12 +92,16 @@ class DealerController extends Controller
     {
         $dealer->update(['status' => DealerStatus::Suspended]);
 
+        AuditLog::record('dealer.suspended', $request->user(), $dealer);
+
         return back()->with('success', 'Dealer suspended.');
     }
 
     public function reactivate(Request $request, Dealer $dealer)
     {
         $dealer->update(['status' => DealerStatus::Approved]);
+
+        AuditLog::record('dealer.reactivated', $request->user(), $dealer);
 
         return back()->with('success', 'Dealer reactivated.');
     }

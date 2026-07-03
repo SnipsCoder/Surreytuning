@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
-
 {
     const CREATED_AT = null;
 
@@ -39,13 +38,24 @@ class Setting extends Model
         ];
     }
 
+    protected static ?self $instance = null;
+
     public static function get(): self
     {
-        return static::firstOrCreate(['id' => 1], [
-            'vat_rate' => 20.00,
-            'invoice_start_number' => 10000,
-            'invoice_reference_prefix' => 'INV',
-            'theme_colour' => '#e63012',
-        ]);
+        if (static::$instance === null) {
+            static::$instance = static::firstOrCreate(['id' => 1], [
+                'vat_rate' => 20.00,
+                'invoice_start_number' => 10000,
+                'invoice_reference_prefix' => 'INV',
+                'theme_colour' => '#e63012',
+            ]);
+        }
+
+        return static::$instance;
+    }
+
+    public static function clearCache(): void
+    {
+        static::$instance = null;
     }
 }

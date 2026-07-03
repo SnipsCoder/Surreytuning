@@ -1,14 +1,14 @@
-<div>
+﻿<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
     <input type="text" name="name" value="{{ old('name', $tool?->name) }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
 </div>
 
 <div class="grid grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
         <select name="category" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
             @foreach (\App\Enums\TuningToolCategory::cases() as $category)
                 <option value="{{ $category->value }}" @selected(old('category', $tool?->category?->value) === $category->value)>
                     {{ $category->label() }}
@@ -20,7 +20,7 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
         <input type="number" name="sort_order" value="{{ old('sort_order', $tool?->sort_order) }}"
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 

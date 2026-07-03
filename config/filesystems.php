@@ -74,6 +74,24 @@ return [
             'throw' => false,
         ],
 
+        /*
+         * Separate PRIVATE R2 bucket used exclusively for database backups
+         * (spatie/laravel-backup). Kept distinct from the 'r2' upload bucket so
+         * a compromised app credential can't read/delete backups, and vice
+         * versa. Falls back to the primary R2 credentials if dedicated backup
+         * credentials aren't set.
+         */
+        'r2_backups' => [
+            'driver' => 's3',
+            'key' => env('R2_BACKUP_ACCESS_KEY_ID', env('R2_ACCESS_KEY_ID')),
+            'secret' => env('R2_BACKUP_SECRET_ACCESS_KEY', env('R2_SECRET_ACCESS_KEY')),
+            'region' => 'auto',
+            'bucket' => env('R2_BACKUP_BUCKET'),
+            'endpoint' => env('R2_BACKUP_ENDPOINT', env('R2_ENDPOINT')),
+            'use_path_style_endpoint' => false,
+            'throw' => true,
+        ],
+
     ],
 
     /*

@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="File Stages" subtitle="Tuning stages available for file requests">
         <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-file-stage' }))"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -8,7 +8,7 @@
 
     <x-data-table :headers="['Name', 'Vehicle Type', 'Price (Net)', 'Turnaround', 'Active', '']">
         @forelse ($fileStages as $fileStage)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $fileStage->name }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $fileStage->vehicle_type->label() }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">£{{ number_format((float) $fileStage->price_net, 2) }}</td>

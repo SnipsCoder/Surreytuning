@@ -16,6 +16,5 @@ class DealerApplicationApproved
         public readonly DealerApplication $application,
         public readonly Dealer $dealer,
         public readonly User $user,
-    ) {
-    }
+    ) {}
 }

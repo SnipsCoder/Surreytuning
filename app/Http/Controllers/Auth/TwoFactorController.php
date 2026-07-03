@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Mail\TwoFactorCodeMail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -22,7 +24,7 @@ class TwoFactorController extends Controller
     public function initTotp(Request $request): RedirectResponse
     {
         $user = $request->user();
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
 
         $secret = $google2fa->generateSecretKey();
 
@@ -70,11 +72,26 @@ class TwoFactorController extends Controller
             return back()->withErrors(['code' => 'The code you entered is incorrect or has expired.']);
         }
 
-        $user->forceFill(['two_factor_confirmed_at' => now()])->save();
+        $recoveryCodes = $this->generateRecoveryCodes();
+
+        $user->forceFill([
+            'two_factor_confirmed_at' => now(),
+            'two_factor_recovery_codes' => $recoveryCodes,
+        ])->save();
         session(['two_factor_verified' => true]);
 
-        return redirect()->intended($this->homeRoute($user))
-            ->with('success', 'Two-factor authentication has been enabled.');
+        // Do NOT use redirect()->intended(): a guest bounced from an owner-only URL
+        // (e.g. /dashboard) has that path stashed as url.intended, which would send a
+        // dealer into the owner portal and trip IsOwnerUser (403). Always use the
+        // role-based homeRoute, and drop the stale intended URL. Mirrors the same
+        // decision in AuthenticatedSessionController@store.
+        $request->session()->forget('url.intended');
+
+        // Surface the recovery codes exactly once, on the redirect after setup, so
+        // the user can store them. They are never shown again in plaintext.
+        return redirect($this->homeRoute($user))
+            ->with('success', 'Two-factor authentication has been enabled.')
+            ->with('recovery_codes', $recoveryCodes);
     }
 
     public function challenge(Request $request): View|RedirectResponse
@@ -99,13 +116,19 @@ class TwoFactorController extends Controller
         $user = $request->user();
         $code = preg_replace('/\s+/', '', $request->input('code'));
 
-        if (! $this->verifyCode($user, $code)) {
+        // Accept either a live OTP/TOTP code or a one-time recovery code (used when
+        // the authenticator/email is unavailable). Recovery codes are consumed.
+        if (! $this->verifyCode($user, $code) && ! $this->consumeRecoveryCode($user, $request->input('code'))) {
             return back()->withErrors(['code' => 'The code you entered is incorrect or has expired.']);
         }
 
         session(['two_factor_verified' => true]);
 
-        return redirect()->intended($this->homeRoute($user));
+        // See confirm(): a stale url.intended stashed by an owner-only route would
+        // land a dealer on the owner dashboard (403). Always use the role-based home.
+        $request->session()->forget('url.intended');
+
+        return redirect($this->homeRoute($user));
     }
 
     public function resend(Request $request): RedirectResponse
@@ -131,6 +154,7 @@ class TwoFactorController extends Controller
             'two_factor_confirmed_at' => null,
             'email_otp_code' => null,
             'email_otp_expires_at' => null,
+            'two_factor_recovery_codes' => null,
         ])->save();
 
         session()->forget('two_factor_verified');
@@ -141,7 +165,7 @@ class TwoFactorController extends Controller
     private function verifyCode($user, string $code): bool
     {
         if ($user->two_factor_method === 'totp') {
-            $google2fa = new Google2FA();
+            $google2fa = new Google2FA;
             $secret = decrypt($user->two_factor_secret);
 
             return (bool) $google2fa->verifyKey($secret, $code);
@@ -154,6 +178,38 @@ class TwoFactorController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function generateRecoveryCodes(): array
+    {
+        return collect(range(1, 8))
+            ->map(fn () => Str::random(10).'-'.Str::random(10))
+            ->all();
+    }
+
+    private function consumeRecoveryCode($user, ?string $input): bool
+    {
+        $input = trim((string) $input);
+
+        if ($input === '') {
+            return false;
+        }
+
+        $codes = $user->two_factor_recovery_codes ?? [];
+
+        if (! in_array($input, $codes, true)) {
+            return false;
+        }
+
+        // Single-use: remove the consumed code and persist the remainder.
+        $remaining = array_values(array_filter($codes, fn ($code) => ! hash_equals($code, $input)));
+
+        $user->forceFill(['two_factor_recovery_codes' => $remaining])->save();
+
+        return true;
     }
 
     private function sendEmailOtp($user): void
@@ -170,7 +226,7 @@ class TwoFactorController extends Controller
 
     private function homeRoute($user): string
     {
-        return in_array($user->role, [\App\Enums\UserRole::Owner, \App\Enums\UserRole::Technician])
+        return in_array($user->role, [UserRole::Owner, UserRole::Technician])
             ? route('owner.dashboard')
             : route('client.dashboard');
     }

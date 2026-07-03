@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Vehicle Stats" subtitle="Performance figures by make/model">
         <a href="{{ route('vehicle-stats.create') }}"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -10,19 +10,19 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
             <input type="text" name="make" value="{{ request('make') }}"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
         </div>
 
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
             <input type="text" name="model" value="{{ request('model') }}"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
         </div>
 
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fuel</label>
             <select name="fuel"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
                 <option value="">All</option>
                 @foreach (\App\Enums\FuelType::cases() as $fuel)
                     <option value="{{ $fuel->value }}" @selected(request('fuel') === $fuel->value)>{{ $fuel->label() }}</option>
@@ -39,7 +39,7 @@
 
     <x-data-table :headers="['Make', 'Model', 'Year Range', 'Engine', 'Stage', 'BHP Before/After', 'Torque Before/After', '']">
         @forelse ($vehicleStats as $vehicleStat)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $vehicleStat->make }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->model }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->year_from }} - {{ $vehicleStat->year_to }}</td>

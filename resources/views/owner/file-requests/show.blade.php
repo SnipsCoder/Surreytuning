@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <div x-data="{ tab: 'message' }">
         <x-page-header :title="$fileRequest->request_number_formatted" :subtitle="$fileRequest->make.' '.$fileRequest->model.' • '.$fileRequest->dealer?->company_name">
             <div class="flex items-center gap-3">
@@ -10,7 +10,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {{-- Left panel: details + status/stage/assignment + message thread --}}
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm border border-gray-200 dark:border-[#2a2a2a] p-5">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Vehicle &amp; Job Details</h3>
                     <dl class="grid grid-cols-2 gap-4 text-sm">
                         <div><dt class="text-gray-500 dark:text-gray-400">Registration</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->registration ?? '—' }}</dd></div>
@@ -24,14 +24,14 @@
                     </dl>
 
                     @if ($fileRequest->client_notes)
-                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-[#2a2a2a]">
                             <dt class="text-gray-500 dark:text-gray-400 text-sm mb-1">Client Notes</dt>
                             <dd class="text-sm text-gray-900 dark:text-gray-100">{{ $fileRequest->client_notes }}</dd>
                         </div>
                     @endif
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm border border-gray-200 dark:border-[#2a2a2a] p-5">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Message Thread</h3>
                     <div class="space-y-3 max-h-96 overflow-y-auto">
                         @forelse ($fileRequest->messages as $message)
@@ -53,7 +53,7 @@
                     </div>
 
                     @if ($fileRequest->attachments->isNotEmpty())
-                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-[#2a2a2a]">
                             <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Attachments</h4>
                             <ul class="space-y-1">
                                 @foreach ($fileRequest->attachments as $attachment)
@@ -70,13 +70,13 @@
 
             {{-- Right panel: action tabs --}}
             <div class="space-y-4">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm border border-gray-200 dark:border-[#2a2a2a] p-5">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Status &amp; Assignment</h3>
 
                     <form method="POST" action="{{ route('owner.file-requests.status', $fileRequest) }}" class="mb-3">
                         @csrf
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Status</label>
-                        <select name="status" onchange="this.form.submit()" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                        <select name="status" onchange="this.form.submit()" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                             @foreach ($statuses as $status)
                                 <option value="{{ $status->value }}" @selected($fileRequest->status === $status)>{{ $status->label() }}</option>
                             @endforeach
@@ -86,7 +86,7 @@
                     <form method="POST" action="{{ route('owner.file-requests.assign', $fileRequest) }}">
                         @csrf
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Technician</label>
-                        <select name="assigned_technician_id" onchange="this.form.submit()" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                        <select name="assigned_technician_id" onchange="this.form.submit()" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                             <option value="">Unassigned</option>
                             @foreach ($technicians as $technician)
                                 <option value="{{ $technician->id }}" @selected($fileRequest->assigned_technician_id === $technician->id)>{{ $technician->full_name }}</option>
@@ -95,8 +95,8 @@
                     </form>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div class="flex flex-wrap border-b border-gray-200 dark:border-gray-700 text-xs font-medium">
+                <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm border border-gray-200 dark:border-[#2a2a2a]">
+                    <div class="flex flex-wrap border-b border-gray-200 dark:border-[#2a2a2a] text-xs font-medium">
                         <button type="button" x-on:click="tab = 'message'" :class="tab === 'message' ? 'text-indigo-600 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'text-gray-500 border-transparent dark:text-gray-400'" class="px-3 py-2 border-b-2">Message</button>
                         <button type="button" x-on:click="tab = 'respond'" :class="tab === 'respond' ? 'text-indigo-600 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'text-gray-500 border-transparent dark:text-gray-400'" class="px-3 py-2 border-b-2">Respond</button>
                         <button type="button" x-on:click="tab = 'charge'" :class="tab === 'charge' ? 'text-indigo-600 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'text-gray-500 border-transparent dark:text-gray-400'" class="px-3 py-2 border-b-2">Add Charge</button>
@@ -111,7 +111,7 @@
                             <form method="POST" action="{{ route('owner.messages.store', $fileRequest) }}" class="space-y-3">
                                 @csrf
                                 <input type="hidden" name="is_internal" value="0">
-                                <textarea name="body" rows="4" required maxlength="5000" placeholder="Write a message to the client..." class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm"></textarea>
+                                <textarea name="body" rows="4" required maxlength="5000" placeholder="Write a message to the client..." class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm"></textarea>
                                 <button type="submit" class="w-full px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500">Send Message</button>
                             </form>
                         </div>
@@ -120,7 +120,7 @@
                         <div x-show="tab === 'respond'" x-cloak>
                             <form method="POST" action="{{ route('owner.file-requests.respond', $fileRequest) }}" enctype="multipart/form-data" class="space-y-3">
                                 @csrf
-                                <textarea name="message" rows="3" placeholder="Optional message to accompany the file..." class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm"></textarea>
+                                <textarea name="message" rows="3" placeholder="Optional message to accompany the file..." class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm"></textarea>
                                 <input type="file" name="file" class="w-full text-sm text-gray-700 dark:text-gray-300">
                                 <button type="submit" class="w-full px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500">Send Response</button>
                             </form>
@@ -132,17 +132,17 @@
                                 @csrf
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</label>
-                                    <input type="text" name="description" required maxlength="255" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                                    <input type="text" name="description" required maxlength="255" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Amount (net, £)</label>
-                                    <input type="number" name="amount_net" step="0.01" min="0.01" required class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                                    <input type="number" name="amount_net" step="0.01" min="0.01" required class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                                 </div>
                                 <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                    <input type="checkbox" name="apply_vat" value="1" checked class="rounded border-gray-300 dark:border-gray-700">
+                                    <input type="checkbox" name="apply_vat" value="1" checked class="rounded border-gray-300 dark:border-[#2a2a2a]">
                                     Apply VAT
                                 </label>
-                                <button type="submit" class="w-full px-4 py-2 rounded-md bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium hover:bg-gray-800">Add Charge</button>
+                                <button type="submit" class="w-full px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a]">Add Charge</button>
                             </form>
                         </div>
 
@@ -152,18 +152,18 @@
                                 @csrf
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit Type</label>
-                                    <select name="credit_type" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                                    <select name="credit_type" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                                         <option value="slave">Slave Credits</option>
                                         <option value="evc">EVC Credits</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Amount</label>
-                                    <input type="number" name="amount" step="0.01" min="0.01" required class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                                    <input type="number" name="amount" step="0.01" min="0.01" required class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Reason</label>
-                                    <input type="text" name="reason" required maxlength="255" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm">
+                                    <input type="text" name="reason" required maxlength="255" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
                                 </div>
                                 <button type="submit" class="w-full px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-500">Add Credit</button>
                             </form>
@@ -174,7 +174,7 @@
                             <form method="POST" action="{{ route('owner.messages.store', $fileRequest) }}" class="space-y-3">
                                 @csrf
                                 <input type="hidden" name="is_internal" value="1">
-                                <textarea name="body" rows="4" required maxlength="5000" placeholder="Internal note (not visible to client)..." class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm"></textarea>
+                                <textarea name="body" rows="4" required maxlength="5000" placeholder="Internal note (not visible to client)..." class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm"></textarea>
                                 <button type="submit" class="w-full px-4 py-2 rounded-md bg-yellow-600 text-white text-sm font-medium hover:bg-yellow-500">Add Internal Note</button>
                             </form>
                         </div>
@@ -195,9 +195,9 @@
             <form method="POST" action="{{ route('owner.file-requests.void', $fileRequest) }}" class="space-y-3">
                 @csrf
                 <p class="text-sm text-gray-600 dark:text-gray-300">This action cannot be undone. Please provide a reason for voiding this request.</p>
-                <textarea name="void_reason" rows="3" required maxlength="500" placeholder="Reason for voiding..." class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm"></textarea>
+                <textarea name="void_reason" rows="3" required maxlength="500" placeholder="Reason for voiding..." class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm"></textarea>
                 <div class="flex justify-end gap-2">
-                    <button type="button" x-on:click="$dispatch('close-modal', 'void-confirm')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300">Cancel</button>
+                    <button type="button" x-on:click="$dispatch('close-modal', 'void-confirm')" class="px-4 py-2 rounded-md border border-gray-300 dark:border-[#2a2a2a] text-sm font-medium text-gray-600 dark:text-gray-300">Cancel</button>
                     <button type="submit" class="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-500">Confirm Void</button>
                 </div>
             </form>

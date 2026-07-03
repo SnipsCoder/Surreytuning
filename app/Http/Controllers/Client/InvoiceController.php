@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Client;
 use App\Enums\InvoiceStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Services\InvoicePdfService;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
+    public function __construct(private StripeService $stripeService) {}
 
     public function index(Request $request)
     {
@@ -34,11 +33,25 @@ class InvoiceController extends Controller
 
     public function show(Request $request, Invoice $invoice)
     {
-        abort_unless($invoice->dealer_id === $request->user()->dealer_id, 403);
+        $this->authorize('view', $invoice);
 
         return view('client.invoices.show', [
             'invoice' => $invoice,
         ]);
+    }
+
+    public function pdf(Request $request, Invoice $invoice, InvoicePdfService $pdfService)
+    {
+        $this->authorize('view', $invoice);
+
+        return $pdfService->make($invoice)->stream($pdfService->filename($invoice));
+    }
+
+    public function download(Request $request, Invoice $invoice, InvoicePdfService $pdfService)
+    {
+        $this->authorize('view', $invoice);
+
+        return $pdfService->make($invoice)->download($pdfService->filename($invoice));
     }
 
     public function pay(Request $request, Invoice $invoice)
@@ -58,7 +71,7 @@ class InvoiceController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            route('client.payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'invoice',

@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Health Check Token
+    |--------------------------------------------------------------------------
+    |
+    | Optional shared secret guarding the deep `/healthz` endpoint. When set,
+    | callers must pass `?token=` to match; otherwise the endpoint returns 404
+    | so uptime details are not exposed publicly. Leave null in local dev.
+    |
+    */
+
+    'health_check_token' => env('HEALTH_CHECK_TOKEN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

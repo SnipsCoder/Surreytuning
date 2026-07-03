@@ -46,6 +46,7 @@ class Noticeboard extends Model
             })
             ->where(function ($q) use ($today) {
                 $q->whereNull('show_until')->orWhere('show_until', '>=', $today);
-            });
+            })
+            ->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'normal' THEN 2 WHEN 'low' THEN 3 ELSE 4 END");
     }
 }

@@ -10,35 +10,40 @@ use App\Models\Noticeboard;
 use App\Models\OpeningHour;
 use App\Models\PortalStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $user     = $request->user();
+        $user = $request->user();
         $dealerId = $user->dealer_id;
-        $dealer   = $user->dealer;
+        $dealer = $user->dealer;
 
         $stats = [
-            'pending'            => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Pending)->count(),
-            'in_progress'        => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Progress)->count(),
-            'completed_this_year'=> FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Closed)->whereYear('updated_at', now()->year)->count(),
-            'slave_balance'      => $dealer?->slave_credit_balance ?? 0,
-            'evc_balance'        => $dealer?->evc_credit_balance ?? 0,
+            'pending' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Pending)->count(),
+            'in_progress' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Progress)->count(),
+            'completed_this_year' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Closed)->whereYear('updated_at', now()->year)->count(),
+            'slave_balance' => $dealer?->slave_credit_balance ?? 0,
+            'evc_balance' => $dealer?->evc_credit_balance ?? 0,
+        ];
+
+        $deltas = [
+            'pending_yesterday' => FileRequest::where('dealer_id', $dealerId)->whereDate('created_at', now()->subDay())->count(),
+            'in_progress_today' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Progress)->whereDate('updated_at', today())->count(),
+            'completed_this_month' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Closed)->whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->count(),
         ];
 
         // 12-month spend chart from paid invoices
-        $spendData  = [];
+        $spendData = [];
         $spendLabels = [];
         for ($i = 11; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $spendLabels[] = $month->format('M');
-            $spendData[]   = Invoice::where('dealer_id', $dealerId)
+            $spendData[] = Invoice::where('dealer_id', $dealerId)
                 ->where('status', 'paid')
                 ->whereYear('paid_at', $month->year)
                 ->whereMonth('paid_at', $month->month)
-                ->sum('total') / 100;
+                ->sum('amount_gross');
         }
 
         $recentFileRequests = FileRequest::where('dealer_id', $dealerId)
@@ -48,7 +53,6 @@ class DashboardController extends Controller
             ->get();
 
         $notices = Noticeboard::active()
-            ->orderByDesc('priority')
             ->take(5)
             ->get();
 
@@ -58,10 +62,16 @@ class DashboardController extends Controller
 
         $totalSpent = Invoice::where('dealer_id', $dealerId)
             ->where('status', 'paid')
-            ->sum('total') / 100;
+            ->sum('amount_gross');
+
+        $totalSpentThisYear = Invoice::where('dealer_id', $dealerId)
+            ->where('status', 'paid')
+            ->whereYear('paid_at', now()->year)
+            ->sum('amount_gross');
 
         return view('client.dashboard', compact(
             'stats',
+            'deltas',
             'spendData',
             'spendLabels',
             'recentFileRequests',
@@ -69,6 +79,7 @@ class DashboardController extends Controller
             'portalStatus',
             'todayHours',
             'totalSpent',
+            'totalSpentThisYear',
             'dealer',
         ));
     }

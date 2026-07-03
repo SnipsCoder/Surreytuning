@@ -12,7 +12,12 @@ class DealerApplicationTest extends TestCase
 {
     private function ownerUser(): User
     {
-        return User::factory()->create(['role' => UserRole::Owner]);
+        $this->withSession(['two_factor_verified' => true]);
+
+        return User::factory()->create([
+            'role' => UserRole::Owner,
+            'two_factor_confirmed_at' => now(),
+        ]);
     }
 
     private function application(array $overrides = []): DealerApplication

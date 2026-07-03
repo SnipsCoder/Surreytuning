@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('slave_credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dealer_id')->constrained('dealers');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('file_request_id')->nullable()->constrained('file_requests')->nullOnDelete();
             $table->enum('type', ['top_up', 'deduction', 'manual_credit', 'refund']);
             $table->decimal('amount', 10, 2);

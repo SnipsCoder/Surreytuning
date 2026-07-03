@@ -12,9 +12,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public FileRequestMessage $message)
-    {
-    }
+    public function __construct(public FileRequestMessage $message) {}
 
     public function via(object $notifiable): array
     {
@@ -25,7 +23,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
     {
         $fileRequest = $this->message->fileRequest;
         $ref = $fileRequest->request_number_formatted;
-        $url = url('/file-requests/' . $fileRequest->id);
+        $url = url('/file-requests/'.$fileRequest->id);
 
         return (new MailMessage)
             ->subject("New Message on File Request {$ref}")

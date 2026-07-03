@@ -14,6 +14,5 @@ class PaymentConfirmed
     public function __construct(
         public readonly Invoice $invoice,
         public readonly Dealer $dealer,
-    ) {
-    }
+    ) {}
 }

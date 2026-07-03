@@ -1,7 +1,7 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Bosch ECU Search" subtitle="Search Bosch ECU reference data" />
 
-    <form method="GET" action="{{ route('owner.bosch-ecu.index') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 flex flex-wrap items-end gap-4">
+    <form method="GET" action="{{ route('owner.bosch-ecu.index') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-4 mb-6 flex flex-wrap items-end gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manufacturer Number</label>
             <input type="text" name="manufacturer_number" value="{{ $manufacturerNumber }}" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
@@ -19,7 +19,7 @@
     </form>
 
     @if (! $hasSearched)
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-8 text-center text-sm text-gray-500 dark:text-gray-400">
             Enter a manufacturer number or car producer to search.
         </div>
     @else

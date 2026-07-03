@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -34,7 +35,7 @@ class TenancyServiceProvider extends ServiceProvider
 
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;
-                })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
+                })->shouldBeQueued(false), // Intentionally synchronous — see note below.
             ],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],
@@ -46,8 +47,19 @@ class TenancyServiceProvider extends ServiceProvider
                     Jobs\DeleteDatabase::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
-                })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
+                })->shouldBeQueued(false), // Intentionally synchronous — see note below.
             ],
+
+            // NOTE: The create/delete pipelines above are deliberately kept
+            // synchronous (`shouldBeQueued(false)`). Tenants are provisioned
+            // and offboarded rarely, by the operator via `tenants:create` /
+            // `tenants:delete` — there is no self-service web signup. Running
+            // synchronously gives the operator truthful, immediate feedback and
+            // lets the command roll back a partial provision, rather than
+            // risking a silent failure if a queue worker is down in a system
+            // where data safety is paramount. Do not flip these to `true`
+            // without introducing async signup that can tolerate deferred,
+            // out-of-band provisioning.
 
             // Domain events
             Events\CreatingDomain::class => [],
@@ -142,7 +154,7 @@ class TenancyServiceProvider extends ServiceProvider
         ];
 
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
-            $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
+            $this->app[Kernel::class]->prependToMiddlewarePriority($middleware);
         }
     }
 }

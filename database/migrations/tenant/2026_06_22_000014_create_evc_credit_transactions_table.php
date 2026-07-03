@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('evc_credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dealer_id')->constrained('dealers');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('winols_bundle_id')->nullable()->constrained('winols_bundles')->nullOnDelete();
-            $table->enum('type', ['purchase', 'manual_credit', 'refund']);
+            $table->enum('type', ['purchase', 'deduction', 'manual_credit', 'refund']);
             $table->decimal('amount', 10, 2);
             $table->string('reason')->nullable();
             $table->decimal('balance_after', 10, 2);

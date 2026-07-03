@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Client;
 use App\Http\Controllers\DealerApplicationController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\Owner;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Webhooks;
@@ -41,8 +42,8 @@ Route::middleware([
             Route::post('/setup/email', [Auth\TwoFactorController::class, 'initEmail'])->name('setup.email');
             Route::post('/confirm', [Auth\TwoFactorController::class, 'confirm'])->name('confirm');
             Route::get('/challenge', [Auth\TwoFactorController::class, 'challenge'])->name('challenge');
-            Route::post('/verify', [Auth\TwoFactorController::class, 'verify'])->name('verify');
-            Route::post('/resend', [Auth\TwoFactorController::class, 'resend'])->name('resend');
+            Route::post('/verify', [Auth\TwoFactorController::class, 'verify'])->middleware('throttle:6,1')->name('verify');
+            Route::post('/resend', [Auth\TwoFactorController::class, 'resend'])->middleware('throttle:6,1')->name('resend');
             Route::post('/disable', [Auth\TwoFactorController::class, 'disable'])->name('disable');
         });
     });
@@ -53,6 +54,10 @@ Route::middleware([
     Route::get('/apply', [DealerApplicationController::class, 'create'])->name('apply.create');
     Route::post('/apply', [DealerApplicationController::class, 'store'])->name('apply.store')->middleware('throttle:3,60');
     Route::get('/apply/received', fn () => view('auth.application-received'))->name('apply.received');
+
+    // Public legal pages
+    Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
+    Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
 
     // Owner/admin portal (no prefix)
     Route::middleware(['auth', 'two_factor', 'owner'])->group(function () {
@@ -84,6 +89,8 @@ Route::middleware([
 
         // Invoices
         Route::resource('invoices', Owner\InvoiceController::class)->only(['index', 'show', 'store']);
+        Route::get('/invoices/{invoice}/download', [Owner\InvoiceController::class, 'download'])->name('owner.invoices.download');
+        Route::post('/invoices/{invoice}/send', [Owner\InvoiceController::class, 'send'])->name('owner.invoices.send');
         Route::post('/invoices/{invoice}/void', [Owner\InvoiceController::class, 'void'])->name('owner.invoices.void');
         Route::post('/invoices/{invoice}/mark-paid', [Owner\InvoiceController::class, 'markPaid'])->name('owner.invoices.mark-paid');
 
@@ -145,6 +152,8 @@ Route::middleware([
         // Invoices
         Route::get('/invoices', [Client\InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/{invoice}', [Client\InvoiceController::class, 'show'])->name('invoices.show');
+        Route::get('/invoices/{invoice}/pdf', [Client\InvoiceController::class, 'pdf'])->name('invoices.pdf');
+        Route::get('/invoices/{invoice}/download', [Client\InvoiceController::class, 'download'])->name('invoices.download');
         Route::post('/invoices/{invoice}/pay', [Client\InvoiceController::class, 'pay'])->name('invoices.pay');
 
         // Stripe return

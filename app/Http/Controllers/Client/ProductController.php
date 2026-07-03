@@ -21,8 +21,7 @@ class ProductController extends Controller
         private CreditService $creditService,
         private InvoiceService $invoiceService,
         private StripeService $stripeService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request)
     {
@@ -124,7 +123,7 @@ class ProductController extends Controller
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            route('client.payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'product',

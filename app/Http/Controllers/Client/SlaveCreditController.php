@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 
 class SlaveCreditController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
-    }
+    public function __construct(private StripeService $stripeService) {}
 
     public function index(Request $request)
     {
@@ -44,18 +43,20 @@ class SlaveCreditController extends Controller
             ->findOrFail($validated['product_id']);
 
         $dealer = $request->user()->dealer;
-        $amount = (float) $product->price_net;
+        $settings = Setting::get();
+        $amountNet = (float) $product->price_net;
+        $amountGross = round($amountNet * (1 + $settings->vat_rate / 100), 2);
 
         $session = $this->stripeService->createCheckoutSession(
             [[
                 'price_data' => [
                     'currency' => 'gbp',
                     'product_data' => ['name' => $product->name],
-                    'unit_amount' => (int) round($amount * 100),
+                    'unit_amount' => (int) round($amountGross * 100),
                 ],
                 'quantity' => 1,
             ]],
-            route('client.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            route('client.payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
                 'type' => 'slave_credits',

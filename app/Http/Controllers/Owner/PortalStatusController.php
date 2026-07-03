@@ -6,6 +6,7 @@ use App\Enums\PortalStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\PortalStatus;
 use Illuminate\Http\Request;
+
 class PortalStatusController extends Controller
 {
     public function update(Request $request)

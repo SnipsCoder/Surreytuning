@@ -1,20 +1,20 @@
-<div>
+﻿<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
     <input type="text" name="name" value="{{ old('name', $winolsBundle?->name) }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
 </div>
 
 <div class="grid grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Credits</label>
         <input type="number" name="credits" min="1" value="{{ old('credits', $winolsBundle?->credits) }}" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (Net)</label>
         <input type="number" name="price_net" step="0.01" min="0" value="{{ old('price_net', $winolsBundle?->price_net) }}" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 

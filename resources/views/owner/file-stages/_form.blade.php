@@ -1,23 +1,23 @@
-@php
+﻿@php
     $vehicleTypes = \App\Enums\VehicleType::cases();
 @endphp
 
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
     <input type="text" name="name" value="{{ old('name', $fileStage?->name) }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
 </div>
 
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
     <textarea name="description" rows="2"
-        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">{{ old('description', $fileStage?->description) }}</textarea>
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">{{ old('description', $fileStage?->description) }}</textarea>
 </div>
 
 <div class="grid grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vehicle Type</label>
-        <select name="vehicle_type" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+        <select name="vehicle_type" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
             @foreach ($vehicleTypes as $type)
                 <option value="{{ $type->value }}" @selected(old('vehicle_type', $fileStage?->vehicle_type?->value) === $type->value)>{{ $type->label() }}</option>
             @endforeach
@@ -27,7 +27,7 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Turnaround (hours)</label>
         <input type="number" name="turnaround_hours" min="0" value="{{ old('turnaround_hours', $fileStage?->turnaround_hours) }}" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 
@@ -35,13 +35,13 @@
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (Net)</label>
         <input type="number" name="price_net" step="0.01" min="0" value="{{ old('price_net', $fileStage?->price_net) }}" required
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
         <input type="number" name="sort_order" value="{{ old('sort_order', $fileStage?->sort_order ?? 0) }}"
-            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 </div>
 

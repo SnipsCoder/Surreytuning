@@ -1,4 +1,4 @@
-<x-layouts.owner>
+﻿<x-layouts.owner>
     <x-page-header title="Products" subtitle="Shop products available to dealers">
         <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-product' }))"
             class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
@@ -8,7 +8,7 @@
 
     <x-data-table :headers="['Image', 'Name', 'Price (Net)', 'Payment Type', 'Stock', 'Active', '']">
         @forelse ($products as $product)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
+            <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm">
                     @if ($product->image_path)
                         <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->image_path) }}" alt="{{ $product->name }}" class="h-10 w-10 object-cover rounded-md">
