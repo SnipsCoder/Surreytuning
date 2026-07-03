@@ -34,11 +34,11 @@
     >
         <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <ol class="flex items-center gap-4 text-sm">
-                <li :class="step === 1 ? 'text-orange-600 font-semibold' : 'text-gray-500 dark:text-gray-400'">1. Vehicle Details</li>
+                <li :class="step === 1 ? 'text-[#e63012] font-semibold' : 'text-gray-500 dark:text-gray-400'">1. Vehicle Details</li>
                 <li class="text-gray-300 dark:text-gray-600">&rarr;</li>
-                <li :class="step === 2 ? 'text-orange-600 font-semibold' : 'text-gray-500 dark:text-gray-400'">2. Service Selection</li>
+                <li :class="step === 2 ? 'text-[#e63012] font-semibold' : 'text-gray-500 dark:text-gray-400'">2. Service Selection</li>
                 <li class="text-gray-300 dark:text-gray-600">&rarr;</li>
-                <li :class="step === 3 ? 'text-orange-600 font-semibold' : 'text-gray-500 dark:text-gray-400'">3. File Upload</li>
+                <li :class="step === 3 ? 'text-[#e63012] font-semibold' : 'text-gray-500 dark:text-gray-400'">3. File Upload</li>
             </ol>
         </div>
 
@@ -95,7 +95,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <x-input-label for="fuel" value="Fuel Type *" />
-                        <select id="fuel" name="fuel" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <select id="fuel" name="fuel" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                             <option value="">Select...</option>
                             @foreach (\App\Enums\FuelType::cases() as $fuel)
                                 @continue(in_array($fuel, [\App\Enums\FuelType::Electric, \App\Enums\FuelType::Hybrid]))
@@ -106,7 +106,7 @@
                     </div>
                     <div>
                         <x-input-label for="transmission" value="Transmission *" />
-                        <select id="transmission" name="transmission" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <select id="transmission" name="transmission" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                             <option value="">Select...</option>
                             @foreach (\App\Enums\TransmissionType::cases() as $transmission)
                                 <option value="{{ $transmission->value }}" @selected(old('transmission') === $transmission->value)>{{ $transmission->label() }}</option>
@@ -124,7 +124,7 @@
 
                 <div>
                     <x-input-label for="file_type" value="File Type *" />
-                    <select id="file_type" name="file_type" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <select id="file_type" name="file_type" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                         <option value="ecu" @selected(old('file_type', 'ecu') === 'ecu')>ECU</option>
                         <option value="tcu" @selected(old('file_type') === 'tcu')>TCU</option>
                         <option value="adblue" @selected(old('file_type') === 'adblue')>AdBlue</option>
@@ -146,7 +146,7 @@
                 </div>
 
                 <div class="flex justify-end pt-2">
-                    <button type="button" x-on:click="next()" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700">
+                    <button type="button" x-on:click="next()" class="inline-flex items-center px-4 py-2 bg-[#e63012] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#c42910]">
                         Next: Service Selection
                     </button>
                 </div>
@@ -156,7 +156,7 @@
             <div x-show="step === 2" x-cloak class="space-y-6">
                 <div>
                     <x-input-label for="file_stage_id" value="File Stage *" />
-                    <select id="file_stage_id" name="file_stage_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <select id="file_stage_id" name="file_stage_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                         <option value="">Select...</option>
                         @foreach ($fileStages as $stage)
                             <option value="{{ $stage->id }}" @selected(old('file_stage_id') == $stage->id)>{{ $stage->name }}</option>
@@ -167,7 +167,7 @@
 
                 <div>
                     <x-input-label for="tool_id" value="Tuning Tool *" />
-                    <select id="tool_id" name="tool_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                    <select id="tool_id" name="tool_id" x-bind:required="step === 2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                         <option value="">Select...</option>
                         @foreach ($tools as $tool)
                             <option value="{{ $tool->id }}" @selected(old('tool_id') == $tool->id)>{{ $tool->name }}</option>
@@ -182,7 +182,7 @@
                         @foreach ($fileOptions as $option)
                             <label class="flex items-center justify-between rounded-md border border-gray-200 dark:border-gray-700 px-4 py-2">
                                 <span class="flex items-center gap-2">
-                                    <input type="checkbox" name="file_options[]" value="{{ $option->id }}" x-model="fileOptions" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                    <input type="checkbox" name="file_options[]" value="{{ $option->id }}" x-model="fileOptions" class="rounded border-gray-300 text-[#e63012] focus:ring-[#e63012]">
                                     <span class="text-sm text-gray-900 dark:text-gray-100">{{ $option->name }}</span>
                                 </span>
                                 <span class="text-sm text-gray-500 dark:text-gray-400">&pound;{{ number_format($option->price_net, 2) }}</span>
@@ -195,7 +195,7 @@
                 <div>
                     <x-input-label value="DTC Codes (optional)" />
                     <div class="mt-2 flex gap-2">
-                        <input type="text" x-model="newDtc" x-on:keydown.enter.prevent="addDtc()" placeholder="e.g. P0420" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                        <input type="text" x-model="newDtc" x-on:keydown.enter.prevent="addDtc()" placeholder="e.g. P0420" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">
                         <button type="button" x-on:click="addDtc()" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600">
                             Add
                         </button>
@@ -215,7 +215,7 @@
                     <button type="button" x-on:click="back()" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600">
                         Back
                     </button>
-                    <button type="button" x-on:click="next()" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700">
+                    <button type="button" x-on:click="next()" class="inline-flex items-center px-4 py-2 bg-[#e63012] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#c42910]">
                         Next: File Upload
                     </button>
                 </div>
@@ -230,11 +230,11 @@
                         x-on:dragleave.prevent="dragging = false"
                         x-on:drop.prevent="dragging = false; if ($event.dataTransfer.files.length) { $refs.fileInput.files = $event.dataTransfer.files; fileName = $event.dataTransfer.files[0].name; }"
                         x-on:click="$refs.fileInput.click()"
-                        :class="dragging ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-gray-300 dark:border-gray-600'"
+                        :class="dragging ? 'border-[#e63012] bg-[#e63012]/10 dark:bg-[#e63012]/20' : 'border-gray-300 dark:border-gray-600'"
                         class="mt-1 flex flex-col items-center justify-center w-full rounded-md border-2 border-dashed px-6 py-8 text-center cursor-pointer transition-colors"
                     >
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            <span class="font-semibold text-orange-700 dark:text-orange-300">Click to choose a file</span> or drag and drop it here
+                            <span class="font-semibold text-[#e63012] dark:text-[#e63012]">Click to choose a file</span> or drag and drop it here
                         </p>
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="fileName ? 'Selected: ' + fileName : 'No file chosen'"></p>
                         <input
@@ -253,7 +253,7 @@
 
                 <div>
                     <x-input-label for="client_notes" value="Notes (optional)" />
-                    <textarea id="client_notes" name="client_notes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-orange-500 focus:ring-orange-500">{{ old('client_notes') }}</textarea>
+                    <textarea id="client_notes" name="client_notes" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]">{{ old('client_notes') }}</textarea>
                     <x-input-error :messages="$errors->get('client_notes')" class="mt-1" />
                 </div>
 
@@ -266,7 +266,7 @@
                     <button type="button" x-on:click="back()" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600">
                         Back
                     </button>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-[#e63012] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#c42910]">
                         Submit File Request
                     </button>
                 </div>
