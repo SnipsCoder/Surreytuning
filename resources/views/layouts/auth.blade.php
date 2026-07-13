@@ -5,21 +5,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Surrey Tuning Services') }}</title>
+        <title>{{ \App\Models\Setting::brandName() }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <x-brand-styles />
     </head>
     <body class="font-sans antialiased min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
         <div class="w-full max-w-md">
             <div class="mb-8 flex justify-center">
-                @php $settings = \App\Models\Setting::first(); @endphp
+                @php $settings = \App\Models\Setting::first(); $brandName = \App\Models\Setting::brandName(); @endphp
                 @if ($settings && $settings->logo_dark)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-12 object-contain">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-12 object-contain">
                 @else
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='Surrey Tuning Services';">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='{{ $brandName }}';">
                 @endif
             </div>
 

@@ -6,7 +6,7 @@
     <p class="text-gray-400">Last updated {{ now()->format('j F Y') }}.</p>
 
     <p>
-        {{ config('app.name', 'Surrey Tuning Services') }} ("we", "us") is committed to protecting the
+        {{ \App\Models\Setting::brandName() }} ("we", "us") is committed to protecting the
         personal data of the dealers and users who use this portal. This policy explains what we
         collect, why we hold it, and the rights you have over it.
     </p>
@@ -44,7 +44,7 @@
     <p>
         To exercise any of these rights, contact us at
         @if ($contactEmail)
-            <a href="mailto:{{ $contactEmail }}" class="text-[#e63012] hover:underline">{{ $contactEmail }}</a>.
+            <a href="mailto:{{ $contactEmail }}" class="text-brand hover:underline">{{ $contactEmail }}</a>.
         @else
             our usual support address.
         @endif

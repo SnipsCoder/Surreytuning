@@ -41,7 +41,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code or Description</label>
             <input type="text" x-model="query" x-on:input="search"
-                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-[#e63012] focus:ring-[#e63012]"
+                class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-brand focus:ring-brand"
                 placeholder="e.g. P0420">
         </div>
 

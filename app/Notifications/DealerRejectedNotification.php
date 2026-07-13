@@ -22,7 +22,7 @@ class DealerRejectedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Surrey Tuning Services — Application Update')
+            ->subject(\App\Models\Setting::brandName().' — Application Update')
             ->view('emails.dealer-rejected', [
                 'application' => $this->application,
             ]);

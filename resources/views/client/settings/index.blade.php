@@ -12,7 +12,7 @@
             <nav class="-mb-px flex gap-6">
                 @foreach (['account' => 'Account', 'profile' => 'Profile', 'security' => 'Security', 'notifications' => 'Notifications'] as $key => $label)
                     <button type="button" x-on:click="tab = '{{ $key }}'"
-                        :class="tab === '{{ $key }}' ? 'border-[#e63012] text-[#e63012]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
+                        :class="tab === '{{ $key }}' ? 'border-brand text-brand' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
                         class="py-3 text-sm font-medium border-b-2 whitespace-nowrap">
                         {{ $label }}
                     </button>
@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">Save Changes</button>
+                    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">Save Changes</button>
+                    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">Update Password</button>
+                    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Update Password</button>
                 </div>
             </form>
         </div>
@@ -132,14 +132,14 @@
                 <label class="flex items-center gap-3">
                     <input type="hidden" name="notify_comments_email" value="0">
                     <input type="checkbox" name="notify_comments_email" value="1" @checked(old('notify_comments_email', $user->notify_comments_email))
-                        class="rounded border-gray-300 text-[#e63012] shadow-sm">
+                        class="rounded border-gray-300 text-brand shadow-sm">
                     <span class="text-sm text-gray-700 dark:text-gray-300">New comment on my file orders</span>
                 </label>
 
                 <label class="flex items-center gap-3">
                     <input type="hidden" name="notify_file_requests_email" value="0">
                     <input type="checkbox" name="notify_file_requests_email" value="1" @checked(old('notify_file_requests_email', $user->notify_file_requests_email))
-                        class="rounded border-gray-300 text-[#e63012] shadow-sm">
+                        class="rounded border-gray-300 text-brand shadow-sm">
                     <span class="text-sm text-gray-700 dark:text-gray-300">File request status updates (email)</span>
                 </label>
 
@@ -148,12 +148,12 @@
                 <label class="flex items-center gap-3">
                     <input type="hidden" name="notify_file_requests_sms" value="0">
                     <input type="checkbox" name="notify_file_requests_sms" value="1" @checked(old('notify_file_requests_sms', $user->notify_file_requests_sms))
-                        class="rounded border-gray-300 text-[#e63012] shadow-sm">
+                        class="rounded border-gray-300 text-brand shadow-sm">
                     <span class="text-sm text-gray-700 dark:text-gray-300">File request status updates (SMS)</span>
                 </label>
 
                 <div class="pt-2">
-                    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">Save Preferences</button>
+                    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Save Preferences</button>
                 </div>
             </form>
         </div>

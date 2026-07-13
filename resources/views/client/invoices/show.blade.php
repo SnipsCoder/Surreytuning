@@ -1,7 +1,7 @@
 <x-layouts.client>
     <x-page-header title="Invoice #{{ $invoice->invoice_number }}" subtitle="{{ $invoice->description }}">
         <a href="{{ route('client.invoices.pdf', $invoice) }}" target="_blank"
-           class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:opacity-90">
+           class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:opacity-90">
             View PDF
         </a>
 

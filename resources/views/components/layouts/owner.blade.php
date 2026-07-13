@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Surrey Tuning Services') }}</title>
+        <title>{{ \App\Models\Setting::brandName() }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -18,8 +18,9 @@
             } catch (\Throwable $e) {
                 $settings = null;
             }
+            $brandName = \App\Models\Setting::brandName();
         @endphp
-        <style>:root { --brand: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
+        <x-brand-styles />
 
         {{ $head ?? '' }}
     </head>
@@ -29,10 +30,10 @@
             <aside class="hidden lg:flex lg:flex-col flex-shrink-0 w-64 bg-[#1e293b] border-r border-white/5">
                 <div class="flex items-center h-16 px-5 bg-black border-b border-white/5 flex-shrink-0">
                     @if ($settings && $settings->logo_dark)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[148px] object-contain">
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-8 max-w-[148px] object-contain">
                     @else
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-8 max-w-[148px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <span class="ms-3 text-white font-semibold hidden">Surrey Tuning</span>
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-8 max-w-[148px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <span class="ms-3 text-white font-semibold hidden">{{ $brandName }}</span>
                     @endif
                 </div>
 
@@ -76,9 +77,9 @@
                                 <a href="{{ Route::has($link['route']) ? route($link['route']) : '#' }}"
                                    class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg mb-0.5 transition-colors
                                        {{ $isActive
-                                           ? 'bg-[#e63012]/15 text-[#e63012] border border-[#e63012]/30'
+                                           ? 'bg-brand/15 text-brand border border-brand/30'
                                            : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent' }}">
-                                    <svg class="w-4 h-4 flex-shrink-0 {{ $isActive ? 'text-[#e63012]' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 flex-shrink-0 {{ $isActive ? 'text-brand' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         {!! $link['icon'] !!}
                                     </svg>
                                     {{ $link['label'] }}
@@ -103,7 +104,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                             <input x-ref="globalSearch" type="text" placeholder="Search anything..."
-                                   class="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-sm rounded-lg bg-[#0f172a] border border-white/10 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#e63012]/50 focus:ring-1 focus:ring-[#e63012]/30 transition-colors">
+                                   class="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-sm rounded-lg bg-[#0f172a] border border-white/10 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition-colors">
                             <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-white/5 border border-white/10 rounded pointer-events-none">⌘K</kbd>
                         </div>
 
@@ -152,7 +153,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
                             @if ($pendingApplications > 0)
-                                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-[#e63012] text-white text-[10px] font-bold rounded-full">
+                                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-brand text-white text-[10px] font-bold rounded-full">
                                     {{ $pendingApplications > 9 ? '9+' : $pendingApplications }}
                                 </span>
                             @endif
@@ -168,7 +169,7 @@
                             $initials = strtoupper(substr(auth()->user()->first_name ?? '', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1));
                         @endphp
                         <div class="relative">
-                            <div class="w-9 h-9 rounded-full bg-[#e63012]/20 flex items-center justify-center text-sm font-bold text-[#e63012]">
+                            <div class="w-9 h-9 rounded-full bg-brand/20 flex items-center justify-center text-sm font-bold text-brand">
                                 {{ $initials }}
                             </div>
                             <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-[#1e293b] rounded-full"></span>
@@ -186,7 +187,7 @@
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-y-auto bg-[#0f172a] p-6 flex flex-col">
+                <main x-data="{}" class="flex-1 overflow-y-auto bg-[#0f172a] p-6 flex flex-col">
                     <x-flash-messages />
                     <div class="flex-1">
                         {{ $slot }}
@@ -194,7 +195,7 @@
 
                     <!-- Footer -->
                     <footer class="mt-8 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600">
-                        <p>&copy; {{ date('Y') }} {{ config('app.name', 'Surrey Tuning Services') }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} {{ $brandName }}. All rights reserved.</p>
                         <p>Owner Portal v1.0</p>
                     </footer>
                 </main>

@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --brand: 230 48 18;
+        --brand-dark: 196 41 15;
+    }
+}

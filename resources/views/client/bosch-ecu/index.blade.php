@@ -10,7 +10,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Car Producer</label>
             <input type="text" name="car_producer" value="{{ $carProducer }}" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
         </div>
-        <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-[#e63012] hover:bg-[#c8280f]">
+        <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c8280f]">
             Search
         </button>
         @if ($hasSearched)

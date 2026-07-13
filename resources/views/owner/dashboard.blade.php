@@ -13,7 +13,7 @@
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent File Requests</h2>
                 @if ($pendingApplicationsCount > 0)
-                    <a href="{{ route('dealer-applications.index') }}" class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-[#e63012]/10 text-[#e63012]">
+                    <a href="{{ route('dealer-applications.index') }}" class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-brand/10 text-brand">
                         {{ $pendingApplicationsCount }} pending dealer application{{ $pendingApplicationsCount === 1 ? '' : 's' }}
                     </a>
                 @endif
@@ -23,7 +23,7 @@
                 @forelse ($recentFileRequests as $fileRequest)
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            <a href="{{ route('file-requests.show', $fileRequest) }}" class="text-[#e63012] hover:underline">
+                            <a href="{{ route('file-requests.show', $fileRequest) }}" class="text-brand hover:underline">
                                 {{ $fileRequest->request_number_formatted }}
                             </a>
                         </td>
@@ -50,7 +50,7 @@
                 @forelse ($topDealers as $dealer)
                     <li>
                         <a href="{{ route('dealers.show', $dealer) }}" class="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-md bg-[#e63012] text-white text-sm font-semibold shrink-0">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-md bg-brand text-white text-sm font-semibold shrink-0">
                                 {{ $loop->iteration }}
                             </span>
                             <span class="min-w-0">

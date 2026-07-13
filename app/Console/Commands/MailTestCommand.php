@@ -33,14 +33,16 @@ class MailTestCommand extends Command
         $this->line("Recipient:    {$recipient}");
 
         try {
+            $brand = $fromName !== '' ? $fromName : 'the dealer portal';
+
             Mail::raw(
-                "This is a test email from Surrey Tuning Services.\n\n".
+                "This is a test email from {$brand}.\n\n".
                 "If you received this message, your mail configuration is working.\n\n".
                 'Mailer: '.$mailer."\n".
                 'Sent at: '.now()->toDateTimeString().' UTC',
-                function ($message) use ($recipient) {
+                function ($message) use ($recipient, $brand) {
                     $message->to($recipient)
-                        ->subject('Surrey Tuning Services — Mail Configuration Test');
+                        ->subject($brand.' — Mail Configuration Test');
                 }
             );
         } catch (Throwable $e) {

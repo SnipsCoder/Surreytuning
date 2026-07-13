@@ -5,21 +5,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ ($title ?? '') ? $title.' — ' : '' }}{{ config('app.name', 'Surrey Tuning Services') }}</title>
+        <title>{{ ($title ?? '') ? $title.' — ' : '' }}{{ \App\Models\Setting::brandName() }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <x-brand-styles />
     </head>
     <body class="font-sans antialiased min-h-screen bg-[#0f172a] py-10 px-4">
         <div class="mx-auto w-full max-w-3xl">
             <div class="mb-8 flex justify-center">
-                @php $settings = \App\Models\Setting::first(); @endphp
+                @php $settings = \App\Models\Setting::first(); $brandName = \App\Models\Setting::brandName(); @endphp
                 @if ($settings && $settings->logo_dark)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-12 object-contain">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-12 object-contain">
                 @else
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='Surrey Tuning Services';">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='{{ $brandName }}';">
                 @endif
             </div>
 
@@ -31,7 +33,7 @@
             </div>
 
             <p class="mt-6 text-center text-xs text-gray-500">
-                &copy; {{ now()->year }} {{ config('app.name', 'Surrey Tuning Services') }}.
+                &copy; {{ now()->year }} {{ $brandName }}.
                 <a href="{{ route('legal.terms') }}" class="text-gray-400 hover:text-white underline">Terms</a>
                 &middot;
                 <a href="{{ route('legal.privacy') }}" class="text-gray-400 hover:text-white underline">Privacy</a>

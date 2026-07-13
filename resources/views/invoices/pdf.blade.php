@@ -1,7 +1,8 @@
 @php
     use App\Enums\InvoiceStatus;
 
-    $providerName = ($appName = config('app.name')) && $appName !== 'Laravel' ? $appName : 'Surrey Tuning Services';
+    $providerName = $settings instanceof \App\Models\Setting ? $settings->resolveBrandName() : \App\Models\Setting::brandName();
+    $brandColour = $settings instanceof \App\Models\Setting ? $settings->resolveBrandColour() : \App\Models\Setting::brandColour();
     $prefix = $settings->invoice_reference_prefix ?: 'INV';
     $reference = $prefix . '-' . $invoice->invoice_number;
     $vatRate = rtrim(rtrim(number_format((float) $settings->vat_rate, 2), '0'), '.');
@@ -47,7 +48,7 @@
             color: #ffffff;
         }
         .header .doc-ref { text-align: right; font-size: 12px; color: #cbd5e1; }
-        .accent-bar { height: 4px; background-color: #e63012; }
+        .accent-bar { height: 4px; background-color: {{ $brandColour }}; }
 
         .body { padding: 28px 32px; }
 

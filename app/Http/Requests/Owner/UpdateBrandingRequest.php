@@ -18,6 +18,8 @@ class UpdateBrandingRequest extends FormRequest
             'logo_dark' => ['nullable', 'image', 'max:2048'],
             'login_background' => ['nullable', 'image', 'max:4096'],
             'theme_colour' => ['nullable', 'string', 'max:7'],
+            'brand_name' => ['nullable', 'string', 'max:255'],
+            'support_email' => ['nullable', 'email', 'max:255'],
         ];
     }
 }

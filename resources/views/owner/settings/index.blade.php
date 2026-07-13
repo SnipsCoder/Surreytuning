@@ -1,4 +1,4 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header title="Settings" subtitle="Manage portal configuration" />
 
     @if (session('success'))
@@ -21,7 +21,7 @@
                     <button
                         type="button"
                         x-on:click="tab = '{{ $key }}'"
-                        :class="tab === '{{ $key }}' ? 'border-[#e63012] text-[#e63012]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                        :class="tab === '{{ $key }}' ? 'border-brand text-brand' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
                         class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium"
                     >
                         {{ $label }}
@@ -72,7 +72,7 @@
                 <input type="hidden" name="terms_and_conditions" value="{{ $settings->terms_and_conditions }}">
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Account Settings
                     </button>
                 </div>
@@ -96,7 +96,7 @@
                             {{ $days[$hour->day_of_week] ?? $hour->day_of_week }}
                         </div>
                         <label class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <input type="checkbox" name="hours[{{ $i }}][is_open]" value="1" {{ $hour->is_open ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-[#e63012] focus:ring-[#e63012]">
+                            <input type="checkbox" name="hours[{{ $i }}][is_open]" value="1" {{ $hour->is_open ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                             Open
                         </label>
                         <input type="time" name="hours[{{ $i }}][open_time]" value="{{ \Illuminate\Support\Carbon::parse($hour->open_time)->format('H:i') }}" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
@@ -106,7 +106,7 @@
                 @endforeach
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Opening Hours
                     </button>
                 </div>
@@ -145,10 +145,20 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Theme Colour</label>
                         <input type="color" name="theme_colour" value="{{ old('theme_colour', $settings->theme_colour) }}" class="h-10 w-20 rounded-md border-gray-300 dark:border-gray-600">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand Name</label>
+                        <input type="text" name="brand_name" value="{{ old('brand_name', $settings->brand_name) }}" placeholder="Dealer Portal" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shown across the portal, invoices and legal pages.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Support Email</label>
+                        <input type="email" name="support_email" value="{{ old('support_email', $settings->support_email) }}" placeholder="support@example.com" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for the Contact Support link and legal contact details.</p>
+                    </div>
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Branding
                     </button>
                 </div>
@@ -173,12 +183,12 @@
                 <input type="hidden" name="active_tab" value="dealer">
 
                 <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                    <input type="checkbox" name="dealer_auto_onboard" value="1" {{ $settings->dealer_auto_onboard ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-[#e63012] focus:ring-[#e63012]">
+                    <input type="checkbox" name="dealer_auto_onboard" value="1" {{ $settings->dealer_auto_onboard ? 'checked' : '' }} class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                     Automatically onboard new dealer applications
                 </label>
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Dealer Settings
                     </button>
                 </div>
@@ -216,7 +226,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Invoice Settings
                     </button>
                 </div>
@@ -246,7 +256,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
                         Save Terms &amp; Conditions
                     </button>
                 </div>

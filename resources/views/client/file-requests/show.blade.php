@@ -144,7 +144,7 @@
                                 {{ $message->body }}
                             </div>
                             <span class="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                                {{ $message->sender?->first_name ?? 'Surrey Tuning' }} &middot; {{ $message->created_at->format('d/m/Y H:i') }}
+                                {{ $message->sender?->first_name ?? \App\Models\Setting::brandName() }} &middot; {{ $message->created_at->format('d/m/Y H:i') }}
                             </span>
                         </div>
                     @endif

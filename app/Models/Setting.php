@@ -21,6 +21,8 @@ class Setting extends Model
         'logo_dark',
         'login_background',
         'theme_colour',
+        'brand_name',
+        'support_email',
         'dealer_auto_onboard',
         'terms_and_conditions',
         'stripe_public_key',
@@ -57,5 +59,88 @@ class Setting extends Model
     public static function clearCache(): void
     {
         static::$instance = null;
+    }
+
+    /**
+     * Resolve the brand / product name shown throughout the portal.
+     * Falls back to the configured app name, then a generic default,
+     * so a freshly white-labelled tenant never leaks "Laravel" or a
+     * previous owner's name.
+     */
+    public function resolveBrandName(): string
+    {
+        if (filled($this->brand_name)) {
+            return $this->brand_name;
+        }
+
+        $appName = config('app.name');
+
+        if (filled($appName) && $appName !== 'Laravel') {
+            return $appName;
+        }
+
+        return 'Dealer Portal';
+    }
+
+    /**
+     * Resolve the public support email address.
+     * Falls back to the configured mail "from" address.
+     */
+    public function resolveSupportEmail(): ?string
+    {
+        if (filled($this->support_email)) {
+            return $this->support_email;
+        }
+
+        return config('mail.from.address');
+    }
+
+    /**
+     * Resolve the brand colour as a hex string. Emails cannot use CSS
+     * variables reliably, so they inline this value directly.
+     */
+    public function resolveBrandColour(): string
+    {
+        return filled($this->theme_colour) ? $this->theme_colour : '#e63012';
+    }
+
+    /**
+     * Static convenience for the resolved brand name, safe to call from
+     * Blade layouts before a request-scoped instance exists.
+     */
+    public static function brandName(): string
+    {
+        try {
+            return (static::first() ?? new static())->resolveBrandName();
+        } catch (\Throwable $e) {
+            $appName = config('app.name');
+
+            return (filled($appName) && $appName !== 'Laravel') ? $appName : 'Dealer Portal';
+        }
+    }
+
+    /**
+     * Static convenience for the resolved support email.
+     */
+    public static function supportEmail(): ?string
+    {
+        try {
+            return (static::first() ?? new static())->resolveSupportEmail();
+        } catch (\Throwable $e) {
+            return config('mail.from.address');
+        }
+    }
+
+    /**
+     * Static convenience for the resolved brand colour, safe to call from
+     * email templates before a request-scoped instance exists.
+     */
+    public static function brandColour(): string
+    {
+        try {
+            return (static::first() ?? new static())->resolveBrandColour();
+        } catch (\Throwable $e) {
+            return '#e63012';
+        }
     }
 }

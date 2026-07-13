@@ -29,7 +29,7 @@ class DealerApprovedNotification extends Notification implements ShouldQueue
         ], false));
 
         return (new MailMessage)
-            ->subject('Welcome to Surrey Tuning Services — Set Your Password')
+            ->subject('Welcome to '.\App\Models\Setting::brandName().' — Set Your Password')
             ->view('emails.dealer-approved', [
                 'application' => $this->application,
                 'resetUrl' => $resetUrl,

@@ -4,7 +4,7 @@
     $accents = [
         'blue'   => 'text-blue-400',
         'green'  => 'text-green-400',
-        'red'    => 'text-[#e63012]',
+        'red'    => 'text-brand',
         'yellow' => 'text-amber-400',
         'gray'   => 'text-slate-400',
     ];
