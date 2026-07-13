@@ -14,7 +14,7 @@ class AdjustCreditsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'credit_type' => ['required', 'in:slave,evc'],
+            'credit_type' => ['required', 'in:file,evc'],
             'amount' => ['required', 'numeric', 'not_in:0'],
             'reason' => ['required', 'string', 'max:255'],
         ];

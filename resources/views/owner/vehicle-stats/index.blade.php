@@ -1,7 +1,7 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header title="Vehicle Stats" subtitle="Performance figures by make/model">
         <a href="{{ route('vehicle-stats.create') }}"
-            class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
             Add Vehicle Stat
         </a>
     </x-page-header>

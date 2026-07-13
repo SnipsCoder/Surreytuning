@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum SlaveCreditTransactionType: string
+enum FileCreditTransactionType: string
 {
     case TopUp = 'top_up';
     case Deduction = 'deduction';

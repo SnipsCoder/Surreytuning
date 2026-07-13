@@ -1,7 +1,7 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header title="Noticeboard" subtitle="Notices shown to dealers">
-        <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-noticeboard' }))"
-            class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-noticeboard' }))"
+            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
             Add Notice
         </button>
     </x-page-header>
@@ -24,7 +24,7 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $noticeboard->created_at->format('d/m/Y') }}</td>
                 <td class="px-4 py-3 text-sm text-right space-x-3">
-                    <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-noticeboard-{{ $noticeboard->id }}' }))"
+                    <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-noticeboard-{{ $noticeboard->id }}' }))"
                         class="text-indigo-600 dark:text-indigo-400 hover:underline">Edit</button>
                     <form method="POST" action="{{ route('noticeboards.destroy', $noticeboard) }}" class="inline" onsubmit="return confirm('Delete this notice?')">
                         @csrf

@@ -79,20 +79,20 @@ class DealerTest extends TestCase
         $this->assertSame('Spoke with dealer about late payment.', $dealer->refresh()->notes);
     }
 
-    public function test_slave_credits_can_be_adjusted(): void
+    public function test_file_credits_can_be_adjusted(): void
     {
         $owner = $this->ownerUser();
-        $dealer = Dealer::factory()->create(['slave_credit_balance' => 10]);
+        $dealer = Dealer::factory()->create(['file_credit_balance' => 10]);
 
         $response = $this->actingAs($owner)->post("/dealers/{$dealer->id}/credits", [
-            'credit_type' => 'slave',
+            'credit_type' => 'file',
             'amount' => 25,
             'reason' => 'Goodwill credit',
         ]);
 
         $response->assertRedirect();
-        $this->assertEquals(35, $dealer->refresh()->slave_credit_balance);
-        $this->assertDatabaseHas('slave_credit_transactions', [
+        $this->assertEquals(35, $dealer->refresh()->file_credit_balance);
+        $this->assertDatabaseHas('file_credit_transactions', [
             'dealer_id' => $dealer->id,
             'reason' => 'Goodwill credit',
         ]);

@@ -48,6 +48,8 @@
                 <td class="px-4 py-3 text-sm text-right space-x-2 whitespace-nowrap">
                     <a href="{{ route('invoices.show', $invoice) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">View</a>
 
+                    <a href="{{ route('owner.invoices.download', $invoice) }}" class="text-slate-600 dark:text-slate-300 hover:underline">PDF</a>
+
                     @if ($invoice->status === \App\Enums\InvoiceStatus::Issued)
                         <form method="POST" action="{{ route('owner.invoices.mark-paid', $invoice) }}" class="inline">
                             @csrf

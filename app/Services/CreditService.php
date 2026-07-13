@@ -3,28 +3,28 @@
 namespace App\Services;
 
 use App\Enums\EvcCreditTransactionType;
-use App\Enums\SlaveCreditTransactionType;
+use App\Enums\FileCreditTransactionType;
 use App\Exceptions\InsufficientCreditsException;
 use App\Models\Dealer;
 use App\Models\EvcCreditTransaction;
-use App\Models\SlaveCreditTransaction;
+use App\Models\FileCreditTransaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class CreditService
 {
-    public function addSlaveCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): SlaveCreditTransaction
+    public function addFileCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
-            $balanceAfter = bcadd((string) $dealer->slave_credit_balance, (string) $amount, 2);
+            $balanceAfter = bcadd((string) $dealer->file_credit_balance, (string) $amount, 2);
 
-            $dealer->update(['slave_credit_balance' => $balanceAfter]);
+            $dealer->update(['file_credit_balance' => $balanceAfter]);
 
-            return SlaveCreditTransaction::create([
+            return FileCreditTransaction::create([
                 'dealer_id' => $dealer->id,
                 'user_id' => $performedBy?->id,
                 'file_request_id' => $fileRequestId,
-                'type' => SlaveCreditTransactionType::TopUp,
+                'type' => FileCreditTransactionType::TopUp,
                 'amount' => $amount,
                 'reason' => $reason,
                 'balance_after' => $balanceAfter,
@@ -32,22 +32,22 @@ class CreditService
         });
     }
 
-    public function deductSlaveCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): SlaveCreditTransaction
+    public function deductFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
-            if ($dealer->slave_credit_balance < $amount) {
-                throw new InsufficientCreditsException('Dealer does not have sufficient slave credits.');
+            if ($dealer->file_credit_balance < $amount) {
+                throw new InsufficientCreditsException('Dealer does not have sufficient file credits.');
             }
 
-            $balanceAfter = bcsub((string) $dealer->slave_credit_balance, (string) $amount, 2);
+            $balanceAfter = bcsub((string) $dealer->file_credit_balance, (string) $amount, 2);
 
-            $dealer->update(['slave_credit_balance' => $balanceAfter]);
+            $dealer->update(['file_credit_balance' => $balanceAfter]);
 
-            return SlaveCreditTransaction::create([
+            return FileCreditTransaction::create([
                 'dealer_id' => $dealer->id,
                 'user_id' => $performedBy->id,
                 'file_request_id' => $fileRequestId,
-                'type' => SlaveCreditTransactionType::Deduction,
+                'type' => FileCreditTransactionType::Deduction,
                 'amount' => -$amount,
                 'reason' => $reason,
                 'balance_after' => $balanceAfter,
@@ -55,18 +55,18 @@ class CreditService
         });
     }
 
-    public function manualAdjustSlaveCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): SlaveCreditTransaction
+    public function manualAdjustFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
-            $balanceAfter = bcadd((string) $dealer->slave_credit_balance, (string) $amount, 2);
+            $balanceAfter = bcadd((string) $dealer->file_credit_balance, (string) $amount, 2);
 
-            $dealer->update(['slave_credit_balance' => $balanceAfter]);
+            $dealer->update(['file_credit_balance' => $balanceAfter]);
 
-            return SlaveCreditTransaction::create([
+            return FileCreditTransaction::create([
                 'dealer_id' => $dealer->id,
                 'user_id' => $performedBy->id,
                 'file_request_id' => null,
-                'type' => $amount >= 0 ? SlaveCreditTransactionType::ManualCredit : SlaveCreditTransactionType::Deduction,
+                'type' => $amount >= 0 ? FileCreditTransactionType::ManualCredit : FileCreditTransactionType::Deduction,
                 'amount' => $amount,
                 'reason' => $reason,
                 'balance_after' => $balanceAfter,
@@ -135,8 +135,8 @@ class CreditService
         });
     }
 
-    public function hasSufficientSlaveCredits(Dealer $dealer, float $amount): bool
+    public function hasSufficientFileCredits(Dealer $dealer, float $amount): bool
     {
-        return $dealer->slave_credit_balance >= $amount;
+        return $dealer->file_credit_balance >= $amount;
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('price_net', 10, 2);
             $table->boolean('vat_applicable')->default(false);
-            $table->enum('payment_type', ['slave_credits', 'direct_payment', 'both'])->default('both');
+            $table->enum('payment_type', ['file_credits', 'direct_payment', 'both'])->default('both');
             $table->unsignedInteger('stock')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('image_path')->nullable();

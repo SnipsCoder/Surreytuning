@@ -140,8 +140,8 @@ Route::middleware([
         Route::get('/download/{attachment}', [Client\FileDownloadController::class, 'download'])->name('download');
 
         // Credits
-        Route::get('/credits/slave', [Client\SlaveCreditController::class, 'index'])->name('credits.slave');
-        Route::post('/credits/slave/checkout', [Client\SlaveCreditController::class, 'checkout'])->name('credits.slave.checkout');
+        Route::get('/credits/file', [Client\FileCreditController::class, 'index'])->name('credits.file');
+        Route::post('/credits/file/checkout', [Client\FileCreditController::class, 'checkout'])->name('credits.file.checkout');
         Route::get('/credits/evc', [Client\EvcCreditController::class, 'index'])->name('credits.evc');
         Route::post('/credits/evc/checkout', [Client\EvcCreditController::class, 'checkout'])->name('credits.evc.checkout');
 

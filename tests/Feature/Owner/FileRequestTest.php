@@ -78,17 +78,17 @@ class FileRequestTest extends TestCase
     public function test_add_credit_updates_dealer_balance(): void
     {
         $owner = $this->ownerUser();
-        $dealer = Dealer::factory()->create(['slave_credit_balance' => 0]);
+        $dealer = Dealer::factory()->create(['file_credit_balance' => 0]);
         $fileRequest = FileRequest::factory()->create(['dealer_id' => $dealer->id]);
 
         $response = $this->actingAs($owner)->post("/file-requests/{$fileRequest->id}/credit", [
-            'credit_type' => 'slave',
+            'credit_type' => 'file',
             'amount' => 50,
             'reason' => 'Goodwill credit',
         ]);
 
         $response->assertRedirect();
-        $this->assertEquals(50, $dealer->refresh()->slave_credit_balance);
+        $this->assertEquals(50, $dealer->refresh()->file_credit_balance);
     }
 
     public function test_void_closes_file_request(): void

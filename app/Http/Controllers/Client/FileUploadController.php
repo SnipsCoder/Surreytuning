@@ -123,8 +123,8 @@ class FileUploadController extends Controller
 
         event(new FileRequestSubmitted($fileRequest));
 
-        if (! $creditService->hasSufficientSlaveCredits($dealer, (float) ($fileRequest->fileStage->price_net ?? 0))) {
-            session()->flash('warning', 'Your slave credit balance may be insufficient to cover this request. Please top up to avoid delays.');
+        if (! $creditService->hasSufficientFileCredits($dealer, (float) ($fileRequest->fileStage->price_net ?? 0))) {
+            session()->flash('warning', 'Your file credit balance may be insufficient to cover this request. Please top up to avoid delays.');
         }
 
         return redirect()

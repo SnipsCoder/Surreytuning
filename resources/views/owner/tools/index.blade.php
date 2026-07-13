@@ -1,7 +1,7 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header title="Tuning Tools" subtitle="Tools used to read/write files">
-        <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-tool' }))"
-            class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-tool' }))"
+            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
             Add Tool
         </button>
     </x-page-header>
@@ -22,7 +22,7 @@
                     @endif
                 </td>
                 <td class="px-4 py-3 text-sm text-right space-x-3">
-                    <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-tool-{{ $tool->id }}' }))"
+                    <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-tool-{{ $tool->id }}' }))"
                         class="text-indigo-600 dark:text-indigo-400 hover:underline">Edit</button>
                     <form method="POST" action="{{ route('tools.destroy', $tool) }}" class="inline" onsubmit="return confirm('Delete this tool?')">
                         @csrf

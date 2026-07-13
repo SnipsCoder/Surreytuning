@@ -52,12 +52,27 @@
                 </dl>
 
                 <div>
+                    <label for="discount_percentage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Discount (%)</label>
+                    <div class="relative max-w-[10rem]">
+                        <input type="number" id="discount_percentage" name="discount_percentage"
+                            min="0" max="100" step="0.01"
+                            value="{{ old('discount_percentage', number_format((float) $dealer->discount_percentage, 2, '.', '')) }}"
+                            class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pr-8">
+                        <span class="absolute inset-y-0 right-3 flex items-center text-sm text-gray-400">%</span>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Reduces the price this dealer pays across file credits, EVC bundles and products. Credits and goods received are unchanged.</p>
+                    @error('discount_percentage')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                     <textarea id="notes" name="notes" rows="5" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes', $dealer->notes) }}</textarea>
                 </div>
 
                 <button type="submit" class="px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a] dark:hover:bg-gray-600">
-                    Save Notes
+                    Save Changes
                 </button>
             </form>
         </div>
@@ -118,8 +133,8 @@
             <div class="flex items-center justify-between mb-4">
                 <div class="flex gap-8">
                     <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Slave Credits</p>
-                        <p class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ number_format((float) $dealer->slave_credit_balance, 2) }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">File Credits</p>
+                        <p class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ number_format((float) $dealer->file_credit_balance, 2) }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">EVC Credits</p>
@@ -132,9 +147,9 @@
                 </button>
             </div>
 
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-2">Slave Credit Transactions</h3>
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-2">File Credit Transactions</h3>
             <x-data-table :headers="['Amount', 'Reason', 'Date']">
-                @forelse ($slaveTransactions as $transaction)
+                @forelse ($fileTransactions as $transaction)
                     <tr>
                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ number_format((float) $transaction->amount, 2) }}</td>
                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $transaction->reason }}</td>
@@ -142,12 +157,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No slave credit transactions found.</td>
+                        <td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No file credit transactions found.</td>
                     </tr>
                 @endforelse
             </x-data-table>
-            @if ($slaveTransactions->hasPages())
-                <div class="mt-3">{{ $slaveTransactions->links() }}</div>
+            @if ($fileTransactions->hasPages())
+                <div class="mt-3">{{ $fileTransactions->links() }}</div>
             @endif
 
             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-2">EVC Credit Transactions</h3>
@@ -177,7 +192,7 @@
             <div>
                 <label for="credit_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Credit Type</label>
                 <select id="credit_type" name="credit_type" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-gray-100 text-sm shadow-sm">
-                    <option value="slave">Slave Credits</option>
+                    <option value="file">File Credits</option>
                     <option value="evc">EVC Credits</option>
                 </select>
             </div>

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('unit_price_net', 10, 2);
             $table->decimal('vat_amount', 10, 2)->default(0.00);
             $table->decimal('total_gross', 10, 2);
-            $table->enum('payment_method', ['slave_credits', 'stripe']);
+            $table->enum('payment_method', ['file_credits', 'stripe']);
             $table->string('stripe_payment_intent_id')->nullable();
             $table->enum('status', ['pending', 'paid', 'fulfilled', 'refunded'])->default('pending');
             $table->timestamps();

@@ -74,7 +74,9 @@ class StripeWebhookController extends Controller
                 $paymentIntentId = $session->payment_intent;
 
                 match ($metadata->type ?? null) {
-                    'slave_credits' => $this->handleSlaveCredits($metadata, $paymentIntentId),
+                    // Accept both the legacy 'slave_credits' and the new 'file_credits'
+                    // type so checkout sessions created before this rename still complete.
+                    'slave_credits', 'file_credits' => $this->handleFileCredits($metadata, $paymentIntentId),
                     'evc_bundle' => $this->handleEvcBundle($metadata, $paymentIntentId),
                     'product' => $this->handleProduct($metadata, $paymentIntentId),
                     'invoice' => $this->handleInvoice($metadata, $paymentIntentId),
@@ -98,10 +100,10 @@ class StripeWebhookController extends Controller
         return response('Webhook handled', 200);
     }
 
-    private function handleSlaveCredits(object $metadata, ?string $paymentIntentId): void
+    private function handleFileCredits(object $metadata, ?string $paymentIntentId): void
     {
         if ($paymentIntentId && Invoice::where('stripe_payment_intent_id', $paymentIntentId)->exists()) {
-            Log::info('Stripe webhook: duplicate slave_credits event skipped', ['payment_intent_id' => $paymentIntentId]);
+            Log::info('Stripe webhook: duplicate file_credits event skipped', ['payment_intent_id' => $paymentIntentId]);
 
             return;
         }
@@ -109,19 +111,23 @@ class StripeWebhookController extends Controller
         $dealer = Dealer::findOrFail($metadata->dealer_id);
         $user = User::findOrFail($metadata->user_id);
         $product = Product::findOrFail($metadata->product_id);
-        $amount = (float) $product->price_net;
 
-        $this->creditService->addSlaveCredits(
+        // The dealer receives credits at full face value; the discount only
+        // reduces the money they pay, so it applies to the invoice net.
+        $creditAmount = (float) $product->price_net;
+        $invoiceAmount = $dealer->discountedPrice((float) $product->price_net);
+
+        $this->creditService->addFileCredits(
             $dealer,
-            $amount,
-            "Slave credit top-up: {$product->name}",
+            $creditAmount,
+            "File credit top-up: {$product->name}",
             $user,
         );
 
         $invoice = $this->invoiceService->createInvoice(
             $dealer,
-            "Slave credit top-up: {$product->name}",
-            $amount,
+            "File credit top-up: {$product->name}",
+            $invoiceAmount,
             InvoiceType::CreditTopUp,
             $user,
         );
@@ -154,7 +160,7 @@ class StripeWebhookController extends Controller
         $invoice = $this->invoiceService->createInvoice(
             $dealer,
             "EVC bundle purchase: {$bundle->name}",
-            (float) $bundle->price_net,
+            $dealer->discountedPrice((float) $bundle->price_net),
             InvoiceType::EvcBundle,
             $user,
             $bundle->id,

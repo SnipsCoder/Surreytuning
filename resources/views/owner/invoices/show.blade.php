@@ -1,4 +1,4 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header :title="'Invoice #' . $invoice->invoice_number" :subtitle="$invoice->dealer->company_name">
         <a href="{{ route('owner.invoices.download', $invoice) }}"
            class="px-4 py-2 rounded-md bg-slate-700 text-white text-sm font-medium hover:bg-slate-600">
@@ -9,7 +9,7 @@
             <form method="POST" action="{{ route('owner.invoices.send', $invoice) }}"
                   onsubmit="return confirm('Email this invoice to the dealer?');">
                 @csrf
-                <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:opacity-90">
+                <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:opacity-90">
                     Email to client
                 </button>
             </form>

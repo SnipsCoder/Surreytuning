@@ -8,7 +8,7 @@ use App\Models\Setting;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 
-class SlaveCreditController extends Controller
+class FileCreditController extends Controller
 {
     public function __construct(private StripeService $stripeService) {}
 
@@ -17,15 +17,15 @@ class SlaveCreditController extends Controller
         $dealer = $request->user()->dealer;
 
         $products = Product::where('is_active', true)
-            ->whereIn('payment_type', ['slave_credits', 'both'])
+            ->whereIn('payment_type', ['file_credits', 'both'])
             ->orderBy('sort_order')
             ->get();
 
-        $transactions = $dealer->slaveCreditTransactions()
+        $transactions = $dealer->fileCreditTransactions()
             ->latest()
             ->paginate(15);
 
-        return view('client.credits.slave', [
+        return view('client.credits.file', [
             'dealer' => $dealer,
             'products' => $products,
             'transactions' => $transactions,
@@ -39,12 +39,12 @@ class SlaveCreditController extends Controller
         ]);
 
         $product = Product::where('is_active', true)
-            ->whereIn('payment_type', ['slave_credits', 'both'])
+            ->whereIn('payment_type', ['file_credits', 'both'])
             ->findOrFail($validated['product_id']);
 
         $dealer = $request->user()->dealer;
         $settings = Setting::get();
-        $amountNet = (float) $product->price_net;
+        $amountNet = $dealer->discountedPrice((float) $product->price_net);
         $amountGross = round($amountNet * (1 + $settings->vat_rate / 100), 2);
 
         $session = $this->stripeService->createCheckoutSession(
@@ -59,7 +59,7 @@ class SlaveCreditController extends Controller
             route('client.payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             route('client.payment.cancel'),
             [
-                'type' => 'slave_credits',
+                'type' => 'file_credits',
                 'dealer_id' => $dealer->id,
                 'user_id' => $request->user()->id,
                 'product_id' => $product->id,

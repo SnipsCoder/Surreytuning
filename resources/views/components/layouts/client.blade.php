@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Surrey Tuning Services') }}</title>
+        <title>{{ \App\Models\Setting::brandName() }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -18,8 +18,9 @@
             } catch (\Throwable $e) {
                 $settings = null;
             }
+            $brandName = \App\Models\Setting::brandName();
         @endphp
-        <style>:root { --brand: {{ $settings->theme_colour ?? '#e63012' }}; }</style>
+        <x-brand-styles />
 
         {{ $head ?? '' }}
     </head>
@@ -30,10 +31,10 @@
                 <!-- Logo -->
                 <div class="flex items-center h-16 px-5 bg-black border-b border-white/5 flex-shrink-0">
                     @if ($settings && $settings->logo_dark)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ config('app.name') }}" class="h-8 max-w-[160px] object-contain">
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain">
                     @else
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-8 max-w-[160px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <span class="ms-3 text-white font-semibold hidden">Surrey Tuning</span>
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <span class="ms-3 text-white font-semibold hidden">{{ $brandName }}</span>
                     @endif
                 </div>
 
@@ -64,8 +65,8 @@
                             ],
                             'FINANCIAL' => [
                                 [
-                                    'label' => 'Slave Credits',
-                                    'route' => 'client.credits.slave',
+                                    'label' => 'File Credits',
+                                    'route' => 'client.credits.file',
                                     'icon'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
                                 ],
                                 [
@@ -130,10 +131,10 @@
                                     href="{{ Route::has($link['route']) ? route($link['route']) : '#' }}"
                                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg mb-0.5 transition-colors border
                                         {{ $isActive
-                                            ? 'text-white bg-[#e63012]/15 border-[#e63012]/30'
+                                            ? 'text-white bg-brand/15 border-brand/30'
                                             : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent' }}"
                                 >
-                                    <svg class="w-4 h-4 flex-shrink-0 {{ $isActive ? 'text-[#e63012]' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 flex-shrink-0 {{ $isActive ? 'text-brand' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         {!! $link['icon'] !!}
                                     </svg>
                                     {{ $link['label'] }}
@@ -147,16 +148,19 @@
                 <div class="p-3 flex-shrink-0">
                     <div class="bg-[#0f172a] border border-white/5 rounded-xl p-4">
                         <div class="flex items-center gap-2 mb-1">
-                            <svg class="w-4 h-4 text-[#e63012]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             <span class="text-sm font-semibold text-white">Need Help?</span>
                         </div>
                         <p class="text-xs text-slate-500 mb-3">Contact our support team for assistance with your account.</p>
-                        <a href="mailto:support@surreytuning.co.uk"
-                           class="block w-full text-center px-3 py-1.5 bg-[#e63012] hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors">
-                            Contact Support
-                        </a>
+                        @php $supportEmail = \App\Models\Setting::supportEmail(); @endphp
+                        @if ($supportEmail)
+                            <a href="mailto:{{ $supportEmail }}"
+                               class="block w-full text-center px-3 py-1.5 bg-brand hover:bg-brand-dark text-white text-xs font-semibold rounded-lg transition-colors">
+                                Contact Support
+                            </a>
+                        @endif
                     </div>
                 </div>
             </aside>
@@ -165,35 +169,29 @@
             <div class="flex-1 flex flex-col min-w-0">
                 <!-- Header -->
                 <header class="h-16 flex items-center justify-between px-6 bg-[#1e293b] border-b border-white/5 flex-shrink-0">
-                    <!-- Left: search + credit pills -->
-                    <div class="flex items-center gap-4">
-                        <!-- Search -->
-                        <div class="relative hidden md:block" x-data
-                             @keydown.window.cmd.k.prevent="$refs.globalSearch.focus()"
-                             @keydown.window.ctrl.k.prevent="$refs.globalSearch.focus()">
-                            <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <input x-ref="globalSearch" type="text" placeholder="Search anything..."
-                                   class="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-sm rounded-lg bg-[#0f172a] border border-white/10 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#e63012]/50 focus:ring-1 focus:ring-[#e63012]/30 transition-colors">
-                            <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-white/5 border border-white/10 rounded pointer-events-none">⌘K</kbd>
-                        </div>
+                    @php $dealer = auth()->user()->dealer ?? null; @endphp
 
-                        @php $dealer = auth()->user()->dealer ?? null; @endphp
+                    <!-- Left spacer -->
+                    <div class="flex items-center gap-4"></div>
+
+                    <!-- Right: credit pills + notification bell + user avatar -->
+                    <div class="flex items-center gap-4">
                         @if ($dealer)
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#0f172a] text-slate-300 border border-white/10">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                Slave: {{ number_format($dealer->slave_credit_balance ?? 0) }}
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#0f172a] text-slate-300 border border-white/10">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                EVC: {{ number_format($dealer->evc_credit_balance ?? 0) }}
-                            </span>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <span class="inline-flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg whitespace-nowrap flex-shrink-0 bg-white/5 border border-white/10">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0"></span>
+                                    <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">File</span>
+                                    <span class="tabular-nums text-sm font-bold text-white">{{ number_format($dealer->file_credit_balance ?? 0) }}</span>
+                                </span>
+                                <span class="inline-flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg whitespace-nowrap flex-shrink-0 bg-white/5 border border-white/10">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"></span>
+                                    <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">EVC</span>
+                                    <span class="tabular-nums text-sm font-bold text-white">{{ number_format($dealer->evc_credit_balance ?? 0) }}</span>
+                                </span>
+                            </div>
+                            <div class="w-px h-6 bg-white/10"></div>
                         @endif
-                    </div>
 
-                    <!-- Right: notification bell + user avatar -->
-                    <div class="flex items-center gap-4">
                         @php $unreadNoticeCount = \App\Models\Noticeboard::active()->count(); @endphp
 
                         <!-- Notification bell -->
@@ -202,7 +200,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
                             @if ($unreadNoticeCount > 0)
-                                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-[#e63012] text-white text-[10px] font-bold rounded-full">
+                                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-brand text-white text-[10px] font-bold rounded-full">
                                     {{ $unreadNoticeCount > 9 ? '9+' : $unreadNoticeCount }}
                                 </span>
                             @endif
@@ -219,8 +217,8 @@
                                 @endif
                             </div>
                             <div class="relative flex-shrink-0">
-                                <div class="w-8 h-8 rounded-full bg-[#e63012]/20 border border-[#e63012]/30 flex items-center justify-center">
-                                    <span class="text-xs font-bold text-[#e63012]">
+                                <div class="w-8 h-8 rounded-full bg-brand/20 border border-brand/30 flex items-center justify-center">
+                                    <span class="text-xs font-bold text-brand">
                                         {{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? '', 0, 1)) }}
                                     </span>
                                 </div>
@@ -260,7 +258,7 @@
                     </div>
                 @endif
 
-                <main class="flex-1 overflow-y-auto bg-[#0f172a] p-6 flex flex-col">
+                <main x-data="{}" class="flex-1 overflow-y-auto bg-[#0f172a] p-6 flex flex-col">
                     <x-flash-messages />
                     <div class="flex-1">
                         {{ $slot }}
@@ -268,7 +266,7 @@
 
                     <!-- Footer -->
                     <footer class="mt-8 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600">
-                        <p>&copy; {{ date('Y') }} {{ config('app.name', 'Surrey Tuning Services') }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} {{ $brandName }}. All rights reserved.</p>
                         <p>Dealer Portal v1.0</p>
                     </footer>
                 </main>

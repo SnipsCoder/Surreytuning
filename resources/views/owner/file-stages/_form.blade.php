@@ -1,4 +1,4 @@
-﻿@php
+@php
     $vehicleTypes = \App\Enums\VehicleType::cases();
 @endphp
 
@@ -61,7 +61,7 @@
     <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
         Cancel
     </button>
-    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
         Save
     </button>
 </div>

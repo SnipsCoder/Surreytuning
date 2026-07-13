@@ -36,7 +36,7 @@ class DataSubjectService
             'users',
             'fileRequests',
             'invoices',
-            'slaveCreditTransactions',
+            'fileCreditTransactions',
             'evcCreditTransactions',
         ]);
 
@@ -50,7 +50,7 @@ class DataSubjectService
                 'country' => $dealer->country,
                 'invoice_address' => $dealer->invoice_address,
                 'status' => $dealer->status?->value,
-                'slave_credit_balance' => $dealer->slave_credit_balance,
+                'file_credit_balance' => $dealer->file_credit_balance,
                 'evc_credit_balance' => $dealer->evc_credit_balance,
                 'terms_accepted_at' => $dealer->terms_accepted_at?->toIso8601String(),
                 'notes' => $dealer->notes,
@@ -87,7 +87,7 @@ class DataSubjectService
             // these schemas evolve.
             'file_requests' => $dealer->fileRequests->toArray(),
             'invoices' => $dealer->invoices->toArray(),
-            'slave_credit_transactions' => $dealer->slaveCreditTransactions->toArray(),
+            'file_credit_transactions' => $dealer->fileCreditTransactions->toArray(),
             'evc_credit_transactions' => $dealer->evcCreditTransactions->toArray(),
         ];
     }

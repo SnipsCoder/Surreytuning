@@ -17,8 +17,9 @@ class Dealer extends Model
         'company_name',
         'country',
         'invoice_address',
-        'slave_credit_balance',
+        'file_credit_balance',
         'evc_credit_balance',
+        'discount_percentage',
         'status',
         'approved_at',
         'approved_by',
@@ -30,8 +31,9 @@ class Dealer extends Model
     protected function casts(): array
     {
         return [
-            'slave_credit_balance' => 'decimal:2',
+            'file_credit_balance' => 'decimal:2',
             'evc_credit_balance' => 'decimal:2',
+            'discount_percentage' => 'decimal:2',
             'status' => DealerStatus::class,
             'approved_at' => 'datetime',
             'terms_accepted_at' => 'datetime',
@@ -53,9 +55,9 @@ class Dealer extends Model
         return $this->hasMany(Invoice::class);
     }
 
-    public function slaveCreditTransactions(): HasMany
+    public function fileCreditTransactions(): HasMany
     {
-        return $this->hasMany(SlaveCreditTransaction::class);
+        return $this->hasMany(FileCreditTransaction::class);
     }
 
     public function evcCreditTransactions(): HasMany
@@ -71,5 +73,25 @@ class Dealer extends Model
     public function scopeApproved($query)
     {
         return $query->where('status', DealerStatus::Approved);
+    }
+
+    /**
+     * Apply this dealer's discount to a net price.
+     *
+     * The discount reduces the money the dealer pays; it never changes the
+     * quantity of credits or goods they receive. Returns the discounted net,
+     * rounded to 2 decimal places.
+     */
+    public function discountedPrice(float $net): float
+    {
+        $discount = (float) $this->discount_percentage;
+
+        if ($discount <= 0) {
+            return round($net, 2);
+        }
+
+        $discount = min($discount, 100);
+
+        return round($net * (1 - $discount / 100), 2);
     }
 }

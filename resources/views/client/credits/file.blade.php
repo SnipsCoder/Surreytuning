@@ -1,8 +1,8 @@
 <x-layouts.client>
-    <x-page-header title="Slave Credits" subtitle="Top up and track your slave credit balance" />
+    <x-page-header title="File Credits" subtitle="Top up and track your file credit balance" />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <x-stat-card label="Current Balance" value="£{{ number_format($dealer->slave_credit_balance, 2) }}" colour="blue" />
+        <x-stat-card label="Current Balance" value="£{{ number_format($dealer->file_credit_balance, 2) }}" colour="blue" />
     </div>
 
     @if ($products->isNotEmpty())
@@ -17,9 +17,9 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ $product->description }}</p>
                         @endif
                         <p class="text-2xl font-bold text-orange-600 mb-1">£{{ number_format($product->price_net, 2) }}</p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">= {{ number_format($product->price_net, 2) }} slave credits (no VAT)</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500">= {{ number_format($product->price_net, 2) }} file credits (no VAT)</p>
                     </div>
-                    <form method="POST" action="{{ route('client.credits.slave.checkout') }}" class="mt-4">
+                    <form method="POST" action="{{ route('client.credits.file.checkout') }}" class="mt-4">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <x-primary-button type="submit" class="w-full justify-center">Buy via Stripe</x-primary-button>
@@ -39,7 +39,7 @@
 
     @if ($transactions->isEmpty())
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-sm text-gray-500 dark:text-gray-400">
-            No slave credit transactions yet.
+            No file credit transactions yet.
         </div>
     @else
         <x-data-table :headers="['Date', 'Type', 'Amount', 'Balance After', 'Reason']">

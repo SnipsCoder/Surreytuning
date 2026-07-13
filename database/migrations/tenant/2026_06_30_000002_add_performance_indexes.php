@@ -14,7 +14,7 @@ return new class extends Migration
             $table->index('request_number');
         });
 
-        Schema::table('slave_credit_transactions', function (Blueprint $table) {
+        Schema::table('file_credit_transactions', function (Blueprint $table) {
             $table->index(['dealer_id', 'created_at']);
         });
 
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->dropIndex(['request_number']);
         });
 
-        Schema::table('slave_credit_transactions', function (Blueprint $table) {
+        Schema::table('file_credit_transactions', function (Blueprint $table) {
             $table->dropIndex(['dealer_id', 'created_at']);
         });
 

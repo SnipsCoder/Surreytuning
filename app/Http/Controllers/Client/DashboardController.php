@@ -23,7 +23,7 @@ class DashboardController extends Controller
             'pending' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Pending)->count(),
             'in_progress' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Progress)->count(),
             'completed_this_year' => FileRequest::where('dealer_id', $dealerId)->where('status', FileRequestStatus::Closed)->whereYear('updated_at', now()->year)->count(),
-            'slave_balance' => $dealer?->slave_credit_balance ?? 0,
+            'file_balance' => $dealer?->file_credit_balance ?? 0,
             'evc_balance' => $dealer?->evc_credit_balance ?? 0,
         ];
 

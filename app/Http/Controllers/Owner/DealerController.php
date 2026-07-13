@@ -37,9 +37,9 @@ class DealerController extends Controller
             'invoices' => fn ($query) => $query->latest()->limit(10),
         ]);
 
-        $slaveTransactions = $dealer->slaveCreditTransactions()
+        $fileTransactions = $dealer->fileCreditTransactions()
             ->latest()
-            ->paginate(20, ['*'], 'slave_page')
+            ->paginate(20, ['*'], 'file_page')
             ->withQueryString();
 
         $evcTransactions = $dealer->evcCreditTransactions()
@@ -49,7 +49,7 @@ class DealerController extends Controller
 
         return view('owner.dealers.show', [
             'dealer' => $dealer,
-            'slaveTransactions' => $slaveTransactions,
+            'fileTransactions' => $fileTransactions,
             'evcTransactions' => $evcTransactions,
         ]);
     }
@@ -58,9 +58,27 @@ class DealerController extends Controller
     {
         $validated = $request->validate([
             'notes' => ['nullable', 'string'],
+            'discount_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        $dealer->update($validated);
+        $previousDiscount = (float) $dealer->discount_percentage;
+        $newDiscount = (float) ($validated['discount_percentage'] ?? 0);
+
+        $dealer->update([
+            'notes' => $validated['notes'] ?? $dealer->notes,
+            'discount_percentage' => $newDiscount,
+        ]);
+
+        if ($newDiscount !== $previousDiscount) {
+            AuditLog::record(
+                'dealer.discount_updated',
+                $request->user(),
+                $dealer,
+                $newDiscount,
+                "Discount changed from {$previousDiscount}% to {$newDiscount}%",
+                ['previous' => $previousDiscount, 'new' => $newDiscount],
+            );
+        }
 
         return back()->with('success', 'Dealer updated.');
     }
@@ -70,8 +88,8 @@ class DealerController extends Controller
         $amount = (float) $request->validated('amount');
         $reason = $request->validated('reason');
 
-        if ($request->validated('credit_type') === 'slave') {
-            $creditService->manualAdjustSlaveCredits($dealer, $amount, $reason, $request->user());
+        if ($request->validated('credit_type') === 'file') {
+            $creditService->manualAdjustFileCredits($dealer, $amount, $reason, $request->user());
         } else {
             $creditService->manualAdjustEvcCredits($dealer, $amount, $reason, $request->user());
         }

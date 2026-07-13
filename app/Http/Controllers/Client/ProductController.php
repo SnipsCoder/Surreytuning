@@ -46,12 +46,12 @@ class ProductController extends Controller
         $paymentMethod = $request->validate([
             'payment_method' => [
                 'required',
-                Rule::in(['slave_credits', 'stripe']),
+                Rule::in(['file_credits', 'stripe']),
             ],
         ])['payment_method'];
 
-        if ($product->payment_type === ProductPaymentType::SlaveCredits && $paymentMethod !== 'slave_credits') {
-            abort(422, 'This product can only be purchased with slave credits.');
+        if ($product->payment_type === ProductPaymentType::FileCredits && $paymentMethod !== 'file_credits') {
+            abort(422, 'This product can only be purchased with file credits.');
         }
 
         if ($product->payment_type === ProductPaymentType::DirectPayment && $paymentMethod !== 'stripe') {
@@ -59,21 +59,22 @@ class ProductController extends Controller
         }
 
         $dealer = $request->user()->dealer;
+        $unitNet = $dealer->discountedPrice((float) $product->price_net);
         $vatAmount = $product->vat_applicable
-            ? round($product->price_net * (Setting::get()->vat_rate / 100), 2)
+            ? round($unitNet * (Setting::get()->vat_rate / 100), 2)
             : 0.00;
-        $totalGross = $product->price_net + $vatAmount;
+        $totalGross = $unitNet + $vatAmount;
 
-        if ($paymentMethod === 'slave_credits') {
+        if ($paymentMethod === 'file_credits') {
             try {
-                $this->creditService->deductSlaveCredits(
+                $this->creditService->deductFileCredits(
                     $dealer,
                     (float) $totalGross,
                     "Purchase of product: {$product->name}",
                     $request->user(),
                 );
             } catch (InsufficientCreditsException $e) {
-                return back()->with('error', 'Insufficient slave credit balance for this purchase.');
+                return back()->with('error', 'Insufficient file credit balance for this purchase.');
             }
 
             $order = ProductOrder::create([
@@ -81,17 +82,17 @@ class ProductController extends Controller
                 'user_id' => $request->user()->id,
                 'product_id' => $product->id,
                 'quantity' => 1,
-                'unit_price_net' => $product->price_net,
+                'unit_price_net' => $unitNet,
                 'vat_amount' => $vatAmount,
                 'total_gross' => $totalGross,
-                'payment_method' => 'slave_credits',
+                'payment_method' => 'file_credits',
                 'status' => 'paid',
             ]);
 
             $invoice = $this->invoiceService->createInvoice(
                 $dealer,
                 "Product purchase: {$product->name}",
-                (float) $product->price_net,
+                (float) $unitNet,
                 InvoiceType::Product,
                 $request->user(),
                 $order->id,
@@ -99,7 +100,7 @@ class ProductController extends Controller
             );
             $this->invoiceService->markPaid($invoice);
 
-            return redirect()->route('client.products.index')->with('success', 'Product purchased using slave credits.');
+            return redirect()->route('client.products.index')->with('success', 'Product purchased using file credits.');
         }
 
         $order = ProductOrder::create([
@@ -107,7 +108,7 @@ class ProductController extends Controller
             'user_id' => $request->user()->id,
             'product_id' => $product->id,
             'quantity' => 1,
-            'unit_price_net' => $product->price_net,
+            'unit_price_net' => $unitNet,
             'vat_amount' => $vatAmount,
             'total_gross' => $totalGross,
             'payment_method' => 'stripe',

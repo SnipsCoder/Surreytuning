@@ -1,4 +1,4 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <div x-data="{ view: localStorage.getItem('owner-frq-view') || 'board' }"
          x-init="$watch('view', v => localStorage.setItem('owner-frq-view', v))">
 
@@ -11,12 +11,12 @@
             <div class="flex items-center gap-2">
                 <div class="inline-flex rounded-lg overflow-hidden border border-white/10">
                     <button type="button" x-on:click="view = 'board'"
-                        :class="view === 'board' ? 'bg-[#e63012] text-white' : 'bg-[#141414] text-slate-400 hover:text-white'"
+                        :class="view === 'board' ? 'bg-brand text-white' : 'bg-[#141414] text-slate-400 hover:text-white'"
                         class="px-4 py-1.5 text-sm font-semibold transition-colors">
                         Board
                     </button>
                     <button type="button" x-on:click="view = 'list'"
-                        :class="view === 'list' ? 'bg-[#e63012] text-white' : 'bg-[#141414] text-slate-400 hover:text-white'"
+                        :class="view === 'list' ? 'bg-brand text-white' : 'bg-[#141414] text-slate-400 hover:text-white'"
                         class="px-4 py-1.5 text-sm font-semibold transition-colors border-x border-white/10">
                         List
                     </button>
@@ -32,10 +32,10 @@
         <form method="GET" action="{{ route('file-requests.index') }}" class="mb-6 flex flex-wrap gap-3">
             <input type="text" name="search" value="{{ request('search') }}"
                 placeholder="Search request #, make, model, dealer..."
-                class="flex-1 min-w-[220px] bg-[#141414] border border-white/10 text-white placeholder-slate-500 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#e63012]">
+                class="flex-1 min-w-[220px] bg-[#141414] border border-white/10 text-white placeholder-slate-500 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand">
 
             <select name="status" onchange="this.form.submit()"
-                class="bg-[#141414] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e63012]">
+                class="bg-[#141414] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
                 <option value="">All Statuses</option>
                 @foreach ($statuses as $status)
                     @continue(in_array($status, [\App\Enums\FileRequestStatus::Closed, \App\Enums\FileRequestStatus::Void], true))
@@ -44,7 +44,7 @@
             </select>
 
             <select name="assigned_technician_id" onchange="this.form.submit()"
-                class="bg-[#141414] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#e63012]">
+                class="bg-[#141414] border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
                 <option value="">All Technicians</option>
                 @foreach ($technicians as $technician)
                     <option value="{{ $technician->id }}" @selected((string) request('assigned_technician_id') === (string) $technician->id)>{{ $technician->full_name }}</option>

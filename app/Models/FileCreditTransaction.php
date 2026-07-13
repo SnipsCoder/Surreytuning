@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Enums\SlaveCreditTransactionType;
+use App\Enums\FileCreditTransactionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SlaveCreditTransaction extends Model
+class FileCreditTransaction extends Model
 {
     const UPDATED_AT = null;
 
@@ -23,7 +23,7 @@ class SlaveCreditTransaction extends Model
     protected function casts(): array
     {
         return [
-            'type' => SlaveCreditTransactionType::class,
+            'type' => FileCreditTransactionType::class,
             'amount' => 'decimal:2',
             'balance_after' => 'decimal:2',
         ];

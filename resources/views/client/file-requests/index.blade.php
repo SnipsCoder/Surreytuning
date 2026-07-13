@@ -7,14 +7,14 @@
             <div class="flex items-center gap-3">
                 <form method="GET" action="{{ route('client.file-requests.index') }}" class="flex items-center gap-2">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search make, model, request #..."
-                        class="bg-[#1e293b] border border-white/10 text-white placeholder-slate-500 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#e63012] w-56">
+                        class="bg-[#1e293b] border border-white/10 text-white placeholder-slate-500 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand w-56">
                     <button type="submit"
                         class="px-4 py-2 bg-[#1e293b] border border-white/10 text-slate-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
                         Filter
                     </button>
                 </form>
                 <a href="{{ route('client.upload.create') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-[#e63012] hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition-colors">
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-semibold rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     New Request
                 </a>
@@ -25,12 +25,12 @@
         <div class="flex gap-6 border-b border-white/10 mb-6">
             <button type="button" x-on:click="view = 'board'"
                 class="pb-3 text-sm font-medium transition-colors border-b-2 -mb-px"
-                :class="view === 'board' ? 'text-white border-[#e63012]' : 'text-slate-500 border-transparent hover:text-slate-300'">
+                :class="view === 'board' ? 'text-white border-brand' : 'text-slate-500 border-transparent hover:text-slate-300'">
                 Board View
             </button>
             <button type="button" x-on:click="view = 'list'"
                 class="pb-3 text-sm font-medium transition-colors border-b-2 -mb-px"
-                :class="view === 'list' ? 'text-white border-[#e63012]' : 'text-slate-500 border-transparent hover:text-slate-300'">
+                :class="view === 'list' ? 'text-white border-brand' : 'text-slate-500 border-transparent hover:text-slate-300'">
                 List View
             </button>
         </div>
@@ -42,9 +42,10 @@
         @else
 
         {{-- Board view --}}
-        <div x-show="view === 'board'" x-cloak class="overflow-x-auto pb-4">
-            <div class="flex gap-4 min-w-max">
+        <div x-show="view === 'board'" x-cloak class="pb-4">
+            <div class="grid grid-cols-7 gap-3 items-start">
                 @foreach ($statuses as $status)
+                    @continue($status === \App\Enums\FileRequestStatus::Void)
                     @php
                         $grouped = $fileRequests instanceof \Illuminate\Pagination\LengthAwarePaginator
                             ? $fileRequests->getCollection()->where('status', $status)
@@ -72,7 +73,7 @@
                         ];
                         $borderClass = $borderColours[$status->colour()] ?? 'border-l-slate-500';
                     @endphp
-                    <div class="w-72 flex-shrink-0 bg-[#1e293b] border border-white/5 rounded-xl p-3">
+                    <div class="min-w-0 bg-[#1e293b] border border-white/5 rounded-xl p-3">
                         <!-- Column header -->
                         <div class="flex items-center justify-between mb-3 px-1">
                             <div class="flex items-center gap-2">

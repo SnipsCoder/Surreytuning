@@ -19,7 +19,17 @@ class FileRequestController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $fileRequests = $query->latest()->paginate(25);
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('request_number', 'like', "%{$search}%")
+                    ->orWhere('registration', 'like', "%{$search}%")
+                    ->orWhere('make', 'like', "%{$search}%")
+                    ->orWhere('model', 'like', "%{$search}%");
+            });
+        }
+
+        $fileRequests = $query->latest()->paginate(25)->withQueryString();
 
         return view('client.file-requests.index', [
             'fileRequests' => $fileRequests,

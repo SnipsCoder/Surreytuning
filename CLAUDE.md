@@ -76,7 +76,7 @@ The client dashboard must include:
 - Four stat cards: Pending Files, In Progress, Completed (this year), Credit Balance
 - **Spend over time chart** — use Chart.js (already available via CDN). Line chart showing monthly spend with red gradient fill.
 - Recent file requests table with status badges, vehicle logos, job references, and Open buttons
-- Right panel: Recent Notifications list, Account Summary (Slave Credits balance + Top Up button, EVC Credits + Buy button, Total Spent)
+- Right panel: Recent Notifications list, Account Summary (File Credits balance + Top Up button, EVC Credits + Buy button, Total Spent)
 - Sidebar sections grouped: FILE SERVICE, FINANCIAL, TOOLS & DATA, ACCOUNT
 
 ### Chart.js Usage
@@ -293,7 +293,7 @@ enum PortalStatusEnum: string {
 9. `file_request_messages`
 10. `file_request_attachments`
 11. `dtc_codes` (per-job DTC codes)
-12. `slave_credit_transactions`
+12. `file_credit_transactions`
 13. `evc_credit_transactions`
 14. `winols_bundles`
 15. `products`
@@ -356,10 +356,10 @@ Please do the following in order:
    - TransmissionType: manual, semi_auto, automatic
    - VehicleType: all, car, van, bike, other
    - TuningToolCategory: obd, bench, boot, bdm, other
-   - SlaveCreditTransactionType: top_up, deduction, manual_credit, refund
+   - FileCreditTransactionType: top_up, deduction, manual_credit, refund
    - EvcCreditTransactionType: purchase, manual_credit, refund
    - NoticePriority: low, normal, high
-   - ProductPaymentType: slave_credits, direct_payment, both
+   - ProductPaymentType: file_credits, direct_payment, both
 
 4. LAYOUTS — Create three Blade layout files:
 
@@ -383,11 +383,11 @@ Please do the following in order:
    c) resources/views/layouts/client.blade.php
       - Sidebar (lighter slate #334155, width 256px) with nav links:
         Dashboard, File Requests, Upload File, File Archive,
-        Slave Credits, EVC Credits, Products, Invoices,
+        File Credits, EVC Credits, Products, Invoices,
         DTC Search, Vehicle Stats, Bosch ECU, Portal Users,
         Settings, Whats New
-      - Top header bar: Slave Credits balance badge, EVC Credits balance badge, user name, logout
-      - Credit balances in header pulled from auth()->user()->dealer->slave_credit_balance
+      - Top header bar: File Credits balance badge, EVC Credits balance badge, user name, logout
+      - Credit balances in header pulled from auth()->user()->dealer->file_credit_balance
       - Same flash messages and dark mode toggle
 
 5. BLADE COMPONENTS — Create these reusable Blade components in resources/views/components/:
@@ -501,7 +501,7 @@ Add to users:
   company_name VARCHAR(255)
   country VARCHAR(255) DEFAULT 'United Kingdom'
   invoice_address TEXT NULL
-  slave_credit_balance DECIMAL(10,2) DEFAULT 0.00
+  file_credit_balance DECIMAL(10,2) DEFAULT 0.00
   evc_credit_balance DECIMAL(10,2) DEFAULT 0.00
   status ENUM('pending','approved','rejected','suspended') DEFAULT 'pending'
   approved_at TIMESTAMP NULL
@@ -631,7 +631,7 @@ Add to users:
   description VARCHAR(255) NULL
   created_at TIMESTAMP
 
-### slave_credit_transactions table
+### file_credit_transactions table
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
   dealer_id BIGINT UNSIGNED NOT NULL FK → dealers.id
   user_id BIGINT UNSIGNED NOT NULL FK → users.id
@@ -667,7 +667,7 @@ Add to users:
   description TEXT NULL
   price_net DECIMAL(10,2) NOT NULL
   vat_applicable TINYINT(1) DEFAULT 0
-  payment_type ENUM('slave_credits','direct_payment','both') DEFAULT 'both'
+  payment_type ENUM('file_credits','direct_payment','both') DEFAULT 'both'
   stock INT UNSIGNED NULL  -- NULL = unlimited
   is_active TINYINT(1) DEFAULT 1
   image_path VARCHAR(255) NULL
@@ -683,7 +683,7 @@ Add to users:
   unit_price_net DECIMAL(10,2) NOT NULL
   vat_amount DECIMAL(10,2) DEFAULT 0.00
   total_gross DECIMAL(10,2) NOT NULL
-  payment_method ENUM('slave_credits','stripe') NOT NULL
+  payment_method ENUM('file_credits','stripe') NOT NULL
   stripe_payment_intent_id VARCHAR(255) NULL
   status ENUM('pending','paid','fulfilled','refunded') DEFAULT 'pending'
   timestamps
@@ -795,9 +795,9 @@ User model (extend existing):
 
 Dealer model:
   $fillable: all columns
-  Casts: slave_credit_balance decimal:2, evc_credit_balance decimal:2, status → DealerStatus::class
+  Casts: file_credit_balance decimal:2, evc_credit_balance decimal:2, status → DealerStatus::class
   SoftDeletes
-  Relationships: hasMany User, hasMany FileRequest, hasMany Invoice, hasMany SlaveCreditTransaction, hasMany EvcCreditTransaction, hasOne primaryContact (User where is_primary_contact=1)
+  Relationships: hasMany User, hasMany FileRequest, hasMany Invoice, hasMany FileCreditTransaction, hasMany EvcCreditTransaction, hasOne primaryContact (User where is_primary_contact=1)
   Scope: scopeApproved()
 
 DealerApplication model: $fillable all, cast status → ApplicationStatus
@@ -820,7 +820,7 @@ FileRequestMessage model: $fillable all, cast type → MessageType, is_internal/
 FileRequestAttachment model: $fillable all, cast attachment_type → AttachmentType
 FileRequestOption model: $fillable all, cast price_net decimal:2
 DtcCode model: $fillable all
-SlaveCreditTransaction model: $fillable all, casts decimal:2, type → SlaveCreditTransactionType
+FileCreditTransaction model: $fillable all, casts decimal:2, type → FileCreditTransactionType
 EvcCreditTransaction model: $fillable all, casts decimal:2, type → EvcCreditTransactionType
 WinolsBundle model: $fillable all
 Product model: $fillable all, cast payment_type → ProductPaymentType
@@ -1016,8 +1016,8 @@ Route::prefix('my')->middleware(['auth', 'client', 'dealer_approved'])->name('cl
     Route::get('/download/{attachment}', [Client\FileDownloadController::class, 'download'])->name('download');
     
     // Credits
-    Route::get('/credits/slave', [Client\SlaveCreditController::class, 'index'])->name('credits.slave');
-    Route::post('/credits/slave/checkout', [Client\SlaveCreditController::class, 'checkout'])->name('credits.slave.checkout');
+    Route::get('/credits/file', [Client\FileCreditController::class, 'index'])->name('credits.file');
+    Route::post('/credits/file/checkout', [Client\FileCreditController::class, 'checkout'])->name('credits.file.checkout');
     Route::get('/credits/evc', [Client\EvcCreditController::class, 'index'])->name('credits.evc');
     Route::post('/credits/evc/checkout', [Client\EvcCreditController::class, 'checkout'])->name('credits.evc.checkout');
     
@@ -1091,30 +1091,30 @@ Please build the four core service classes for the Surrey Tuning Services portal
 
 Methods (all wrapped in DB::transaction()):
 
-addSlaveCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): SlaveCreditTransaction
-- Adds $amount to dealer->slave_credit_balance
-- Creates SlaveCreditTransaction: type='top_up', amount=$amount, balance_after=new_balance
+addFileCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): FileCreditTransaction
+- Adds $amount to dealer->file_credit_balance
+- Creates FileCreditTransaction: type='top_up', amount=$amount, balance_after=new_balance
 - Updates dealer record
 - Returns the transaction
 
-deductSlaveCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): SlaveCreditTransaction
+deductFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): FileCreditTransaction
 - Throws InsufficientCreditsException if balance < amount
-- Deducts $amount from dealer->slave_credit_balance (makes balance negative direction)
-- Creates SlaveCreditTransaction: type='deduction', amount=-$amount, balance_after=new_balance
+- Deducts $amount from dealer->file_credit_balance (makes balance negative direction)
+- Creates FileCreditTransaction: type='deduction', amount=-$amount, balance_after=new_balance
 - Returns the transaction
 
-manualAdjustSlaveCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): SlaveCreditTransaction
+manualAdjustFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): FileCreditTransaction
 - Can be positive (credit) or negative (deduction) — determined by sign of $amount
 - type = 'manual_credit' if positive, 'deduction' if negative
 - Same transaction + balance update logic
 
 addEvcCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $winolsBundleId = null): EvcCreditTransaction
-- Same pattern as slave credits
+- Same pattern as file credits
 
 deductEvcCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): EvcCreditTransaction
 
-hasSufficientSlaveCredits(Dealer $dealer, float $amount): bool
-- Returns dealer->slave_credit_balance >= $amount
+hasSufficientFileCredits(Dealer $dealer, float $amount): bool
+- Returns dealer->file_credit_balance >= $amount
 
 Create app/Exceptions/InsufficientCreditsException.php extending RuntimeException.
 
@@ -1198,7 +1198,7 @@ app/Http/Requests/Owner/AddChargeRequest.php:
   Rules: description required|string|max:255, amount_net required|numeric|min:0.01, apply_vat boolean
 
 app/Http/Requests/Owner/AddCreditRequest.php:
-  Rules: credit_type required|in:slave,evc, amount required|numeric|min:0.01, reason required|string|max:255
+  Rules: credit_type required|in:file,evc, amount required|numeric|min:0.01, reason required|string|max:255
 
 app/Http/Requests/Owner/UpdateFileRequestStatusRequest.php:
   Rules: status required|Enum(FileRequestStatus)
@@ -1212,9 +1212,9 @@ app/Http/Requests/Dealer/StoreDealerApplicationRequest.php:
 ## WRITE UNIT TESTS:
 
 tests/Unit/Services/CreditServiceTest.php:
-- Test addSlaveCredits updates balance and creates transaction
-- Test deductSlaveCredits fails when insufficient balance (throws InsufficientCreditsException)
-- Test deductSlaveCredits succeeds and updates balance correctly
+- Test addFileCredits updates balance and creates transaction
+- Test deductFileCredits fails when insufficient balance (throws InsufficientCreditsException)
+- Test deductFileCredits succeeds and updates balance correctly
 - Test DB transaction rolls back on failure
 
 tests/Unit/Services/InvoiceServiceTest.php:
@@ -1226,7 +1226,7 @@ Run: php artisan test tests/Unit/
 
 ### Phase 3 Success Criteria
 - [ ] `php artisan test tests/Unit/` — all unit tests pass
-- [ ] `CreditService::addSlaveCredits()` can be called from tinker without error
+- [ ] `CreditService::addFileCredits()` can be called from tinker without error
 - [ ] `InsufficientCreditsException` is thrown when balance is insufficient
 - [ ] All four Form Request files exist with correct rules
 
@@ -1284,7 +1284,7 @@ FileRequestController@show (GET /file-requests/{fileRequest}):
       Tab 1 "Message": text area + send button. Shows message thread below (chronological, owner messages right-aligned). System messages centred grey. Internal notes shown with lock icon and amber background.
       Tab 2 "Respond": file upload zone (returned file) + message textarea + submit button
       Tab 3 "Add Charge": description input, amount_net input, apply_vat checkbox (shows VAT calculation), submit → calls addCharge
-      Tab 4 "Add Credit": credit_type select (Slave/EVC), amount input, reason input → calls addCredit  
+      Tab 4 "Add Credit": credit_type select (File/EVC), amount input, reason input → calls addCredit  
       Tab 5 "Internal Note": textarea for owner-only note → posts as MessageType::InternalNote
       Tab 6 "Void": reason textarea + confirm button (only shown if status != void)
 
@@ -1303,7 +1303,7 @@ FileRequestController@addCharge (POST /file-requests/{fileRequest}/charge):
 
 FileRequestController@addCredit (POST /file-requests/{fileRequest}/credit):
 - Validates using AddCreditRequest
-- Calls CreditService::addSlaveCredits() or addEvcCredits() based on credit_type
+- Calls CreditService::addFileCredits() or addEvcCredits() based on credit_type
 - Creates a credit_event message
 - Returns back with success
 
@@ -1337,19 +1337,19 @@ DealerController@index (GET /dealers):
 - Lists all dealers with credit balances, job count, status badges
 - Search by company_name or email (via primaryContact user)
 - Filter by status
-- View: owner/dealers/index.blade.php — table with columns: Company, Status badge, Slave Credits, EVC Credits, Jobs, Joined, Actions
+- View: owner/dealers/index.blade.php — table with columns: Company, Status badge, File Credits, EVC Credits, Jobs, Joined, Actions
 
 DealerController@show (GET /dealers/{dealer}):
 - View: owner/dealers/show.blade.php with tab navigation (Alpine.js):
   Tab "Overview": company details, balances, approved/suspended/reactivated actions
   Tab "File Requests": paginated table of dealer's jobs
   Tab "Invoices": paginated table of dealer's invoices
-  Tab "Credits": current balances prominently. Slave Credit history table. EVC Credit history table. "Adjust Credits" button opens modal with: credit_type (slave/evc), amount (can be negative for deduction), reason
+  Tab "Credits": current balances prominently. File Credit history table. EVC Credit history table. "Adjust Credits" button opens modal with: credit_type (file/evc), amount (can be negative for deduction), reason
   Tab "Notes": dealer->notes textarea (direct update), no separate notes model needed
 
 DealerController@adjustCredits (POST /dealers/{dealer}/credits):
-- Validates: credit_type in:slave,evc, amount required|numeric, reason required|string|max:255
-- Calls CreditService::manualAdjustSlaveCredits or manualAdjustEvcCredits  
+- Validates: credit_type in:file,evc, amount required|numeric, reason required|string|max:255
+- Calls CreditService::manualAdjustFileCredits or manualAdjustEvcCredits  
 
 DealerController@suspend (POST /dealers/{dealer}/suspend):
 - Sets dealer->status = DealerStatus::Suspended
@@ -1536,7 +1536,7 @@ Update FileRequestPolicy (already created in Phase 4):
 
 DashboardController@index:
 - Queries restricted to auth()->user()->dealer_id
-- Stats: Active Jobs (status not in closed,void), Completed Jobs (status=closed), Slave Credit Balance, EVC Credit Balance
+- Stats: Active Jobs (status not in closed,void), Completed Jobs (status=closed), File Credit Balance, EVC Credit Balance
 - Recent file requests: last 5 for this dealer (with stage badge, status badge)
 - Active noticeboard messages: Noticeboard::scopeActive()->orderBy('priority','desc')->take(3)
 - Portal status: PortalStatus::current() — show banner if not 'available'
@@ -1560,7 +1560,7 @@ Step 2 — Service Selection:
   File Options: checkboxes grouped under the selected stage showing name, description, price_net per option
   Running total shown live (Alpine.js x-text showing selected stage price + sum of checked options)
   Selected tool: dropdown from active TuningTools
-  If dealer has insufficient slave credits to cover total: show warning banner with "Top Up Credits" link. Do NOT block submission — owner can still process and invoice separately.
+  If dealer has insufficient file credits to cover total: show warning banner with "Top Up Credits" link. Do NOT block submission — owner can still process and invoice separately.
   DTC Codes section: ability to add multiple DTC codes (code + optional description). Dynamic add/remove with Alpine.js.
 
 Step 3 — File Upload & Review:
@@ -1651,16 +1651,16 @@ For all checkout flows:
 - All amounts in pence (multiply GBP by 100)
 - Store stripe_payment_intent_id on the related record before redirecting
 
-### Slave Credits Top-Up (GET /my/credits/slave, POST /my/credits/slave/checkout)
+### File Credits Top-Up (GET /my/credits/file, POST /my/credits/file/checkout)
 
-SlaveCreditController@index:
-- Current slave_credit_balance shown prominently
-- List active products where payment_type in ('slave_credits','both') and type implies credit top-up
-  (For now: show WinOLS bundles are EVC only; create at least one Product seeded for slave credit top-up as example)
-- Transaction history table: SlaveCreditTransaction for this dealer, paginated 25/page
+FileCreditController@index:
+- Current file_credit_balance shown prominently
+- List active products where payment_type in ('file_credits','both') and type implies credit top-up
+  (For now: show WinOLS bundles are EVC only; create at least one Product seeded for file credit top-up as example)
+- Transaction history table: FileCreditTransaction for this dealer, paginated 25/page
   Columns: Date, Type badge, Reason, Amount (green=positive, red=negative), Balance After
 
-SlaveCreditController@checkout (POST /my/credits/slave/checkout):
+FileCreditController@checkout (POST /my/credits/file/checkout):
 - Validates: product_id required|exists:products,id
 - Creates Stripe Checkout Session via StripeService
 - Stores: session_id → do NOT create the credit yet (wait for webhook)
@@ -1700,8 +1700,8 @@ ProductController@index:
 - Payment method badge: "Pay with Credits" / "Card Payment" / "Credits or Card"
 
 ProductController@purchase (POST /my/products/{product}/purchase):
-- Validates: payment_method required|in:slave_credits,stripe, quantity optional|integer|min:1
-- If payment_method=slave_credits: check sufficient balance, deduct via CreditService, create ProductOrder, create Invoice, return success
+- Validates: payment_method required|in:file_credits,stripe, quantity optional|integer|min:1
+- If payment_method=file_credits: check sufficient balance, deduct via CreditService, create ProductOrder, create Invoice, return success
 - If payment_method=stripe: create Stripe Checkout Session, redirect
 
 ### Payment Return Pages
@@ -1724,10 +1724,10 @@ StripeWebhookController@handle (POST /webhooks/stripe):
 - Handle these events:
 
   checkout.session.completed:
-    - Get session->metadata to determine what was purchased (type: 'slave_credits', 'evc_bundle', 'product', 'invoice')
-    - If type='slave_credits': 
+    - Get session->metadata to determine what was purchased (type: 'file_credits', 'evc_bundle', 'product', 'invoice')
+    - If type='file_credits': 
         Find product from metadata->product_id
-        Call CreditService::addSlaveCredits() with amount from product->credit_value
+        Call CreditService::addFileCredits() with amount from product->credit_value
         Create Invoice via InvoiceService (type=credit_top_up)
         InvoiceService::markPaid() with payment_intent_id
     - If type='evc_bundle':
@@ -1753,9 +1753,9 @@ StripeWebhookController@handle (POST /webhooks/stripe):
 ## METADATA PATTERN for Stripe Sessions
 
 When creating a checkout session, always include metadata:
-  type: 'slave_credits'|'evc_bundle'|'product'|'invoice'
+  type: 'file_credits'|'evc_bundle'|'product'|'invoice'
   dealer_id: $dealer->id
-  product_id: (for slave_credits)
+  product_id: (for file_credits)
   winols_bundle_id: (for evc_bundle)
   product_order_id: (for product — create ProductOrder record with status=pending BEFORE checkout)
   invoice_id: (for invoice payment)
@@ -1767,7 +1767,7 @@ When creating a checkout session, always include metadata:
 - [ ] `checkout.session.completed` webhook updates dealer credit balance
 - [ ] Invoice is created and marked paid on successful webhook
 - [ ] Client can pay an outstanding invoice
-- [ ] Payment with slave credits deducts balance immediately
+- [ ] Payment with file credits deducts balance immediately
 
 ---
 
@@ -2052,7 +2052,7 @@ Already scaffolded in the layout (toggle in header). Complete the implementation
 
 1. Add database indexes (create a new migration):
    file_requests: INDEX on (dealer_id, status), INDEX on (status), INDEX on (request_number)
-   slave_credit_transactions: INDEX on (dealer_id, created_at)
+   file_credit_transactions: INDEX on (dealer_id, created_at)
    evc_credit_transactions: INDEX on (dealer_id, created_at)
    invoices: INDEX on (dealer_id, status), INDEX on (invoice_number)
    file_request_messages: INDEX on (file_request_id, created_at)

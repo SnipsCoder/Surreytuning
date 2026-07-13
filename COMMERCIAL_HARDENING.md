@@ -115,14 +115,14 @@ CI = GitHub Actions · Payments = Stripe (fixed).
   `200 "Webhook already handled"`, and the `create()` is wrapped in a
   `QueryException` catch so a concurrent delivery that loses the unique-insert
   race also acknowledges 200 and does nothing. This is layered **on top of** the
-  existing per-payment-intent guard in each handler (slave_credits, evc_bundle,
+  existing per-payment-intent guard in each handler (file_credits, evc_bundle,
   product, invoice) — two independent dedup layers. Signature verification stays
   active (400 on `UnexpectedValueException|SignatureVerificationException`).
 - **Tests added (+10):** `tests/Feature/Webhooks/StripeWebhookIdempotencyTest.php`
   (new event processed + recorded; redelivered event is a no-op with
   `PaymentConfirmed` dispatched exactly once; invalid signature → 400, nothing
   recorded — StripeService mocked to bypass real signing);
-  `tests/Unit/Services/CreditServiceTest.php` (add/deduct slave + evc, insufficient
+  `tests/Unit/Services/CreditServiceTest.php` (add/deduct file + evc, insufficient
   balance, manual negative adjustment, DB rollback);
   `tests/Unit/Services/InvoiceServiceTest.php` (VAT calc, sequential numbering,
   skip-VAT, mark-paid + payment-intent preservation, void).
@@ -164,7 +164,7 @@ CI = GitHub Actions · Payments = Stripe (fixed).
 - **`app/Services/DataSubjectService.php`** — subject-level data portability + erasure.
   - `export(Dealer)` builds a complete, secret-free portability package: dealer
     profile, users (mapped whitelist — **no** password / 2FA secret / OTP fields),
-    matched dealer applications, file requests, invoices, and slave/EVC credit
+    matched dealer applications, file requests, invoices, and file/EVC credit
     transactions. `exported_at` ISO-8601 stamped.
   - `erase(Dealer, ?actor, ?reason)` runs in a DB transaction: anonymises matched
     applications, anonymises + soft-deletes users (clears password, avatar,

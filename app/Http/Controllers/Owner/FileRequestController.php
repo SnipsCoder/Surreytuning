@@ -210,8 +210,8 @@ class FileRequestController extends Controller
         $reason = $request->validated('reason');
         $dealer = $fileRequest->dealer;
 
-        if ($request->validated('credit_type') === 'slave') {
-            $creditService->addSlaveCredits($dealer, $amount, $reason, $request->user(), $fileRequest->id);
+        if ($request->validated('credit_type') === 'file') {
+            $creditService->addFileCredits($dealer, $amount, $reason, $request->user(), $fileRequest->id);
         } else {
             $creditService->addEvcCredits($dealer, $amount, $reason, $request->user());
         }

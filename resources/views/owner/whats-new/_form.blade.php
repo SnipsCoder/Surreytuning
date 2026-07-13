@@ -1,4 +1,4 @@
-﻿<div>
+<div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
     <input type="text" name="title" value="{{ old('title', $whatsNew?->title) }}" required
         class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
@@ -28,7 +28,7 @@
     <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
         Cancel
     </button>
-    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
         Save
     </button>
 </div>

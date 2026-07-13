@@ -28,10 +28,10 @@
                         @if ($product->payment_type->value === 'both')
                             <select name="payment_method" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 text-sm">
                                 <option value="stripe">Pay by Card</option>
-                                <option value="slave_credits">Pay with Slave Credits</option>
+                                <option value="file_credits">Pay with File Credits</option>
                             </select>
                         @else
-                            <input type="hidden" name="payment_method" value="{{ $product->payment_type->value === 'slave_credits' ? 'slave_credits' : 'stripe' }}">
+                            <input type="hidden" name="payment_method" value="{{ $product->payment_type->value === 'file_credits' ? 'file_credits' : 'stripe' }}">
                         @endif
 
                         <x-primary-button type="submit" class="w-full justify-center" :disabled="! $inStock">

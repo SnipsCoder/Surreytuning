@@ -1,7 +1,7 @@
-﻿<x-layouts.owner>
+<x-layouts.owner>
     <x-page-header title="File Options" subtitle="Add-on options available for file requests">
-        <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-file-option' }))"
-            class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-file-option' }))"
+            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
             Add File Option
         </button>
     </x-page-header>
@@ -27,7 +27,7 @@
                     @endif
                 </td>
                 <td class="px-4 py-3 text-sm text-right space-x-3">
-                    <button type="button" x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-file-option-{{ $fileOption->id }}' }))"
+                    <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-file-option-{{ $fileOption->id }}' }))"
                         class="text-indigo-600 dark:text-indigo-400 hover:underline">Edit</button>
                     <form method="POST" action="{{ route('file-options.destroy', $fileOption) }}" class="inline" onsubmit="return confirm('Delete this file option?')">
                         @csrf

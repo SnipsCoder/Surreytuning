@@ -1,4 +1,4 @@
-﻿<div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
         <input type="text" name="make" value="{{ old('make', $vehicleStat?->make) }}" required
@@ -90,7 +90,7 @@
     <a href="{{ route('vehicle-stats.index') }}" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
         Cancel
     </a>
-    <button type="submit" class="px-4 py-2 rounded-md bg-[#e63012] text-white text-sm font-medium hover:bg-[#c92a0f]">
+    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
         Save
     </button>
 </div>

@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Surrey Tuning Services') }}</title>
+    <title>{{ \App\Models\Setting::brandName() }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-brand-styles />
     @stack('head')
 </head>
 <body class="bg-[#0f172a] text-white antialiased font-sans">
@@ -14,6 +15,7 @@
     use App\Models\Setting;
     use App\Models\FileRequest;
     $settings = Setting::first();
+    $brandName = Setting::brandName();
     $activeFileRequestCount = FileRequest::where('dealer_id', auth()->user()->dealer_id)
         ->whereNotIn('status', ['closed', 'void'])
         ->count();
@@ -21,7 +23,7 @@
         if (! Route::has($route)) return '#';
         $active = request()->routeIs(($match ?? $route) . '*');
         return $active
-            ? 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-[#e63012]/15 text-[#e63012] border border-[#e63012]/30 transition-colors'
+            ? 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand/15 text-brand border border-brand/30 transition-colors'
             : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors';
     };
     $navUrl = function (string $route): string {
@@ -34,7 +36,7 @@
 
     <!-- Logo -->
     <div class="flex items-center h-16 px-5 border-b border-white/5 flex-shrink-0">
-        <img src="{{ asset('images/logo.png') }}" alt="Surrey Tuning Services" class="h-8 w-auto">
+        <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-8 w-auto">
     </div>
 
     <!-- Navigation -->
@@ -59,7 +61,7 @@
             </svg>
             <span class="flex-1">File Requests</span>
             @if ($activeFileRequestCount > 0)
-                <span class="text-[10px] font-bold bg-[#e63012] text-white rounded-full px-1.5 py-0.5 leading-none">
+                <span class="text-[10px] font-bold bg-brand text-white rounded-full px-1.5 py-0.5 leading-none">
                     {{ $activeFileRequestCount }}
                 </span>
             @endif
@@ -84,12 +86,12 @@
         <!-- FINANCIAL -->
         <p class="px-3 pt-5 pb-1.5 text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Financial</p>
 
-        <a href="{{ $navUrl('client.credits.slave') }}" class="{{ $navHelper('client.credits.slave') }}">
+        <a href="{{ $navUrl('client.credits.file') }}" class="{{ $navHelper('client.credits.file') }}">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            Slave Credits
+            File Credits
         </a>
 
         <a href="{{ $navUrl('client.credits.evc') }}" class="{{ $navHelper('client.credits.evc') }}">
@@ -216,7 +218,7 @@
 
         <!-- Avatar + name + company -->
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-[#e63012] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+            <div class="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
                 {{ strtoupper(substr(auth()->user()->first_name ?? '', 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? '', 0, 1)) }}
             </div>
             <div class="hidden sm:block">

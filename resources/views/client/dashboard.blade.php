@@ -13,7 +13,7 @@
                 <x-status-badge :status="$portalStatus?->status->label() ?? 'Available'" :colour="$portalStatus?->status->colour() ?? 'green'" />
             </div>
             <a href="{{ route('client.upload.create') }}"
-               class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e63012] hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-brand-dark text-white text-sm font-semibold rounded-xl transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Upload New File
             </a>
@@ -24,69 +24,49 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Pending Files -->
         <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Files</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['pending'] }}</p>
-                    @if ($deltas['pending_yesterday'] > 0)
-                        <p class="text-xs text-[#e63012] mt-1 font-medium">+{{ $deltas['pending_yesterday'] }} from yesterday</p>
-                    @else
-                        <p class="text-xs text-slate-600 mt-1">No new yesterday</p>
-                    @endif
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#e63012]/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-[#e63012]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                </div>
+            <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Files</p>
+                <p class="text-3xl font-bold text-white mt-2">{{ $stats['pending'] }}</p>
+                @if ($deltas['pending_yesterday'] > 0)
+                    <p class="text-xs text-brand mt-1 font-medium">+{{ $deltas['pending_yesterday'] }} from yesterday</p>
+                @else
+                    <p class="text-xs text-slate-600 mt-1">No new yesterday</p>
+                @endif
             </div>
         </div>
 
         <!-- In Progress -->
         <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">In Progress</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['in_progress'] }}</p>
-                    @if ($deltas['in_progress_today'] > 0)
-                        <p class="text-xs text-[#e63012] mt-1 font-medium">+{{ $deltas['in_progress_today'] }} from yesterday</p>
-                    @else
-                        <p class="text-xs text-slate-600 mt-1">No change today</p>
-                    @endif
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#e63012]/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-[#e63012]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
+            <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">In Progress</p>
+                <p class="text-3xl font-bold text-white mt-2">{{ $stats['in_progress'] }}</p>
+                @if ($deltas['in_progress_today'] > 0)
+                    <p class="text-xs text-brand mt-1 font-medium">+{{ $deltas['in_progress_today'] }} from yesterday</p>
+                @else
+                    <p class="text-xs text-slate-600 mt-1">No change today</p>
+                @endif
             </div>
         </div>
 
         <!-- Completed This Year -->
         <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completed (This Year)</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ $stats['completed_this_year'] }}</p>
-                    @if ($deltas['completed_this_month'] > 0)
-                        <p class="text-xs text-green-400 mt-1 font-medium">+{{ $deltas['completed_this_month'] }} this month</p>
-                    @else
-                        <p class="text-xs text-slate-600 mt-1">None this month</p>
-                    @endif
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
+            <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completed (This Year)</p>
+                <p class="text-3xl font-bold text-white mt-2">{{ $stats['completed_this_year'] }}</p>
+                @if ($deltas['completed_this_month'] > 0)
+                    <p class="text-xs text-green-400 mt-1 font-medium">+{{ $deltas['completed_this_month'] }} this month</p>
+                @else
+                    <p class="text-xs text-slate-600 mt-1">None this month</p>
+                @endif
             </div>
         </div>
 
         <!-- Credit Balance -->
         <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Credit Balance</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ number_format($stats['slave_balance']) }}</p>
-                    <p class="text-xs text-slate-500 mt-1">Slave Credits</p>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                </div>
+            <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Credit Balance</p>
+                <p class="text-3xl font-bold text-white mt-2">{{ number_format($stats['file_balance']) }}</p>
+                <p class="text-xs text-slate-500 mt-1">File Credits</p>
             </div>
         </div>
     </div>
@@ -110,7 +90,7 @@
             <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
                     <h2 class="text-sm font-semibold text-slate-300">Recent File Requests</h2>
-                    <a href="{{ route('client.file-requests.index') }}" class="text-xs text-[#e63012] hover:text-red-400">View all &rarr;</a>
+                    <a href="{{ route('client.file-requests.index') }}" class="text-xs text-brand hover:text-red-400">View all &rarr;</a>
                 </div>
 
                 @if ($recentFileRequests->isEmpty())
@@ -174,20 +154,20 @@
                     <div class="space-y-4">
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm text-slate-400">Slave Credits</span>
-                                <a href="{{ route('client.credits.slave') }}"
-                                   class="text-xs bg-[#e63012] hover:bg-red-600 text-white px-3 py-1 rounded-lg font-medium transition-colors">
+                                <span class="text-sm text-slate-400">File Credits</span>
+                                <a href="{{ route('client.credits.file') }}"
+                                   class="text-xs bg-brand hover:bg-brand-dark text-white px-3 py-1 rounded-lg font-medium transition-colors">
                                     Top Up
                                 </a>
                             </div>
-                            <p class="text-2xl font-bold text-white">{{ number_format($stats['slave_balance']) }}</p>
+                            <p class="text-2xl font-bold text-white">{{ number_format($stats['file_balance']) }}</p>
                         </div>
 
                         <div class="border-t border-white/5 pt-4">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-sm text-slate-400">EVC Credits</span>
                                 <a href="{{ route('client.credits.evc') }}"
-                                   class="text-xs bg-[#e63012] hover:bg-red-600 text-white px-3 py-1 rounded-lg font-medium transition-colors">
+                                   class="text-xs bg-brand hover:bg-brand-dark text-white px-3 py-1 rounded-lg font-medium transition-colors">
                                     Buy EVC Credits
                                 </a>
                             </div>

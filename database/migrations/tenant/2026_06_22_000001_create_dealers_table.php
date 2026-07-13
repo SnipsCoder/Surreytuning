@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('company_name');
             $table->string('country')->default('United Kingdom');
             $table->text('invoice_address')->nullable();
-            $table->decimal('slave_credit_balance', 10, 2)->default(0.00);
+            $table->decimal('file_credit_balance', 10, 2)->default(0.00);
             $table->decimal('evc_credit_balance', 10, 2)->default(0.00);
             $table->enum('status', ['pending', 'approved', 'rejected', 'suspended'])->default('pending');
             $table->timestamp('approved_at')->nullable();

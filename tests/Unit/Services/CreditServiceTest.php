@@ -3,11 +3,11 @@
 namespace Tests\Unit\Services;
 
 use App\Enums\EvcCreditTransactionType;
-use App\Enums\SlaveCreditTransactionType;
+use App\Enums\FileCreditTransactionType;
 use App\Exceptions\InsufficientCreditsException;
 use App\Models\Dealer;
 use App\Models\EvcCreditTransaction;
-use App\Models\SlaveCreditTransaction;
+use App\Models\FileCreditTransaction;
 use App\Models\User;
 use App\Models\WinolsBundle;
 use App\Services\CreditService;
@@ -16,43 +16,43 @@ use Tests\TestCase;
 
 class CreditServiceTest extends TestCase
 {
-    public function test_add_slave_credits_updates_balance_and_creates_transaction(): void
+    public function test_add_file_credits_updates_balance_and_creates_transaction(): void
     {
-        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'slave_credit_balance' => 100]);
+        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'file_credit_balance' => 100]);
         $user = User::factory()->create();
 
-        $transaction = (new CreditService)->addSlaveCredits($dealer, 50, 'Top up', $user);
+        $transaction = (new CreditService)->addFileCredits($dealer, 50, 'Top up', $user);
 
         $dealer->refresh();
 
-        $this->assertEquals(150, $dealer->slave_credit_balance);
-        $this->assertInstanceOf(SlaveCreditTransaction::class, $transaction);
-        $this->assertEquals(SlaveCreditTransactionType::TopUp, $transaction->type);
+        $this->assertEquals(150, $dealer->file_credit_balance);
+        $this->assertInstanceOf(FileCreditTransaction::class, $transaction);
+        $this->assertEquals(FileCreditTransactionType::TopUp, $transaction->type);
         $this->assertEquals(50, $transaction->amount);
         $this->assertEquals(150, $transaction->balance_after);
     }
 
-    public function test_deduct_slave_credits_fails_when_insufficient_balance(): void
+    public function test_deduct_file_credits_fails_when_insufficient_balance(): void
     {
-        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'slave_credit_balance' => 10]);
+        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'file_credit_balance' => 10]);
         $user = User::factory()->create();
 
         $this->expectException(InsufficientCreditsException::class);
 
-        (new CreditService)->deductSlaveCredits($dealer, 50, 'Deduction', $user);
+        (new CreditService)->deductFileCredits($dealer, 50, 'Deduction', $user);
     }
 
-    public function test_deduct_slave_credits_succeeds_and_updates_balance_correctly(): void
+    public function test_deduct_file_credits_succeeds_and_updates_balance_correctly(): void
     {
-        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'slave_credit_balance' => 100]);
+        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'file_credit_balance' => 100]);
         $user = User::factory()->create();
 
-        $transaction = (new CreditService)->deductSlaveCredits($dealer, 30, 'Deduction', $user);
+        $transaction = (new CreditService)->deductFileCredits($dealer, 30, 'Deduction', $user);
 
         $dealer->refresh();
 
-        $this->assertEquals(70, $dealer->slave_credit_balance);
-        $this->assertEquals(SlaveCreditTransactionType::Deduction, $transaction->type);
+        $this->assertEquals(70, $dealer->file_credit_balance);
+        $this->assertEquals(FileCreditTransactionType::Deduction, $transaction->type);
         $this->assertEquals(-30, $transaction->amount);
         $this->assertEquals(70, $transaction->balance_after);
     }
@@ -85,29 +85,29 @@ class CreditServiceTest extends TestCase
         (new CreditService)->deductEvcCredits($dealer, 50, 'Deduction', $user);
     }
 
-    public function test_manual_slave_adjustment_records_a_deduction_type_when_negative(): void
+    public function test_manual_file_adjustment_records_a_deduction_type_when_negative(): void
     {
-        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'slave_credit_balance' => 100]);
+        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'file_credit_balance' => 100]);
         $user = User::factory()->create();
 
-        $transaction = (new CreditService)->manualAdjustSlaveCredits($dealer, -40, 'Correction', $user);
+        $transaction = (new CreditService)->manualAdjustFileCredits($dealer, -40, 'Correction', $user);
 
         $dealer->refresh();
 
-        $this->assertEquals(60, $dealer->slave_credit_balance);
-        $this->assertEquals(SlaveCreditTransactionType::Deduction, $transaction->type);
+        $this->assertEquals(60, $dealer->file_credit_balance);
+        $this->assertEquals(FileCreditTransactionType::Deduction, $transaction->type);
         $this->assertEquals(-40, $transaction->amount);
         $this->assertEquals(60, $transaction->balance_after);
     }
 
     public function test_db_transaction_rolls_back_on_failure(): void
     {
-        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'slave_credit_balance' => 100]);
+        $dealer = Dealer::create(['company_name' => 'Test Dealer', 'country' => 'UK', 'file_credit_balance' => 100]);
         $user = User::factory()->create();
 
         try {
             DB::transaction(function () use ($dealer, $user) {
-                (new CreditService)->addSlaveCredits($dealer, 50, 'Top up', $user);
+                (new CreditService)->addFileCredits($dealer, 50, 'Top up', $user);
                 throw new \RuntimeException('Forced failure');
             });
         } catch (\RuntimeException) {
@@ -116,7 +116,7 @@ class CreditServiceTest extends TestCase
 
         $dealer->refresh();
 
-        $this->assertEquals(100, $dealer->slave_credit_balance);
-        $this->assertEquals(0, SlaveCreditTransaction::count());
+        $this->assertEquals(100, $dealer->file_credit_balance);
+        $this->assertEquals(0, FileCreditTransaction::count());
     }
 }

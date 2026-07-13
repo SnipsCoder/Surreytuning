@@ -153,7 +153,7 @@
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit Type</label>
                                     <select name="credit_type" class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm">
-                                        <option value="slave">Slave Credits</option>
+                                        <option value="file">File Credits</option>
                                         <option value="evc">EVC Credits</option>
                                     </select>
                                 </div>

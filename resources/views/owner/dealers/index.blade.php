@@ -21,14 +21,14 @@
         @endif
     </form>
 
-    <x-data-table :headers="['Company', 'Status', 'Slave Credits', 'EVC Credits', 'Job Count', 'Joined', '']">
+    <x-data-table :headers="['Company', 'Status', 'File Credits', 'EVC Credits', 'Job Count', 'Joined', '']">
         @forelse ($dealers as $dealer)
             <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $dealer->company_name }}</td>
                 <td class="px-4 py-3 text-sm">
                     <x-status-badge :status="$dealer->status->label()" :colour="$dealer->status->colour()" />
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ number_format((float) $dealer->slave_credit_balance, 2) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ number_format((float) $dealer->file_credit_balance, 2) }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ number_format((float) $dealer->evc_credit_balance, 2) }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $dealer->file_requests_count }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $dealer->created_at->format('d M Y') }}</td>

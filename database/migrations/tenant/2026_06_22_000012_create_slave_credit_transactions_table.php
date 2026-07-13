@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('slave_credit_transactions', function (Blueprint $table) {
+        Schema::create('file_credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dealer_id')->constrained('dealers');
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('slave_credit_transactions');
+        Schema::dropIfExists('file_credit_transactions');
     }
 };

@@ -46,11 +46,11 @@ class AuditLogTest extends TestCase
     public function test_adding_a_credit_records_an_audit_entry(): void
     {
         $owner = $this->ownerUser();
-        $dealer = Dealer::factory()->create(['slave_credit_balance' => 0]);
+        $dealer = Dealer::factory()->create(['file_credit_balance' => 0]);
         $fileRequest = FileRequest::factory()->create(['dealer_id' => $dealer->id]);
 
         $this->actingAs($owner)->post("/file-requests/{$fileRequest->id}/credit", [
-            'credit_type' => 'slave',
+            'credit_type' => 'file',
             'amount' => 50,
             'reason' => 'Goodwill credit',
         ])->assertRedirect();
@@ -89,7 +89,7 @@ class AuditLogTest extends TestCase
         $dealer = Dealer::factory()->create();
 
         $this->actingAs($owner)->post("/dealers/{$dealer->id}/credits", [
-            'credit_type' => 'slave',
+            'credit_type' => 'file',
             'amount' => 25,
             'reason' => 'Goodwill credit',
         ])->assertRedirect();

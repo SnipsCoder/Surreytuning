@@ -42,7 +42,7 @@ class EvcCreditController extends Controller
                 'price_data' => [
                     'currency' => 'gbp',
                     'product_data' => ['name' => $bundle->name],
-                    'unit_amount' => (int) round($bundle->price_net * 100),
+                    'unit_amount' => (int) round($dealer->discountedPrice((float) $bundle->price_net) * 100),
                 ],
                 'quantity' => 1,
             ]],
