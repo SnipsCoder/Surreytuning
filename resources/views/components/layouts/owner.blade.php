@@ -47,6 +47,7 @@
                                 ['label' => 'Dealers',             'route' => 'dealers.index',              'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>'],
                                 ['label' => 'Dealer Applications', 'route' => 'dealer-applications.index', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>'],
                                 ['label' => 'Invoices',            'route' => 'invoices.index',             'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21l-7-7-7 7V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>'],
+                                ['label' => 'Reports',             'route' => 'owner.reports.index',        'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3v18h18M18.75 17V9.5M13.5 17V6.5M8.25 17v-3.5"/>'],
                             ],
                             'CONFIGURATION' => [
                                 ['label' => 'WinOLS Bundles',      'route' => 'winols-bundles.index',       'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>'],
@@ -94,20 +95,8 @@
             <div class="flex-1 flex flex-col min-w-0">
                 <!-- Header -->
                 <header class="h-16 flex items-center justify-between px-6 bg-[#1e293b] border-b border-white/5 flex-shrink-0" x-data="{ open: false }">
-                    <!-- Left: search + portal status pill -->
+                    <!-- Left: portal status pill -->
                     <div class="flex items-center gap-4">
-                        <!-- Search -->
-                        <div class="relative hidden md:block" x-data
-                             @keydown.window.cmd.k.prevent="$refs.globalSearch.focus()"
-                             @keydown.window.ctrl.k.prevent="$refs.globalSearch.focus()">
-                            <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <input x-ref="globalSearch" type="text" placeholder="Search anything..."
-                                   class="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-sm rounded-lg bg-[#0f172a] border border-white/10 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition-colors">
-                            <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-white/5 border border-white/10 rounded pointer-events-none">⌘K</kbd>
-                        </div>
-
                         @php
                             try {
                                 $portalStatus = \App\Models\PortalStatus::find(1);

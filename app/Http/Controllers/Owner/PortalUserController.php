@@ -37,6 +37,13 @@ class PortalUserController extends Controller
         return back()->with('success', 'Invitation sent.');
     }
 
+    public function sendPasswordReset(User $portalUser): RedirectResponse
+    {
+        Password::sendResetLink(['email' => $portalUser->email]);
+
+        return back()->with('success', 'Password reset link sent.');
+    }
+
     public function destroy(User $portalUser): RedirectResponse
     {
         $portalUser->update(['status' => UserStatus::Inactive]);

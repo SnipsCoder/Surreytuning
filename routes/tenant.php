@@ -63,6 +63,9 @@ Route::middleware([
     Route::middleware(['auth', 'two_factor', 'owner'])->group(function () {
         Route::get('/dashboard', [Owner\DashboardController::class, 'index'])->name('owner.dashboard');
 
+        // Reports / business intelligence
+        Route::get('/reports', [Owner\ReportController::class, 'index'])->name('owner.reports.index');
+
         // File Requests
         Route::get('/file-requests/archive', [Owner\FileRequestController::class, 'archive'])->name('owner.file-requests.archive');
         Route::resource('file-requests', Owner\FileRequestController::class)->only(['index', 'show', 'update']);
@@ -101,6 +104,7 @@ Route::middleware([
         Route::resource('tools', Owner\TuningToolController::class)->except(['show']);
         Route::resource('products', Owner\ProductController::class)->except(['show']);
         Route::resource('portal-users', Owner\PortalUserController::class)->except(['show']);
+        Route::post('/portal-users/{portalUser}/reset-password', [Owner\PortalUserController::class, 'sendPasswordReset'])->name('portal-users.reset-password');
         Route::resource('noticeboards', Owner\NoticeboardController::class)->except(['show']);
         Route::resource('vehicle-stats', Owner\VehicleStatController::class)->except(['show']);
 

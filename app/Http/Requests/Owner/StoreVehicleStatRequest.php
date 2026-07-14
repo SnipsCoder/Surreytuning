@@ -16,8 +16,9 @@ class StoreVehicleStatRequest extends FormRequest
         return [
             'make' => ['required', 'string', 'max:100'],
             'model' => ['required', 'string', 'max:100'],
-            'year_from' => ['required', 'integer', 'min:1900', 'max:2100'],
-            'year_to' => ['required', 'integer', 'min:1900', 'max:2100', 'gte:year_from'],
+            'generation' => ['nullable', 'string', 'max:100'],
+            'year_from' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'year_to' => ['nullable', 'integer', 'min:1900', 'max:2100', 'gte:year_from'],
             'engine' => ['required', 'string', 'max:50'],
             'fuel' => ['required', 'in:petrol,diesel,electric,hybrid'],
             'bhp_before' => ['required', 'numeric', 'min:0'],

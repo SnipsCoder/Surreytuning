@@ -17,6 +17,7 @@ use App\Listeners\SendDealerRejectionEmail;
 use App\Listeners\SendPaymentConfirmationEmail;
 use App\Models\FileRequest;
 use App\Models\Invoice;
+use App\Models\Setting;
 use App\Policies\FileRequestPolicy;
 use App\Policies\InvoicePolicy;
 use Illuminate\Support\Facades\Event;
@@ -50,6 +51,14 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(DealerApplicationApproved::class, SendDealerApprovalEmail::class);
         Event::listen(DealerApplicationRejected::class, SendDealerRejectionEmail::class);
         Event::listen(PaymentConfirmed::class, SendPaymentConfirmationEmail::class);
+
+        // The Setting model caches its singleton in a static property. In a
+        // long-running queue worker (QueueTenancyBootstrapper is enabled) that
+        // switches tenant context between jobs, that cache would otherwise bleed
+        // one tenant's settings into the next. Flush it on every tenancy boundary
+        // so Setting::get() always re-reads the active tenant's database.
+        Event::listen(TenancyInitialized::class, fn () => Setting::clearCache());
+        Event::listen(TenancyEnded::class, fn () => Setting::clearCache());
 
         $this->tagSentryWithTenant();
     }

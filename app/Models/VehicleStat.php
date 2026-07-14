@@ -12,6 +12,7 @@ class VehicleStat extends Model
         'model',
         'year_from',
         'year_to',
+        'generation',
         'engine',
         'fuel',
         'bhp_before',

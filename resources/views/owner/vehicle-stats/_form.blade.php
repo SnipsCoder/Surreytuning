@@ -12,16 +12,22 @@
     </div>
 </div>
 
+<div>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Generation</label>
+    <input type="text" name="generation" value="{{ old('generation', $vehicleStat?->generation) }}"
+        class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+</div>
+
 <div class="grid grid-cols-3 gap-4">
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Year From</label>
-        <input type="number" name="year_from" value="{{ old('year_from', $vehicleStat?->year_from) }}" required
+        <input type="number" name="year_from" value="{{ old('year_from', $vehicleStat?->year_from) }}"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Year To</label>
-        <input type="number" name="year_to" value="{{ old('year_to', $vehicleStat?->year_to) }}" required
+        <input type="number" name="year_to" value="{{ old('year_to', $vehicleStat?->year_to) }}"
             class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
     </div>
 

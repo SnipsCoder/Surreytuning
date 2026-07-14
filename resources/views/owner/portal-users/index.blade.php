@@ -15,15 +15,19 @@
                     <x-status-badge :status="$portalUser->role->label()" colour="bg-blue-100 text-blue-800" />
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    @if ($portalUser->status === 'active')
+                    @if ($portalUser->status === \App\Enums\UserStatus::Active)
                         <x-status-badge status="Active" colour="bg-green-100 text-green-800" />
                     @else
                         <x-status-badge status="Inactive" colour="bg-gray-100 text-gray-800" />
                     @endif
                 </td>
                 <td class="px-4 py-3 text-sm text-right">
-                    @if ($portalUser->status === 'active')
-                        <form method="POST" action="{{ route('portal-users.destroy', $portalUser) }}" class="inline" onsubmit="return confirm('Deactivate this user?')">
+                    @if ($portalUser->status === \App\Enums\UserStatus::Active)
+                        <form method="POST" action="{{ route('portal-users.reset-password', $portalUser) }}" class="inline" onsubmit="return confirm('Send a password reset email to this user?')">
+                            @csrf
+                            <button type="submit" class="text-brand hover:underline">Reset password</button>
+                        </form>
+                        <form method="POST" action="{{ route('portal-users.destroy', $portalUser) }}" class="inline ml-3" onsubmit="return confirm('Deactivate this user?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Deactivate</button>

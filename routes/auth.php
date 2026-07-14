@@ -7,16 +7,16 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// NOTE: Public self-registration is intentionally disabled. This is an
+// invite/application-only portal — dealers join via /apply (reviewed and
+// approved by an owner) and staff are invited from the owner portal. The
+// Breeze `register` routes were removed because they created verified users
+// with the default `dealer_owner` role and NO dealer_id (orphaned accounts).
+
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
-
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

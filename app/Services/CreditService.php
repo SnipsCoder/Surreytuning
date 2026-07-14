@@ -16,6 +16,11 @@ class CreditService
     public function addFileCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $fileRequestId = null): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
+            // Lock the dealer row so concurrent credit operations serialise and
+            // read a fresh balance — otherwise two transactions can both read the
+            // same starting balance and one update is lost.
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             $balanceAfter = bcadd((string) $dealer->file_credit_balance, (string) $amount, 2);
 
             $dealer->update(['file_credit_balance' => $balanceAfter]);
@@ -35,6 +40,10 @@ class CreditService
     public function deductFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
+            // Lock the dealer row before the balance check so two concurrent
+            // deductions cannot both pass the check and overspend into a negative.
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             if ($dealer->file_credit_balance < $amount) {
                 throw new InsufficientCreditsException('Dealer does not have sufficient file credits.');
             }
@@ -58,6 +67,8 @@ class CreditService
     public function manualAdjustFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): FileCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             $balanceAfter = bcadd((string) $dealer->file_credit_balance, (string) $amount, 2);
 
             $dealer->update(['file_credit_balance' => $balanceAfter]);
@@ -77,6 +88,8 @@ class CreditService
     public function addEvcCredits(Dealer $dealer, float $amount, string $reason, ?User $performedBy = null, ?int $winolsBundleId = null): EvcCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $winolsBundleId) {
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             $balanceAfter = bcadd((string) $dealer->evc_credit_balance, (string) $amount, 2);
 
             $dealer->update(['evc_credit_balance' => $balanceAfter]);
@@ -96,6 +109,8 @@ class CreditService
     public function deductEvcCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): EvcCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             if ($dealer->evc_credit_balance < $amount) {
                 throw new InsufficientCreditsException('Dealer does not have sufficient EVC credits.');
             }
@@ -119,6 +134,8 @@ class CreditService
     public function manualAdjustEvcCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): EvcCreditTransaction
     {
         return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
+            $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
+
             $balanceAfter = bcadd((string) $dealer->evc_credit_balance, (string) $amount, 2);
 
             $dealer->update(['evc_credit_balance' => $balanceAfter]);

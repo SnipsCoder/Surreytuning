@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Enums\InvoiceType;
 use App\Enums\ProductPaymentType;
 use App\Exceptions\InsufficientCreditsException;
+use App\Exceptions\OutOfStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductOrder;
@@ -13,6 +14,7 @@ use App\Services\CreditService;
 use App\Services\InvoiceService;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -67,38 +69,55 @@ class ProductController extends Controller
 
         if ($paymentMethod === 'file_credits') {
             try {
-                $this->creditService->deductFileCredits(
-                    $dealer,
-                    (float) $totalGross,
-                    "Purchase of product: {$product->name}",
-                    $request->user(),
-                );
+                DB::transaction(function () use ($product, $dealer, $request, $unitNet, $vatAmount, $totalGross) {
+                    // Atomically claim one unit of stock (NULL = unlimited). If
+                    // nothing was decremented the item is sold out, so we abort
+                    // the whole purchase — the rollback ensures no credits are
+                    // taken. This also closes the oversell race between the
+                    // earlier stock check and this write.
+                    if (! is_null($product->stock)) {
+                        $claimed = Product::whereKey($product->id)->where('stock', '>', 0)->decrement('stock');
+
+                        if ($claimed === 0) {
+                            throw new OutOfStockException;
+                        }
+                    }
+
+                    $this->creditService->deductFileCredits(
+                        $dealer,
+                        (float) $totalGross,
+                        "Purchase of product: {$product->name}",
+                        $request->user(),
+                    );
+
+                    $order = ProductOrder::create([
+                        'dealer_id' => $dealer->id,
+                        'user_id' => $request->user()->id,
+                        'product_id' => $product->id,
+                        'quantity' => 1,
+                        'unit_price_net' => $unitNet,
+                        'vat_amount' => $vatAmount,
+                        'total_gross' => $totalGross,
+                        'payment_method' => 'file_credits',
+                        'status' => 'paid',
+                    ]);
+
+                    $invoice = $this->invoiceService->createInvoice(
+                        $dealer,
+                        "Product purchase: {$product->name}",
+                        (float) $unitNet,
+                        InvoiceType::Product,
+                        $request->user(),
+                        $order->id,
+                        ProductOrder::class,
+                    );
+                    $this->invoiceService->markPaid($invoice);
+                });
             } catch (InsufficientCreditsException $e) {
                 return back()->with('error', 'Insufficient file credit balance for this purchase.');
+            } catch (OutOfStockException $e) {
+                return back()->with('error', 'This product is out of stock.');
             }
-
-            $order = ProductOrder::create([
-                'dealer_id' => $dealer->id,
-                'user_id' => $request->user()->id,
-                'product_id' => $product->id,
-                'quantity' => 1,
-                'unit_price_net' => $unitNet,
-                'vat_amount' => $vatAmount,
-                'total_gross' => $totalGross,
-                'payment_method' => 'file_credits',
-                'status' => 'paid',
-            ]);
-
-            $invoice = $this->invoiceService->createInvoice(
-                $dealer,
-                "Product purchase: {$product->name}",
-                (float) $unitNet,
-                InvoiceType::Product,
-                $request->user(),
-                $order->id,
-                ProductOrder::class,
-            );
-            $this->invoiceService->markPaid($invoice);
 
             return redirect()->route('client.products.index')->with('success', 'Product purchased using file credits.');
         }

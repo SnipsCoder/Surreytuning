@@ -18,6 +18,7 @@ use App\Models\FileStage;
 use App\Models\TuningTool;
 use App\Services\CreditService;
 use App\Services\FileStorageService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +41,7 @@ class FileUploadController extends Controller
     {
         $dealer = $request->user()->dealer;
 
-        $fileRequest = DB::transaction(function () use ($request, $dealer) {
+        $makeFileRequest = fn () => DB::transaction(function () use ($request, $dealer) {
             $requestNumber = (int) (DB::table('file_requests')->lockForUpdate()->max('request_number') ?? 0) + 1;
 
             $fileRequest = FileRequest::create([
@@ -97,6 +98,12 @@ class FileUploadController extends Controller
             return $fileRequest;
         });
 
+        // Two concurrent submissions can read the same MAX(request_number) before
+        // either commits; the UNIQUE constraint then rejects the loser. Retry a
+        // few times so the second request simply picks the next number instead of
+        // 500-ing. (A row lock on an aggregate does not reliably gap-lock in MySQL.)
+        $fileRequest = $this->createWithUniqueRetry($makeFileRequest);
+
         try {
             $stored = $fileStorageService->storeFile(
                 $request->file('file'),
@@ -130,5 +137,25 @@ class FileUploadController extends Controller
         return redirect()
             ->route('client.file-requests.show', $fileRequest)
             ->with('success', 'File request submitted successfully.');
+    }
+
+    /**
+     * Run a create-callback, retrying on a duplicate-key violation so a lost
+     * race on request_number picks the next value instead of erroring.
+     */
+    private function createWithUniqueRetry(callable $callback, int $maxAttempts = 3): FileRequest
+    {
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return $callback();
+            } catch (QueryException $e) {
+                // SQLSTATE 23000 / 23505 = integrity constraint (duplicate key).
+                $isDuplicate = in_array((string) $e->getCode(), ['23000', '23505'], true);
+
+                if ($attempt >= $maxAttempts || ! $isDuplicate) {
+                    throw $e;
+                }
+            }
+        }
     }
 }

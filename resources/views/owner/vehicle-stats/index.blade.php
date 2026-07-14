@@ -41,8 +41,23 @@
         @forelse ($vehicleStats as $vehicleStat)
             <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $vehicleStat->make }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->model }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->year_from }} - {{ $vehicleStat->year_to }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    {{ $vehicleStat->model }}
+                    @if ($vehicleStat->generation)
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $vehicleStat->generation }}</span>
+                    @endif
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                    @if ($vehicleStat->year_from && $vehicleStat->year_to)
+                        {{ $vehicleStat->year_from }} - {{ $vehicleStat->year_to }}
+                    @elseif ($vehicleStat->year_from)
+                        {{ $vehicleStat->year_from }}+
+                    @elseif ($vehicleStat->year_to)
+                        Up to {{ $vehicleStat->year_to }}
+                    @else
+                        &mdash;
+                    @endif
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->engine }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->stage }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->bhp_before }} / {{ $vehicleStat->bhp_after }}</td>

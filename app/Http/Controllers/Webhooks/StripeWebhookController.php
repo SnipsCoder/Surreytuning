@@ -17,6 +17,7 @@ use App\Services\InvoiceService;
 use App\Services\StripeService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 use Throwable;
@@ -95,6 +96,15 @@ class StripeWebhookController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            // Release the idempotency claim so Stripe's automatic retry can
+            // reprocess this event from scratch. Each handler is atomic (its
+            // credit + invoice mutations run in one transaction), so nothing
+            // partial was committed and reprocessing will not double-apply.
+            // Returning a non-2xx status is what tells Stripe to retry.
+            ProcessedStripeEvent::where('event_id', $event->id)->delete();
+
+            return response('Webhook handler failed', 500);
         }
 
         return response('Webhook handled', 200);
@@ -117,22 +127,24 @@ class StripeWebhookController extends Controller
         $creditAmount = (float) $product->price_net;
         $invoiceAmount = $dealer->discountedPrice((float) $product->price_net);
 
-        $this->creditService->addFileCredits(
-            $dealer,
-            $creditAmount,
-            "File credit top-up: {$product->name}",
-            $user,
-        );
+        $invoice = DB::transaction(function () use ($dealer, $user, $product, $creditAmount, $invoiceAmount, $paymentIntentId) {
+            $this->creditService->addFileCredits(
+                $dealer,
+                $creditAmount,
+                "File credit top-up: {$product->name}",
+                $user,
+            );
 
-        $invoice = $this->invoiceService->createInvoice(
-            $dealer,
-            "File credit top-up: {$product->name}",
-            $invoiceAmount,
-            InvoiceType::CreditTopUp,
-            $user,
-        );
+            $invoice = $this->invoiceService->createInvoice(
+                $dealer,
+                "File credit top-up: {$product->name}",
+                $invoiceAmount,
+                InvoiceType::CreditTopUp,
+                $user,
+            );
 
-        $this->invoiceService->markPaid($invoice, $paymentIntentId);
+            return $this->invoiceService->markPaid($invoice, $paymentIntentId);
+        });
 
         PaymentConfirmed::dispatch($invoice, $dealer);
     }
@@ -149,25 +161,27 @@ class StripeWebhookController extends Controller
         $user = User::findOrFail($metadata->user_id);
         $bundle = WinolsBundle::findOrFail($metadata->winols_bundle_id);
 
-        $this->creditService->addEvcCredits(
-            $dealer,
-            (float) $bundle->credits,
-            "EVC bundle purchase: {$bundle->name}",
-            $user,
-            $bundle->id,
-        );
+        $invoice = DB::transaction(function () use ($dealer, $user, $bundle, $paymentIntentId) {
+            $this->creditService->addEvcCredits(
+                $dealer,
+                (float) $bundle->credits,
+                "EVC bundle purchase: {$bundle->name}",
+                $user,
+                $bundle->id,
+            );
 
-        $invoice = $this->invoiceService->createInvoice(
-            $dealer,
-            "EVC bundle purchase: {$bundle->name}",
-            $dealer->discountedPrice((float) $bundle->price_net),
-            InvoiceType::EvcBundle,
-            $user,
-            $bundle->id,
-            WinolsBundle::class,
-        );
+            $invoice = $this->invoiceService->createInvoice(
+                $dealer,
+                "EVC bundle purchase: {$bundle->name}",
+                $dealer->discountedPrice((float) $bundle->price_net),
+                InvoiceType::EvcBundle,
+                $user,
+                $bundle->id,
+                WinolsBundle::class,
+            );
 
-        $this->invoiceService->markPaid($invoice, $paymentIntentId);
+            return $this->invoiceService->markPaid($invoice, $paymentIntentId);
+        });
 
         PaymentConfirmed::dispatch($invoice, $dealer);
     }
@@ -181,26 +195,35 @@ class StripeWebhookController extends Controller
         }
 
         $order = ProductOrder::findOrFail($metadata->product_order_id);
-        $order->update([
-            'status' => 'paid',
-            'stripe_payment_intent_id' => $paymentIntentId,
-        ]);
-
         $dealer = Dealer::findOrFail($order->dealer_id);
         $user = User::findOrFail($order->user_id);
         $product = $order->product;
 
-        $invoice = $this->invoiceService->createInvoice(
-            $dealer,
-            "Product purchase: {$product->name}",
-            (float) $order->unit_price_net,
-            InvoiceType::Product,
-            $user,
-            $order->id,
-            ProductOrder::class,
-        );
+        $invoice = DB::transaction(function () use ($order, $dealer, $user, $product, $paymentIntentId) {
+            $order->update([
+                'status' => 'paid',
+                'stripe_payment_intent_id' => $paymentIntentId,
+            ]);
 
-        $this->invoiceService->markPaid($invoice, $paymentIntentId);
+            // Draw down stock now that payment has completed (NULL = unlimited).
+            // The `> 0` guard prevents the count going negative; the card was
+            // already charged, so we fulfil rather than refuse if it hit zero.
+            if (! is_null($product->stock)) {
+                Product::whereKey($product->id)->where('stock', '>', 0)->decrement('stock');
+            }
+
+            $invoice = $this->invoiceService->createInvoice(
+                $dealer,
+                "Product purchase: {$product->name}",
+                (float) $order->unit_price_net,
+                InvoiceType::Product,
+                $user,
+                $order->id,
+                ProductOrder::class,
+            );
+
+            return $this->invoiceService->markPaid($invoice, $paymentIntentId);
+        });
 
         PaymentConfirmed::dispatch($invoice, $dealer);
     }

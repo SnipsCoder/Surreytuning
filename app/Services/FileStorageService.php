@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Enums\AttachmentType;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use RuntimeException;
 
 class FileStorageService
 {
@@ -42,6 +44,20 @@ class FileStorageService
         $disk = $this->disk();
 
         if (! $disk->providesTemporaryUrls()) {
+            // The configured disk cannot sign short-lived URLs. Falling back to a
+            // permanent, unsigned URL would expose a customer's ECU binary to
+            // anyone with the link — a data leak. In production we refuse rather
+            // than serve a public link; locally (e.g. the 'local'/'public' disk
+            // used in dev and tests) we log and fall back so downloads still work.
+            Log::critical('File storage disk cannot produce temporary URLs.', [
+                'disk' => config('filesystems.file_storage_disk', 'r2'),
+                'path' => $path,
+            ]);
+
+            if (app()->environment('production')) {
+                throw new RuntimeException('Secure file downloads are temporarily unavailable. Please try again later.');
+            }
+
             return $disk->url($path);
         }
 

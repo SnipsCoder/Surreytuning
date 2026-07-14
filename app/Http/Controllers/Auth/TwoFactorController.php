@@ -24,6 +24,11 @@ class TwoFactorController extends Controller
     public function initTotp(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($guard = $this->guardReenrolment($request)) {
+            return $guard;
+        }
+
         $google2fa = new Google2FA;
 
         $secret = $google2fa->generateSecretKey();
@@ -50,6 +55,10 @@ class TwoFactorController extends Controller
     {
         $user = $request->user();
 
+        if ($guard = $this->guardReenrolment($request)) {
+            return $guard;
+        }
+
         $user->forceFill([
             'two_factor_method' => 'email',
             'two_factor_secret' => null,
@@ -66,6 +75,11 @@ class TwoFactorController extends Controller
         $request->validate(['code' => ['required', 'string']]);
 
         $user = $request->user();
+
+        if ($guard = $this->guardReenrolment($request)) {
+            return $guard;
+        }
+
         $code = preg_replace('/\s+/', '', $request->input('code'));
 
         if (! $this->verifyCode($user, $code)) {
@@ -160,6 +174,25 @@ class TwoFactorController extends Controller
         session()->forget('two_factor_verified');
 
         return back()->with('success', 'Two-factor authentication has been disabled.');
+    }
+
+    /**
+     * Prevent a session that has authenticated with a password but NOT yet
+     * passed the 2FA challenge from re-enrolling a fresh factor (which would
+     * overwrite the confirmed secret and let an attacker with only the password
+     * bypass 2FA entirely). Users setting up 2FA for the first time have no
+     * confirmed factor and pass through; users who have already verified this
+     * session (e.g. changing their method from settings) also pass through.
+     */
+    private function guardReenrolment(Request $request): ?RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->two_factor_confirmed_at && ! $request->session()->get('two_factor_verified')) {
+            return redirect()->route('two-factor.challenge');
+        }
+
+        return null;
     }
 
     private function verifyCode($user, string $code): bool
