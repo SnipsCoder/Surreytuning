@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\InvoiceMail;
 use App\Models\Dealer;
 use App\Models\Invoice;
+use App\Models\Setting;
 use App\Services\InvoicePdfService;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
@@ -123,7 +124,7 @@ class InvoiceController extends Controller
 
         $mailer = Mail::to($recipient);
 
-        if ($bcc = \App\Models\Setting::get()->bcc_invoice_email) {
+        if ($bcc = Setting::get()->bcc_invoice_email) {
             $mailer->bcc($bcc);
         }
 

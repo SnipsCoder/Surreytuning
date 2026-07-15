@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\DealerApplication;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,7 +30,7 @@ class DealerApprovedNotification extends Notification implements ShouldQueue
         ], false));
 
         return (new MailMessage)
-            ->subject('Welcome to '.\App\Models\Setting::brandName().' — Set Your Password')
+            ->subject('Welcome to '.Setting::brandName().' — Set Your Password')
             ->view('emails.dealer-approved', [
                 'application' => $this->application,
                 'resetUrl' => $resetUrl,

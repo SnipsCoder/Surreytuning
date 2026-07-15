@@ -25,13 +25,13 @@ class InvoiceMail extends Mailable
     public function __construct(public Invoice $invoice)
     {
         $prefix = Setting::get()->invoice_reference_prefix ?: 'INV';
-        $this->reference = $prefix . '-' . $invoice->invoice_number;
+        $this->reference = $prefix.'-'.$invoice->invoice_number;
         $this->url = route('client.invoices.show', $invoice);
     }
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Invoice ' . $this->reference);
+        return new Envelope(subject: 'Invoice '.$this->reference);
     }
 
     public function content(): Content

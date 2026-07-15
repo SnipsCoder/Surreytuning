@@ -33,28 +33,28 @@ return new class extends Migration
         // in tests) store the column as text with the new values already.
         if ($this->isMysql() && Schema::hasColumn('products', 'payment_type')) {
             DB::statement(
-                "ALTER TABLE `products` MODIFY COLUMN `payment_type` "
-                . "ENUM('slave_credits', 'file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
+                'ALTER TABLE `products` MODIFY COLUMN `payment_type` '
+                ."ENUM('slave_credits', 'file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
             );
             DB::table('products')->where('payment_type', 'slave_credits')
                 ->update(['payment_type' => 'file_credits']);
             DB::statement(
-                "ALTER TABLE `products` MODIFY COLUMN `payment_type` "
-                . "ENUM('file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
+                'ALTER TABLE `products` MODIFY COLUMN `payment_type` '
+                ."ENUM('file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
             );
         }
 
         // 4. product_orders.payment_method enum value slave_credits -> file_credits
         if ($this->isMysql() && Schema::hasColumn('product_orders', 'payment_method')) {
             DB::statement(
-                "ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` "
-                . "ENUM('slave_credits', 'file_credits', 'stripe') NOT NULL"
+                'ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` '
+                ."ENUM('slave_credits', 'file_credits', 'stripe') NOT NULL"
             );
             DB::table('product_orders')->where('payment_method', 'slave_credits')
                 ->update(['payment_method' => 'file_credits']);
             DB::statement(
-                "ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` "
-                . "ENUM('file_credits', 'stripe') NOT NULL"
+                'ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` '
+                ."ENUM('file_credits', 'stripe') NOT NULL"
             );
         }
     }
@@ -63,27 +63,27 @@ return new class extends Migration
     {
         if ($this->isMysql() && Schema::hasColumn('product_orders', 'payment_method')) {
             DB::statement(
-                "ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` "
-                . "ENUM('slave_credits', 'file_credits', 'stripe') NOT NULL"
+                'ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` '
+                ."ENUM('slave_credits', 'file_credits', 'stripe') NOT NULL"
             );
             DB::table('product_orders')->where('payment_method', 'file_credits')
                 ->update(['payment_method' => 'slave_credits']);
             DB::statement(
-                "ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` "
-                . "ENUM('slave_credits', 'stripe') NOT NULL"
+                'ALTER TABLE `product_orders` MODIFY COLUMN `payment_method` '
+                ."ENUM('slave_credits', 'stripe') NOT NULL"
             );
         }
 
         if ($this->isMysql() && Schema::hasColumn('products', 'payment_type')) {
             DB::statement(
-                "ALTER TABLE `products` MODIFY COLUMN `payment_type` "
-                . "ENUM('slave_credits', 'file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
+                'ALTER TABLE `products` MODIFY COLUMN `payment_type` '
+                ."ENUM('slave_credits', 'file_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
             );
             DB::table('products')->where('payment_type', 'file_credits')
                 ->update(['payment_type' => 'slave_credits']);
             DB::statement(
-                "ALTER TABLE `products` MODIFY COLUMN `payment_type` "
-                . "ENUM('slave_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
+                'ALTER TABLE `products` MODIFY COLUMN `payment_type` '
+                ."ENUM('slave_credits', 'direct_payment', 'both') NOT NULL DEFAULT 'both'"
             );
         }
 

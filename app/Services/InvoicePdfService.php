@@ -31,6 +31,6 @@ class InvoicePdfService
     {
         $prefix = Setting::get()->invoice_reference_prefix ?: 'INV';
 
-        return $prefix . '-' . $invoice->invoice_number . '.pdf';
+        return $prefix.'-'.$invoice->invoice_number.'.pdf';
     }
 }

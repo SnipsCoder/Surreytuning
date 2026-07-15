@@ -31,14 +31,14 @@ class FileOptionsSeeder extends Seeder
             }
 
             FileOption::create([
-                'file_stage_id'  => null,
-                'name'           => $opt['name'],
-                'description'    => null,
-                'price_net'      => 0,
+                'file_stage_id' => null,
+                'name' => $opt['name'],
+                'description' => null,
+                'price_net' => 0,
                 'vat_applicable' => false,
-                'is_required'    => false,
-                'sort_order'     => $opt['sort_order'],
-                'is_active'      => true,
+                'is_required' => false,
+                'sort_order' => $opt['sort_order'],
+                'is_active' => true,
             ]);
         }
     }

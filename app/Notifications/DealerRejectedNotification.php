@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\DealerApplication;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,7 +23,7 @@ class DealerRejectedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject(\App\Models\Setting::brandName().' — Application Update')
+            ->subject(Setting::brandName().' — Application Update')
             ->view('emails.dealer-rejected', [
                 'application' => $this->application,
             ]);

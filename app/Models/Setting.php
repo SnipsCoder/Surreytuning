@@ -111,7 +111,7 @@ class Setting extends Model
     public static function brandName(): string
     {
         try {
-            return (static::first() ?? new static())->resolveBrandName();
+            return (static::first() ?? new static)->resolveBrandName();
         } catch (\Throwable $e) {
             $appName = config('app.name');
 
@@ -125,7 +125,7 @@ class Setting extends Model
     public static function supportEmail(): ?string
     {
         try {
-            return (static::first() ?? new static())->resolveSupportEmail();
+            return (static::first() ?? new static)->resolveSupportEmail();
         } catch (\Throwable $e) {
             return config('mail.from.address');
         }
@@ -138,7 +138,7 @@ class Setting extends Model
     public static function brandColour(): string
     {
         try {
-            return (static::first() ?? new static())->resolveBrandColour();
+            return (static::first() ?? new static)->resolveBrandColour();
         } catch (\Throwable $e) {
             return '#e63012';
         }
