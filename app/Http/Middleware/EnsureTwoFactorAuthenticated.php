@@ -17,6 +17,11 @@ class EnsureTwoFactorAuthenticated
             return $next($request);
         }
 
+        // Global 2FA kill-switch (reversible via TWO_FACTOR_ENABLED env flag)
+        if (! config('auth.two_factor_enabled', true)) {
+            return $next($request);
+        }
+
         // Never intercept 2FA routes themselves (avoids redirect loops)
         if ($request->routeIs('two-factor.*', 'logout', 'password.*')) {
             return $next($request);

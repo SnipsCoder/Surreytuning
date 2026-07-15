@@ -114,4 +114,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Two-Factor Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Global kill-switch for two-factor authentication enforcement. When set
+    | to false, the EnsureTwoFactorAuthenticated middleware bypasses all 2FA
+    | checks (both TOTP/Google Authenticator and email OTP). Defaults to true
+    | so 2FA is enforced unless explicitly disabled via TWO_FACTOR_ENABLED.
+    |
+    */
+
+    'two_factor_enabled' => env('TWO_FACTOR_ENABLED', true),
+
 ];
