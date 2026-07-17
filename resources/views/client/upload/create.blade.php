@@ -178,15 +178,15 @@
 
                 <div>
                     <x-input-label value="Additional Options" />
-                    <div class="mt-2 space-y-2">
+                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                         @forelse ($fileOptions as $option)
                             <label class="flex items-center gap-2 rounded-md border border-gray-200 dark:border-gray-700 px-4 py-2">
                                 <input type="checkbox" name="file_options[]" value="{{ $option->id }}" x-model="fileOptions" class="rounded border-gray-300 text-brand focus:ring-brand">
                                 <span class="text-sm text-gray-900 dark:text-gray-100">{{ $option->name }}</span>
-                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">&pound;{{ number_format($option->price_net, 2) }}</span>
+                                <span class="ml-auto text-sm font-medium text-gray-500 dark:text-gray-400">&pound;{{ number_format($option->price_net, 2) }}</span>
                             </label>
                         @empty
-                            <p class="rounded-md border border-dashed border-gray-200 dark:border-gray-700 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No additional options are currently available.</p>
+                            <p class="sm:col-span-2 rounded-md border border-dashed border-gray-200 dark:border-gray-700 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No additional options are currently available.</p>
                         @endforelse
                     </div>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Options total: <span class="font-semibold text-gray-900 dark:text-gray-100">&pound;<span x-text="optionsTotal"></span></span></p>

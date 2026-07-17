@@ -21,7 +21,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('/invoices/'.$this->invoice->id);
+        $url = route('client.invoices.show', $this->invoice);
 
         return (new MailMessage)
             ->subject("Payment Confirmed — {$this->invoice->invoice_number}")

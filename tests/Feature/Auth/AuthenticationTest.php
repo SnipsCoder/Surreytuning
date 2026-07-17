@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -37,6 +38,22 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_authenticated_dealer_visiting_guest_route_is_sent_to_dealer_dashboard(): void
+    {
+        $dealer = User::factory()->create(['role' => UserRole::DealerOwner]);
+
+        $this->actingAs($dealer)->get('/login')
+            ->assertRedirect('/my/dashboard');
+    }
+
+    public function test_authenticated_owner_visiting_guest_route_is_sent_to_owner_dashboard(): void
+    {
+        $owner = User::factory()->create(['role' => UserRole::Owner]);
+
+        $this->actingAs($owner)->get('/login')
+            ->assertRedirect('/dashboard');
     }
 
     public function test_users_can_logout(): void

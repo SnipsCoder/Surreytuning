@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Middleware\EnsureDealerApproved;
 use App\Http\Middleware\EnsureTwoFactorAuthenticated;
 use App\Http\Middleware\IsClientUser;
@@ -23,6 +24,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'dealer_approved' => EnsureDealerApproved::class,
             'two_factor' => EnsureTwoFactorAuthenticated::class,
         ]);
+
+        // Already-authenticated users hitting guest routes (e.g. "/" -> /login)
+        // must be routed by role; the framework default sends everyone to
+        // /dashboard, which 403s dealer accounts.
+        $middleware->redirectUsersTo(function (Request $request): string {
+            return in_array($request->user()?->role, [UserRole::DealerOwner, UserRole::DealerUser], true)
+                ? '/my/dashboard'
+                : '/dashboard';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
