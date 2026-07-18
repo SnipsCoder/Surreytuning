@@ -1,72 +1,71 @@
 <x-layouts.client>
     <x-page-header title="Vehicle Stats" subtitle="Performance figures by make/model" />
 
-    <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="grid grid-cols-4 gap-4 mb-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
-            <input type="text" name="make" value="{{ request('make') }}"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
-        </div>
+    <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5 mb-4">
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Vehicle Stats Lookup</h3>
+        <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Make</label>
+                <select name="make" id="filter-make"
+                    class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
+                    <option value="" style="background-color:#1e293b;color:#ffffff">All makes</option>
+                    @foreach ($makes as $make)
+                        <option value="{{ $make }}" @selected(request('make') === $make) style="background-color:#1e293b;color:#ffffff">{{ $make }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
-            <input type="text" name="model" value="{{ request('model') }}"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
-        </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Model</label>
+                <select name="model" id="filter-model"
+                    class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
+                    <option value="" style="background-color:#1e293b;color:#ffffff">All models</option>
+                    @foreach (($modelsByMake[request('make')] ?? collect()) as $model)
+                        <option value="{{ $model }}" @selected(request('model') === $model) style="background-color:#1e293b;color:#ffffff">{{ $model }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fuel</label>
-            <select name="fuel"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
-                <option value="">All</option>
-                @foreach (\App\Enums\FuelType::cases() as $fuel)
-                    <option value="{{ $fuel->value }}" @selected(request('fuel') === $fuel->value)>{{ $fuel->label() }}</option>
-                @endforeach
-            </select>
-        </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Fuel</label>
+                <select name="fuel"
+                    class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
+                    <option value="" style="background-color:#1e293b;color:#ffffff">All fuel types</option>
+                    @foreach (\App\Enums\FuelType::cases() as $fuel)
+                        <option value="{{ $fuel->value }}" @selected(request('fuel') === $fuel->value) style="background-color:#1e293b;color:#ffffff">{{ $fuel->label() }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div class="flex items-end">
-            <button type="submit" class="px-4 py-2 rounded-md bg-gray-700 text-white text-sm font-medium hover:bg-gray-600">
+            <button type="submit"
+                class="flex items-center justify-center gap-2 w-full py-2.5 bg-brand hover:bg-brand-dark text-white text-sm font-semibold rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 Filter
             </button>
-        </div>
-    </form>
-
-    <x-data-table :headers="['Make', 'Model', 'Year Range', 'Engine', 'Fuel', 'Stage', 'BHP Before/After', 'Torque Before/After']">
-        @forelse ($vehicleStats as $vehicleStat)
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $vehicleStat->make }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    {{ $vehicleStat->model }}
-                    @if ($vehicleStat->generation)
-                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $vehicleStat->generation }}</span>
-                    @endif
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-                    @if ($vehicleStat->year_from && $vehicleStat->year_to)
-                        {{ $vehicleStat->year_from }} &ndash; {{ $vehicleStat->year_to }}
-                    @elseif ($vehicleStat->year_from)
-                        {{ $vehicleStat->year_from }}+
-                    @elseif ($vehicleStat->year_to)
-                        Up to {{ $vehicleStat->year_to }}
-                    @else
-                        &mdash;
-                    @endif
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->engine }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->fuel->label() }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->stage }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->bhp_before }} / {{ $vehicleStat->bhp_after }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $vehicleStat->torque_before_nm }} / {{ $vehicleStat->torque_after_nm }}</td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No vehicle stats found.</td>
-            </tr>
-        @endforelse
-    </x-data-table>
-
-    <div class="mt-4">
-        {{ $vehicleStats->links() }}
+        </form>
     </div>
+
+    <script>
+        (function () {
+                const modelsByMake = @json($modelsByMake);
+                const makeSelect = document.getElementById('filter-make');
+                const modelSelect = document.getElementById('filter-model');
+                if (!makeSelect || !modelSelect) return;
+
+                makeSelect.addEventListener('change', function () {
+                    const current = modelSelect.value;
+                    const models = modelsByMake[this.value] || [];
+                    modelSelect.innerHTML = '<option value="" style="background-color:#1e293b;color:#ffffff">All models</option>';
+                    models.forEach(function (model) {
+                        const opt = document.createElement('option');
+                        opt.value = model;
+                        opt.textContent = model;
+                        opt.style.backgroundColor = '#1e293b';
+                        opt.style.color = '#ffffff';
+                        if (model === current) opt.selected = true;
+                        modelSelect.appendChild(opt);
+                    });
+                });
+            })();
+        </script>
 </x-layouts.client>
