@@ -6,7 +6,7 @@
         <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Make</label>
-                <select name="make" id="filter-make"
+                <select name="make" id="filter-make" style="color:#f1f5f9"
                     class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
                     <option value="" style="background-color:#1e293b;color:#ffffff">All makes</option>
                     @foreach ($makes as $make)
@@ -17,7 +17,7 @@
 
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Model</label>
-                <select name="model" id="filter-model"
+                <select name="model" id="filter-model" style="color:#f1f5f9"
                     class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
                     <option value="" style="background-color:#1e293b;color:#ffffff">All models</option>
                     @foreach (($modelsByMake[request('make')] ?? collect()) as $model)
@@ -28,7 +28,7 @@
 
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Fuel</label>
-                <select name="fuel"
+                <select name="fuel" style="color:#f1f5f9"
                     class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
                     <option value="" style="background-color:#1e293b;color:#ffffff">All fuel types</option>
                     @foreach (\App\Enums\FuelType::cases() as $fuel)
@@ -68,4 +68,61 @@
                 });
             })();
         </script>
+
+    <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
+        <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Results</h3>
+            <span class="text-xs text-slate-500">{{ $vehicleStats->total() }} {{ Str::plural('match', $vehicleStats->total()) }}</span>
+        </div>
+
+        <div class="divide-y divide-white/5">
+            @forelse ($vehicleStats as $stat)
+                <div class="px-5 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-slate-100 truncate">{{ $stat->make }} {{ $stat->model }}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {{ $stat->year_from }}–{{ $stat->year_to }} · {{ $stat->engine }} · {{ $stat->fuel->label() }}
+                            </p>
+                        </div>
+                        <span class="shrink-0 inline-flex items-center rounded-md bg-brand/10 text-brand text-xs font-semibold px-2 py-1">Stage {{ $stat->stage }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-3 py-2">
+                            <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">BHP</p>
+                            <p class="text-sm text-slate-200 mt-0.5">
+                                {{ (int) $stat->bhp_before }} <span class="text-slate-600">→</span>
+                                <span class="text-brand font-semibold">{{ (int) $stat->bhp_after }}</span>
+                                <span class="text-xs text-slate-500">(+{{ (int) ($stat->bhp_after - $stat->bhp_before) }})</span>
+                            </p>
+                        </div>
+                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-3 py-2">
+                            <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Torque (Nm)</p>
+                            <p class="text-sm text-slate-200 mt-0.5">
+                                {{ (int) $stat->torque_before_nm }} <span class="text-slate-600">→</span>
+                                <span class="text-brand font-semibold">{{ (int) $stat->torque_after_nm }}</span>
+                                <span class="text-xs text-slate-500">(+{{ (int) ($stat->torque_after_nm - $stat->torque_before_nm) }})</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    @if ($stat->notes)
+                        <p class="text-xs text-slate-500 mt-3">{{ $stat->notes }}</p>
+                    @endif
+                </div>
+            @empty
+                <div class="px-5 py-12 text-center">
+                    <p class="text-sm text-slate-400">No vehicle stats found.</p>
+                    <p class="text-xs text-slate-600 mt-1">Try adjusting or clearing your filters.</p>
+                </div>
+            @endforelse
+        </div>
+
+        @if ($vehicleStats->hasPages())
+            <div class="px-5 py-3 border-t border-white/5">
+                {{ $vehicleStats->links() }}
+            </div>
+        @endif
+    </div>
 </x-layouts.client>
