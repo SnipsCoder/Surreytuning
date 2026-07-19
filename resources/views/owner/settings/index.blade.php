@@ -142,17 +142,36 @@
                         <input type="file" name="login_background" accept="image/*" class="w-full text-sm text-gray-700 dark:text-gray-300">
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Portal Logo (top-left)</label>
+                        @if ($settings->portal_logo)
+                            <div class="mb-2">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Currently loaded:</p>
+                                <img src="{{ Storage::disk('r2')->url($settings->portal_logo) }}" alt="Current portal logo" class="max-h-20 max-w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white p-1 object-contain">
+                            </div>
+                        @endif
+                        <input type="file" name="portal_logo" accept="image/*" class="w-full text-sm text-gray-700 dark:text-gray-300">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shown in the top-left of the portal sidebar. Falls back to the dark logo, then the default.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invoice Header</label>
+                        @if ($settings->invoice_header)
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Current: {{ $settings->invoice_header }}</p>
+                        @endif
+                        <input type="file" name="invoice_header" accept="image/*" class="w-full text-sm text-gray-700 dark:text-gray-300">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separate image printed at the top of invoices. Independent of the portal logo.</p>
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Theme Colour</label>
                         <input type="color" name="theme_colour" value="{{ old('theme_colour', $settings->theme_colour) }}" class="h-10 w-20 rounded-md border-gray-300 dark:border-gray-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand Name</label>
-                        <input type="text" name="brand_name" value="{{ old('brand_name', $settings->brand_name) }}" placeholder="Dealer Portal" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <input type="text" name="brand_name" value="{{ old('brand_name', $settings->brand_name) }}" placeholder="Dealer Portal" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shown across the portal, invoices and legal pages.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Support Email</label>
-                        <input type="email" name="support_email" value="{{ old('support_email', $settings->support_email) }}" placeholder="support@example.com" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <input type="email" name="support_email" value="{{ old('support_email', $settings->support_email) }}" placeholder="support@example.com" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for the Contact Support link and legal contact details.</p>
                     </div>
                 </div>
