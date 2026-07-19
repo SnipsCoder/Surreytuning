@@ -4,11 +4,11 @@
     <form method="GET" action="{{ route('owner.bosch-ecu.index') }}" class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-4 mb-6 flex flex-wrap items-end gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Manufacturer Number</label>
-            <input type="text" name="manufacturer_number" value="{{ $manufacturerNumber }}" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
+            <input type="text" name="manufacturer_number" value="{{ $manufacturerNumber }}" class="rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Car Producer</label>
-            <input type="text" name="car_producer" value="{{ $carProducer }}" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
+            <input type="text" name="car_producer" value="{{ $carProducer }}" class="rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm">
         </div>
         <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c8280f]">
             Search

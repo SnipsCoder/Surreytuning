@@ -137,6 +137,7 @@
             Vehicle Stats
         </a>
 
+        {{-- Hidden until Bosch ECU data is loaded — keep route/controller/view intact.
         <a href="{{ $navUrl('client.bosch-ecu.index') }}" class="{{ $navHelper('client.bosch-ecu.index') }}">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -144,6 +145,7 @@
             </svg>
             Bosch ECU
         </a>
+        --}}
 
         <!-- ACCOUNT -->
         <p class="px-3 pt-5 pb-1.5 text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Account</p>
