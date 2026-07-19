@@ -32,22 +32,22 @@
             line-height: 1.5;
         }
         .header {
-            background-color: #0f172a;
+            background-color: #ffffff;
             padding: 24px 32px;
-            color: #ffffff;
+            color: #0f172a;
         }
         .header table { width: 100%; border-collapse: collapse; }
         .header td { vertical-align: middle; }
         .header .logo { height: 40px; }
-        .header .brand { font-size: 20px; font-weight: bold; color: #ffffff; }
+        .header .brand { font-size: 20px; font-weight: bold; color: #0f172a; }
         .header .doc-title {
             text-align: right;
             font-size: 26px;
             font-weight: bold;
             letter-spacing: 2px;
-            color: #ffffff;
+            color: #000000;
         }
-        .header .doc-ref { text-align: right; font-size: 12px; color: #cbd5e1; }
+        .header .doc-ref { text-align: right; font-size: 12px; color: #475569; }
         .accent-bar { height: 4px; background-color: {{ $brandColour }}; }
 
         .body { padding: 28px 32px; }
