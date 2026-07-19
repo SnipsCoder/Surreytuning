@@ -102,6 +102,7 @@
             })();
         </script>
 
+    @if (request()->hasAny(['make', 'model', 'engine', 'fuel']))
     <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
         <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
             <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Results</h3>
@@ -110,38 +111,38 @@
 
         <div class="divide-y divide-white/5">
             @forelse ($vehicleStats as $stat)
-                <div class="px-5 py-4">
-                    <div class="flex items-start justify-between gap-3">
+                <div class="px-6 py-6">
+                    <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
-                            <p class="text-sm font-semibold text-slate-100 truncate">{{ $stat->make }} {{ $stat->model }}</p>
-                            <p class="text-xs text-slate-500 mt-0.5">
+                            <p class="text-2xl font-bold text-slate-100">{{ $stat->make }} {{ $stat->model }}</p>
+                            <p class="text-base text-slate-400 mt-1">
                                 {{ $stat->year_from }}–{{ $stat->year_to }} · {{ $stat->engine }} · {{ $stat->fuel->label() }}
                             </p>
                         </div>
-                        <span class="shrink-0 inline-flex items-center rounded-md bg-brand/10 text-brand text-xs font-semibold px-2 py-1">Stage {{ $stat->stage }}</span>
+                        <span class="shrink-0 inline-flex items-center rounded-md bg-brand/10 text-brand text-base font-semibold px-3 py-1.5">Stage {{ $stat->stage }}</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 mt-3">
-                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-3 py-2">
-                            <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">BHP</p>
-                            <p class="text-sm text-slate-200 mt-0.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-5 py-4">
+                            <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">BHP</p>
+                            <p class="text-3xl font-bold text-slate-200 mt-1.5">
                                 {{ (int) $stat->bhp_before }} <span class="text-slate-600">→</span>
-                                <span class="text-brand font-semibold">{{ (int) $stat->bhp_after }}</span>
-                                <span class="text-xs text-slate-500">(+{{ (int) ($stat->bhp_after - $stat->bhp_before) }})</span>
+                                <span class="text-brand">{{ (int) $stat->bhp_after }}</span>
+                                <span class="text-lg font-semibold text-slate-500">(+{{ (int) ($stat->bhp_after - $stat->bhp_before) }})</span>
                             </p>
                         </div>
-                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-3 py-2">
-                            <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Torque (Nm)</p>
-                            <p class="text-sm text-slate-200 mt-0.5">
+                        <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-5 py-4">
+                            <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">Torque (Nm)</p>
+                            <p class="text-3xl font-bold text-slate-200 mt-1.5">
                                 {{ (int) $stat->torque_before_nm }} <span class="text-slate-600">→</span>
-                                <span class="text-brand font-semibold">{{ (int) $stat->torque_after_nm }}</span>
-                                <span class="text-xs text-slate-500">(+{{ (int) ($stat->torque_after_nm - $stat->torque_before_nm) }})</span>
+                                <span class="text-brand">{{ (int) $stat->torque_after_nm }}</span>
+                                <span class="text-lg font-semibold text-slate-500">(+{{ (int) ($stat->torque_after_nm - $stat->torque_before_nm) }})</span>
                             </p>
                         </div>
                     </div>
 
                     @if ($stat->notes)
-                        <p class="text-xs text-slate-500 mt-3">{{ $stat->notes }}</p>
+                        <p class="text-base text-slate-400 mt-5">{{ $stat->notes }}</p>
                     @endif
                 </div>
             @empty
@@ -158,4 +159,10 @@
             </div>
         @endif
     </div>
+    @else
+    <div class="bg-[#1e293b] border border-white/5 rounded-xl px-5 py-12 text-center">
+        <p class="text-sm text-slate-400">Use the filters above to search vehicle stats.</p>
+        <p class="text-xs text-slate-600 mt-1">Select a make, model, engine, or fuel type, then press Filter.</p>
+    </div>
+    @endif
 </x-layouts.client>
