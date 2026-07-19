@@ -2139,7 +2139,6 @@ Phase 0 (Environment)
 ## THINGS DELIBERATELY LEFT FOR PHASE 2 (post-MVP)
 
 Do NOT build these in any phase above:
-- PDF invoice generation/download
 - SMS notifications
 - VRM/DVLA auto-lookup on file upload
 - Two-factor authentication (2FA)

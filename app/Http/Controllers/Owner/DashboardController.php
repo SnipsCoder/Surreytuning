@@ -11,6 +11,7 @@ use App\Models\Dealer;
 use App\Models\DealerApplication;
 use App\Models\FileRequest;
 use App\Models\Invoice;
+use App\Models\VehicleStat;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -32,6 +33,7 @@ class DashboardController extends Controller
                 ->orderByDesc('file_requests_count')
                 ->take(8)
                 ->get(),
+            'vehicleMakes' => VehicleStat::query()->select('make')->distinct()->orderBy('make')->pluck('make'),
         ]);
     }
 }

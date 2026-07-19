@@ -13,16 +13,49 @@ class VehicleStatController extends Controller
 {
     public function index(Request $request): View
     {
-        $vehicleStats = VehicleStat::query()
-            ->when($request->filled('make'), fn ($query) => $query->where('make', 'like', "%{$request->input('make')}%"))
-            ->when($request->filled('model'), fn ($query) => $query->where('model', 'like', "%{$request->input('model')}%"))
-            ->when($request->filled('fuel'), fn ($query) => $query->where('fuel', $request->input('fuel')))
-            ->orderBy('make')
-            ->orderBy('model')
-            ->paginate(25)
-            ->withQueryString();
+        $selectedMake = $request->filled('make') ? $request->input('make') : null;
+        $selectedModel = $request->filled('model') ? $request->input('model') : null;
+        $selectedFuel = $request->filled('fuel') ? $request->input('fuel') : null;
 
-        return view('owner.vehicle-stats.index', compact('vehicleStats'));
+        // Distinct makes for the first dropdown.
+        $makes = VehicleStat::query()
+            ->select('make')
+            ->distinct()
+            ->orderBy('make')
+            ->pluck('make');
+
+        // Models for the chosen make (empty until a make is picked).
+        $models = $selectedMake
+            ? VehicleStat::query()
+                ->where('make', $selectedMake)
+                ->select('model')
+                ->distinct()
+                ->orderBy('model')
+                ->pluck('model')
+            : collect();
+
+        // Only load figures once a make is selected — keeps the page light.
+        $stats = null;
+        if ($selectedMake) {
+            $stats = VehicleStat::query()
+                ->where('make', $selectedMake)
+                ->when($selectedModel, fn ($q) => $q->where('model', $selectedModel))
+                ->when($selectedFuel, fn ($q) => $q->where('fuel', $selectedFuel))
+                ->orderBy('model')
+                ->orderBy('year_from')
+                ->orderBy('engine')
+                ->paginate(25)
+                ->withQueryString();
+        }
+
+        return view('owner.vehicle-stats.index', compact(
+            'makes',
+            'models',
+            'stats',
+            'selectedMake',
+            'selectedModel',
+            'selectedFuel',
+        ));
     }
 
     public function create(): View

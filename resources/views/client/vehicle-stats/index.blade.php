@@ -3,7 +3,7 @@
 
     <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5 mb-4">
         <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Vehicle Stats Lookup</h3>
-        <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+        <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Make</label>
                 <select name="make" id="filter-make" style="color:#f1f5f9"
@@ -22,6 +22,17 @@
                     <option value="" style="background-color:#1e293b;color:#ffffff">All models</option>
                     @foreach (($modelsByMake[request('make')] ?? collect()) as $model)
                         <option value="{{ $model }}" @selected(request('model') === $model) style="background-color:#1e293b;color:#ffffff">{{ $model }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Engine</label>
+                <select name="engine" id="filter-engine" style="color:#f1f5f9"
+                    class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
+                    <option value="" style="background-color:#1e293b;color:#ffffff">All engines</option>
+                    @foreach (($enginesByMakeModel[request('make').'|'.request('model')] ?? collect()) as $engine)
+                        <option value="{{ $engine }}" @selected(request('engine') === $engine) style="background-color:#1e293b;color:#ffffff">{{ $engine }}</option>
                     @endforeach
                 </select>
             </div>
@@ -48,9 +59,26 @@
     <script>
         (function () {
                 const modelsByMake = @json($modelsByMake);
+                const enginesByMakeModel = @json($enginesByMakeModel);
                 const makeSelect = document.getElementById('filter-make');
                 const modelSelect = document.getElementById('filter-model');
-                if (!makeSelect || !modelSelect) return;
+                const engineSelect = document.getElementById('filter-engine');
+                if (!makeSelect || !modelSelect || !engineSelect) return;
+
+                function rebuildEngines(keepCurrent) {
+                    const current = keepCurrent ? engineSelect.value : '';
+                    const engines = enginesByMakeModel[makeSelect.value + '|' + modelSelect.value] || [];
+                    engineSelect.innerHTML = '<option value="" style="background-color:#1e293b;color:#ffffff">All engines</option>';
+                    engines.forEach(function (engine) {
+                        const opt = document.createElement('option');
+                        opt.value = engine;
+                        opt.textContent = engine;
+                        opt.style.backgroundColor = '#1e293b';
+                        opt.style.color = '#ffffff';
+                        if (engine === current) opt.selected = true;
+                        engineSelect.appendChild(opt);
+                    });
+                }
 
                 makeSelect.addEventListener('change', function () {
                     const current = modelSelect.value;
@@ -65,6 +93,11 @@
                         if (model === current) opt.selected = true;
                         modelSelect.appendChild(opt);
                     });
+                    rebuildEngines(false);
+                });
+
+                modelSelect.addEventListener('change', function () {
+                    rebuildEngines(false);
                 });
             })();
         </script>

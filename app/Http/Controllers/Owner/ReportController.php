@@ -16,6 +16,7 @@ use App\Models\FileRequest;
 use App\Models\Invoice;
 use App\Models\ProductOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
@@ -32,27 +33,53 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
-        $period = (string) $request->query('period', '30');
-        if (! array_key_exists($period, self::PERIODS)) {
-            $period = '30';
+        // A custom range (both from & to supplied and valid) overrides the presets.
+        $from = $this->parseDate($request->query('from'));
+        $to = $this->parseDate($request->query('to'));
+
+        $customRange = $from !== null && $to !== null;
+        if ($customRange && $from->gt($to)) {
+            // Swap so the earlier date is always the lower bound.
+            [$from, $to] = [$to, $from];
         }
 
-        $start = $period === 'all' ? null : now()->subDays((int) $period)->startOfDay();
+        if ($customRange) {
+            $period = 'custom';
+            $start = $from->copy()->startOfDay();
+            $end = $to->copy()->endOfDay();
+        } else {
+            $period = (string) $request->query('period', '30');
+            if (! array_key_exists($period, self::PERIODS)) {
+                $period = '30';
+            }
+            $start = $period === 'all' ? null : now()->subDays((int) $period)->startOfDay();
+            $end = null;
+        }
+
+        $periodLabel = $customRange
+            ? $start->format('j M Y') . ' – ' . $end->format('j M Y')
+            : self::PERIODS[$period];
+
+        // Upper-bound helper: applies ->where($col, '<=', $end) only for a custom range.
+        $upTo = fn (string $col) => fn ($q) => $end ? $q->where($col, '<=', $end) : $q;
 
         // --- Headline metrics -------------------------------------------------
         $revenue = Invoice::query()
             ->where('status', InvoiceStatus::Paid)
             ->when($start, fn ($q) => $q->where('paid_at', '>=', $start))
+            ->when($end, $upTo('paid_at'))
             ->sum('amount_gross');
 
         $filesReceived = FileRequest::query()
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->count();
 
         $filesCompleted = FileRequest::query()
             ->where('status', FileRequestStatus::Closed)
             ->whereNotNull('closed_at')
             ->when($start, fn ($q) => $q->where('closed_at', '>=', $start))
+            ->when($end, $upTo('closed_at'))
             ->count();
 
         // Average turnaround (created_at -> closed_at) for closed requests in range.
@@ -60,6 +87,7 @@ class ReportController extends Controller
             ->where('status', FileRequestStatus::Closed)
             ->whereNotNull('closed_at')
             ->when($start, fn ($q) => $q->where('closed_at', '>=', $start))
+            ->when($end, $upTo('closed_at'))
             ->get(['created_at', 'closed_at']);
 
         $avgTurnaroundHours = null;
@@ -74,22 +102,26 @@ class ReportController extends Controller
         $fileCreditsSold = FileCreditTransaction::query()
             ->where('type', FileCreditTransactionType::TopUp)
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->sum('amount');
 
         $evcCreditsSold = EvcCreditTransaction::query()
             ->where('type', EvcCreditTransactionType::Purchase)
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->sum('amount');
 
         $productRevenue = ProductOrder::query()
             ->where('status', 'paid')
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->sum('total_gross');
 
         // --- Breakdowns -------------------------------------------------------
         $topDealers = Dealer::query()
-            ->withCount(['fileRequests' => function ($q) use ($start) {
-                $q->when($start, fn ($qq) => $qq->where('created_at', '>=', $start));
+            ->withCount(['fileRequests' => function ($q) use ($start, $end) {
+                $q->when($start, fn ($qq) => $qq->where('created_at', '>=', $start))
+                    ->when($end, fn ($qq) => $qq->where('created_at', '<=', $end));
             }])
             ->having('file_requests_count', '>', 0)
             ->orderByDesc('file_requests_count')
@@ -101,6 +133,7 @@ class ReportController extends Controller
             ->whereNotNull('make')
             ->where('make', '!=', '')
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->groupBy('make')
             ->orderByDesc('total')
             ->take(8)
@@ -110,6 +143,7 @@ class ReportController extends Controller
         $statusCounts = FileRequest::query()
             ->selectRaw('status, COUNT(*) as total')
             ->when($start, fn ($q) => $q->where('created_at', '>=', $start))
+            ->when($end, $upTo('created_at'))
             ->groupBy('status')
             ->pluck('total', 'status');
 
@@ -123,10 +157,21 @@ class ReportController extends Controller
             ->values();
 
         // Daily file volume for the trend bar chart (capped so it stays readable).
-        $trendDays = $period === 'all' ? 30 : min((int) $period, 90);
-        $trendStart = now()->subDays($trendDays - 1)->startOfDay();
+        if ($customRange) {
+            // Span the selected window, but cap the number of bars so it stays legible.
+            $rangeDays = (int) $start->diffInDays($end) + 1;
+            $trendDays = min($rangeDays, 90);
+            $trendStart = $end->copy()->startOfDay()->subDays($trendDays - 1);
+            $trendEnd = $end->copy()->endOfDay();
+        } else {
+            $trendDays = $period === 'all' ? 30 : min((int) $period, 90);
+            $trendStart = now()->subDays($trendDays - 1)->startOfDay();
+            $trendEnd = null;
+        }
+
         $dailyRaw = FileRequest::query()
             ->where('created_at', '>=', $trendStart)
+            ->when($trendEnd, fn ($q) => $q->where('created_at', '<=', $trendEnd))
             ->get(['created_at'])
             ->groupBy(fn (FileRequest $fr) => $fr->created_at->format('Y-m-d'))
             ->map->count();
@@ -145,7 +190,10 @@ class ReportController extends Controller
         return view('owner.reports.index', [
             'period' => $period,
             'periods' => self::PERIODS,
-            'periodLabel' => self::PERIODS[$period],
+            'periodLabel' => $periodLabel,
+            'customRange' => $customRange,
+            'from' => $customRange ? $start->format('Y-m-d') : null,
+            'to' => $customRange ? $end->format('Y-m-d') : null,
             'revenue' => (float) $revenue,
             'filesReceived' => $filesReceived,
             'filesCompleted' => $filesCompleted,
@@ -161,5 +209,21 @@ class ReportController extends Controller
             'dailyPeak' => $dailyPeak,
             'trendDays' => $trendDays,
         ]);
+    }
+
+    /**
+     * Parse a Y-m-d query param into a Carbon date, or null if empty/invalid.
+     */
+    private function parseDate(?string $value): ?Carbon
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::createFromFormat('Y-m-d', trim($value));
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

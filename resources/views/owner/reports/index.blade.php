@@ -19,12 +19,36 @@
         @foreach ($periods as $value => $label)
             <a href="{{ route('owner.reports.index', ['period' => $value]) }}"
                class="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors
-                   {{ $period === (string) $value
+                   {{ ! $customRange && $period === (string) $value
                        ? 'bg-brand/15 text-brand border-brand/30'
                        : 'text-slate-400 border-transparent hover:text-white hover:bg-white/5' }}">
                 {{ $label }}
             </a>
         @endforeach
+
+        <!-- Custom date range -->
+        <form method="GET" action="{{ route('owner.reports.index') }}"
+              class="flex flex-wrap items-center gap-2 ml-1 pl-3 border-l border-gray-700/50
+                  {{ $customRange ? 'rounded-lg border border-brand/30 bg-brand/10 px-3 py-1.5' : '' }}">
+            <label class="text-sm text-slate-400">From</label>
+            <input type="date" name="from" value="{{ $from }}"
+                   class="rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] text-gray-100 text-sm px-2 py-1
+                          focus:border-brand/50 focus:ring-0">
+            <label class="text-sm text-slate-400">To</label>
+            <input type="date" name="to" value="{{ $to }}"
+                   class="rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] text-gray-100 text-sm px-2 py-1
+                          focus:border-brand/50 focus:ring-0">
+            <button type="submit"
+                    class="px-3 py-1.5 rounded-lg text-sm font-medium bg-brand text-white hover:bg-[#c92a0f] transition-colors">
+                Apply
+            </button>
+            @if ($customRange)
+                <a href="{{ route('owner.reports.index') }}"
+                   class="px-2 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
+                    Clear
+                </a>
+            @endif
+        </form>
     </div>
 
     <!-- Headline metrics -->
@@ -46,7 +70,7 @@
     <div class="bg-[#1e293b] border border-gray-700/50 rounded-xl p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">File Requests per Day</h2>
-            <span class="text-sm text-slate-400">Last {{ $trendDays }} days</span>
+            <span class="text-sm text-slate-400">{{ $customRange ? $periodLabel : 'Last ' . $trendDays . ' days' }}</span>
         </div>
         @php $totalTrend = collect($dailyVolume)->sum('count'); @endphp
         @if ($totalTrend === 0)

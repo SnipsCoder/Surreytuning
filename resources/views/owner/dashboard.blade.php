@@ -42,27 +42,69 @@
             </x-data-table>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Top Dealers <span class="text-sm font-normal text-gray-500 dark:text-gray-400">All Time</span></h2>
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Top Dealers <span class="text-sm font-normal text-gray-500 dark:text-gray-400">All Time</span></h2>
+                </div>
+                <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse ($topDealers as $dealer)
+                        <li>
+                            <a href="{{ route('dealers.show', $dealer) }}" class="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <span class="flex items-center justify-center w-8 h-8 rounded-md bg-brand text-white text-sm font-semibold shrink-0">
+                                    {{ $loop->iteration }}
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $dealer->company_name }}</span>
+                                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $dealer->file_requests_count }} {{ Str::plural('File', $dealer->file_requests_count) }}</span>
+                                </span>
+                            </a>
+                        </li>
+                    @empty
+                        <li class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">No dealer activity yet.</li>
+                    @endforelse
+                </ul>
             </div>
-            <ul class="divide-y divide-gray-100 dark:divide-gray-700">
-                @forelse ($topDealers as $dealer)
-                    <li>
-                        <a href="{{ route('dealers.show', $dealer) }}" class="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <span class="flex items-center justify-center w-8 h-8 rounded-md bg-brand text-white text-sm font-semibold shrink-0">
-                                {{ $loop->iteration }}
-                            </span>
-                            <span class="min-w-0">
-                                <span class="block text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $dealer->company_name }}</span>
-                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $dealer->file_requests_count }} {{ Str::plural('File', $dealer->file_requests_count) }}</span>
-                            </span>
-                        </a>
-                    </li>
-                @empty
-                    <li class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">No dealer activity yet.</li>
-                @endforelse
-            </ul>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Vehicle Stats Lookup</h2>
+                    <a href="{{ route('vehicle-stats.index') }}" class="text-sm font-medium text-brand hover:underline">View all &rarr;</a>
+                </div>
+                <form method="GET" action="{{ route('vehicle-stats.index') }}" class="px-6 py-4 space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Make</label>
+                        <select name="make"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                            <option value="">Select a make&hellip;</option>
+                            @foreach ($vehicleMakes as $make)
+                                <option value="{{ $make }}">{{ $make }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
+                        <input type="text" name="model" placeholder="e.g. 147"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fuel</label>
+                        <select name="fuel"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                            <option value="">All fuel types</option>
+                            @foreach (\App\Enums\FuelType::cases() as $fuel)
+                                @continue($fuel === \App\Enums\FuelType::Hybrid)
+                                <option value="{{ $fuel->value }}">{{ $fuel->label() }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit"
+                        class="inline-flex items-center justify-center gap-2 w-full px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-brand-dark transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Look Up
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </x-layouts.owner>

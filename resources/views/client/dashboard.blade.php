@@ -126,6 +126,41 @@
         <!-- Right panel -->
         <div class="space-y-4">
 
+            <!-- Vehicle Stats lookup -->
+            <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Vehicle Stats Lookup</h3>
+                    <a href="{{ route('client.vehicle-stats.index') }}" class="text-xs text-brand hover:text-red-400">View all &rarr;</a>
+                </div>
+                <form method="GET" action="{{ route('client.vehicle-stats.index') }}" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Make</label>
+                        <input type="text" name="make" placeholder="e.g. Alfa Romeo"
+                            class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0 placeholder:text-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Model</label>
+                        <input type="text" name="model" placeholder="e.g. 147"
+                            class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0 placeholder:text-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Fuel</label>
+                        <select name="fuel"
+                            class="block w-full rounded-lg border border-white/10 bg-[#0d0d0d] text-slate-100 text-sm px-3 py-2 focus:border-brand/50 focus:ring-0">
+                            <option value="">All fuel types</option>
+                            @foreach (\App\Enums\FuelType::cases() as $fuel)
+                                <option value="{{ $fuel->value }}">{{ $fuel->label() }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit"
+                        class="flex items-center justify-center gap-2 w-full py-2.5 bg-brand hover:bg-brand-dark text-white text-sm font-semibold rounded-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Look Up
+                    </button>
+                </form>
+            </div>
+
             <!-- Notices -->
             @if ($notices->isNotEmpty())
                 <div class="bg-[#1e293b] border border-white/5 rounded-xl p-5">
