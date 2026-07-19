@@ -20,6 +20,8 @@ class Setting extends Model
         'logo_light',
         'logo_dark',
         'login_background',
+        'portal_logo',
+        'invoice_header',
         'theme_colour',
         'brand_name',
         'support_email',

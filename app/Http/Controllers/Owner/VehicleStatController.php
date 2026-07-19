@@ -15,6 +15,7 @@ class VehicleStatController extends Controller
     {
         $selectedMake = $request->filled('make') ? $request->input('make') : null;
         $selectedModel = $request->filled('model') ? $request->input('model') : null;
+        $selectedEngine = $request->filled('engine') ? $request->input('engine') : null;
         $selectedFuel = $request->filled('fuel') ? $request->input('fuel') : null;
 
         // Distinct makes for the first dropdown.
@@ -34,12 +35,34 @@ class VehicleStatController extends Controller
                 ->pluck('model')
             : collect();
 
+        // Cascading lookup data so Make → Model → Engine can rebuild client-side,
+        // matching the dealer-facing Vehicle Stats lookup.
+        $modelsByMake = VehicleStat::query()
+            ->select('make', 'model')
+            ->distinct()
+            ->orderBy('make')
+            ->orderBy('model')
+            ->get()
+            ->groupBy('make')
+            ->map(fn ($group) => $group->pluck('model')->unique()->values());
+
+        $enginesByMakeModel = VehicleStat::query()
+            ->select('make', 'model', 'engine')
+            ->distinct()
+            ->orderBy('make')
+            ->orderBy('model')
+            ->orderBy('engine')
+            ->get()
+            ->groupBy(fn ($stat) => $stat->make.'|'.$stat->model)
+            ->map(fn ($group) => $group->pluck('engine')->unique()->values());
+
         // Only load figures once a make is selected — keeps the page light.
         $stats = null;
         if ($selectedMake) {
             $stats = VehicleStat::query()
                 ->where('make', $selectedMake)
                 ->when($selectedModel, fn ($q) => $q->where('model', $selectedModel))
+                ->when($selectedEngine, fn ($q) => $q->where('engine', $selectedEngine))
                 ->when($selectedFuel, fn ($q) => $q->where('fuel', $selectedFuel))
                 ->orderBy('model')
                 ->orderBy('year_from')
@@ -51,9 +74,12 @@ class VehicleStatController extends Controller
         return view('owner.vehicle-stats.index', compact(
             'makes',
             'models',
+            'modelsByMake',
+            'enginesByMakeModel',
             'stats',
             'selectedMake',
             'selectedModel',
+            'selectedEngine',
             'selectedFuel',
         ));
     }

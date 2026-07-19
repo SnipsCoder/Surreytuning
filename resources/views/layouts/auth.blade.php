@@ -21,7 +21,7 @@
                 @if ($settings && $settings->logo_dark)
                     <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-12 object-contain">
                 @else
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-12 object-contain" onerror="this.onerror=null;this.src='';this.alt='{{ $brandName }}';">
+                        <span class="text-2xl font-bold text-white">{{ $brandName }}</span>
                 @endif
             </div>
 

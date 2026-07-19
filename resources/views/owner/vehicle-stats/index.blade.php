@@ -1,18 +1,19 @@
 <x-layouts.owner>
     <x-page-header title="Vehicle Stats" subtitle="Performance figures by make/model">
         <a href="{{ route('vehicle-stats.create') }}"
-            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
+            class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-brand-dark">
             Add Vehicle Stat
         </a>
     </x-page-header>
 
-    {{-- Make → Model → Fuel selector. Changing Make resets Model, then auto-submits. --}}
+    {{-- Make → Model → Engine → Fuel selector. Changing an earlier field resets the
+         ones after it, then auto-submits. Mirrors the dealer Vehicle Stats lookup. --}}
     <form method="GET" action="{{ route('vehicle-stats.index') }}"
-          class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div>
             <label class="block text-sm font-medium text-slate-400">Make</label>
             <select name="make"
-                    onchange="this.form.model.value=''; this.form.submit()"
+                    onchange="this.form.model.value=''; this.form.engine.value=''; this.form.submit()"
                     class="mt-1 block w-full rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] text-gray-100 text-sm px-2 py-2 focus:border-brand/50 focus:ring-0">
                 <option value="">Select make…</option>
                 @foreach ($makes as $make)
@@ -24,12 +25,25 @@
         <div>
             <label class="block text-sm font-medium text-slate-400">Model</label>
             <select name="model"
-                    onchange="this.form.submit()"
+                    onchange="this.form.engine.value=''; this.form.submit()"
                     @disabled(! $selectedMake)
                     class="mt-1 block w-full rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] text-gray-100 text-sm px-2 py-2 focus:border-brand/50 focus:ring-0 disabled:opacity-50">
                 <option value="">{{ $selectedMake ? 'All models' : 'Select a make first' }}</option>
                 @foreach ($models as $model)
                     <option value="{{ $model }}" @selected($selectedModel === $model)>{{ $model }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-400">Engine</label>
+            <select name="engine"
+                    onchange="this.form.submit()"
+                    @disabled(! $selectedModel)
+                    class="mt-1 block w-full rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] text-gray-100 text-sm px-2 py-2 focus:border-brand/50 focus:ring-0 disabled:opacity-50">
+                <option value="">{{ $selectedModel ? 'All engines' : 'Select a model first' }}</option>
+                @foreach (($enginesByMakeModel[$selectedMake.'|'.$selectedModel] ?? collect()) as $engine)
+                    <option value="{{ $engine }}" @selected($selectedEngine === $engine)>{{ $engine }}</option>
                 @endforeach
             </select>
         </div>
@@ -55,14 +69,14 @@
     @elseif ($stats->isEmpty())
         <div class="rounded-xl border border-gray-700/50 bg-[#1e293b] px-4 py-12 text-center">
             <p class="text-sm text-slate-400">
-                No vehicle stats for {{ $selectedMake }}@if ($selectedModel) · {{ $selectedModel }}@endif.
+                No vehicle stats for {{ $selectedMake }}@if ($selectedModel) · {{ $selectedModel }}@endif@if ($selectedEngine) · {{ $selectedEngine }}@endif.
             </p>
         </div>
     @else
         <div class="flex items-center justify-between mb-3">
             <p class="text-sm text-slate-400">
                 {{ number_format($stats->total()) }} {{ \Illuminate\Support\Str::plural('result', $stats->total()) }}
-                for <span class="font-medium text-white">{{ $selectedMake }}</span>@if ($selectedModel) · {{ $selectedModel }}@endif
+                for <span class="font-medium text-white">{{ $selectedMake }}</span>@if ($selectedModel) · {{ $selectedModel }}@endif@if ($selectedEngine) · {{ $selectedEngine }}@endif
             </p>
         </div>
 

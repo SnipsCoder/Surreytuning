@@ -166,12 +166,12 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand Name</label>
-                        <input type="text" name="brand_name" value="{{ old('brand_name', $settings->brand_name) }}" placeholder="Dealer Portal" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <input type="text" name="brand_name" value="{{ old('brand_name', $settings->brand_name) }}" placeholder="Dealer Portal" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm text-sm">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shown across the portal, invoices and legal pages.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Support Email</label>
-                        <input type="email" name="support_email" value="{{ old('support_email', $settings->support_email) }}" placeholder="support@example.com" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-[#0f0f0f] dark:text-gray-200 text-sm">
+                        <input type="email" name="support_email" value="{{ old('support_email', $settings->support_email) }}" placeholder="support@example.com" class="w-full rounded-md border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm text-sm">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for the Contact Support link and legal contact details.</p>
                     </div>
                 </div>
@@ -250,6 +250,21 @@
                     </button>
                 </div>
             </form>
+
+            {{-- Preview / test invoice output --}}
+            <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 mt-6">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Test Invoice Output</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Generate an example invoice using sample data and your current invoice settings and branding.
+                    Use this to check that every field displays correctly before issuing real invoices. Nothing is saved &mdash; it opens as a PDF in a new tab.
+                </p>
+                <div class="pt-4">
+                    <a href="{{ route('owner.settings.test-invoice') }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c8280f]">
+                        Print Example Invoice
+                    </a>
+                </div>
+            </div>
         </div>
 
         {{-- T&Cs Tab --}}

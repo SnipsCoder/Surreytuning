@@ -7,11 +7,20 @@
     $reference = $prefix . '-' . $invoice->invoice_number;
     $vatRate = rtrim(rtrim(number_format((float) $settings->vat_rate, 2), '0'), '.');
 
-    // Embed the brand logo as a base64 data URI so DomPDF never needs network access.
+    // Embed the tenant brand logo as a base64 data URI so DomPDF never needs network access.
     $logoData = null;
-    $logoPath = public_path('images/logo.png');
-    if (is_file($logoPath)) {
-        $logoData = 'data:image/png;base64,' . base64_encode((string) file_get_contents($logoPath));
+    $logoKey = $settings->logo_dark ?: $settings->logo_light;
+    if ($logoKey) {
+        try {
+            $disk = \Illuminate\Support\Facades\Storage::disk('r2');
+            if ($disk->exists($logoKey)) {
+                $logoBytes = $disk->get($logoKey);
+                $mime = $disk->mimeType($logoKey) ?: 'image/png';
+                $logoData = 'data:' . $mime . ';base64,' . base64_encode((string) $logoBytes);
+            }
+        } catch (\Throwable $e) {
+            $logoData = null;
+        }
     }
 
     $isPaid = $invoice->status === InvoiceStatus::Paid;

@@ -33,8 +33,7 @@
                     @if ($settings && $settings->logo_dark)
                         <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain">
                     @else
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <span class="ms-3 text-white font-semibold hidden">{{ $brandName }}</span>
+                        <span class="text-white font-semibold text-lg tracking-tight">{{ $brandName }}</span>
                     @endif
                 </div>
 
@@ -267,7 +266,7 @@
 
                     <!-- Footer -->
                     <footer class="mt-8 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600">
-                        <p>&copy; {{ date('Y') }} {{ $brandName }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} Tuning Portal. All rights reserved.</p>
                         <p>Dealer Portal v1.0</p>
                     </footer>
                 </main>

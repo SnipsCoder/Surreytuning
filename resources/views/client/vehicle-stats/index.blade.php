@@ -105,8 +105,8 @@
     @if (request()->hasAny(['make', 'model', 'engine', 'fuel']))
     <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
         <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Results</h3>
-            <span class="text-xs text-slate-500">{{ $vehicleStats->total() }} {{ Str::plural('match', $vehicleStats->total()) }}</span>
+            <h3 class="text-base font-semibold text-slate-300 uppercase tracking-widest">Results</h3>
+            <span class="text-sm text-slate-400">{{ $vehicleStats->total() }} {{ Str::plural('match', $vehicleStats->total()) }}</span>
         </div>
 
         <div class="divide-y divide-white/5">
@@ -114,8 +114,8 @@
                 <div class="px-6 py-6">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
-                            <p class="text-2xl font-bold text-slate-100">{{ $stat->make }} {{ $stat->model }}</p>
-                            <p class="text-base text-slate-400 mt-1">
+                            <p class="text-4xl font-extrabold tracking-tight text-white">{{ $stat->make }} {{ $stat->model }}</p>
+                            <p class="text-lg text-slate-400 mt-2">
                                 {{ $stat->year_from }}–{{ $stat->year_to }} · {{ $stat->engine }} · {{ $stat->fuel->label() }}
                             </p>
                         </div>
