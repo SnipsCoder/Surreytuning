@@ -69,14 +69,14 @@
     @elseif ($stats->isEmpty())
         <div class="rounded-xl border border-gray-700/50 bg-[#1e293b] px-4 py-12 text-center">
             <p class="text-sm text-slate-400">
-                No vehicle stats for {{ $selectedMake }}@if ($selectedModel) · {{ $selectedModel }}@endif@if ($selectedEngine) · {{ $selectedEngine }}@endif.
+                No vehicle stats for {{ $selectedMake }}{{ $selectedModel ? ' · '.$selectedModel : '' }}{{ $selectedEngine ? ' · '.$selectedEngine : '' }}.
             </p>
         </div>
     @else
         <div class="flex items-center justify-between mb-3">
             <p class="text-sm text-slate-400">
                 {{ number_format($stats->total()) }} {{ \Illuminate\Support\Str::plural('result', $stats->total()) }}
-                for <span class="font-medium text-white">{{ $selectedMake }}</span>@if ($selectedModel) · {{ $selectedModel }}@endif@if ($selectedEngine) · {{ $selectedEngine }}@endif
+                for <span class="font-medium text-white">{{ $selectedMake }}</span>{{ $selectedModel ? ' · '.$selectedModel : '' }}{{ $selectedEngine ? ' · '.$selectedEngine : '' }}
             </p>
         </div>
 
