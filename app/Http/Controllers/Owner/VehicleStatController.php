@@ -25,16 +25,6 @@ class VehicleStatController extends Controller
             ->orderBy('make')
             ->pluck('make');
 
-        // Models for the chosen make (empty until a make is picked).
-        $models = $selectedMake
-            ? VehicleStat::query()
-                ->where('make', $selectedMake)
-                ->select('model')
-                ->distinct()
-                ->orderBy('model')
-                ->pluck('model')
-            : collect();
-
         // Cascading lookup data so Make → Model → Engine can rebuild client-side,
         // matching the dealer-facing Vehicle Stats lookup.
         $modelsByMake = VehicleStat::query()
@@ -56,24 +46,20 @@ class VehicleStatController extends Controller
             ->groupBy(fn ($stat) => $stat->make.'|'.$stat->model)
             ->map(fn ($group) => $group->pluck('engine')->unique()->values());
 
-        // Only load figures once a make is selected — keeps the page light.
-        $stats = null;
-        if ($selectedMake) {
-            $stats = VehicleStat::query()
-                ->where('make', $selectedMake)
-                ->when($selectedModel, fn ($q) => $q->where('model', $selectedModel))
-                ->when($selectedEngine, fn ($q) => $q->where('engine', $selectedEngine))
-                ->when($selectedFuel, fn ($q) => $q->where('fuel', $selectedFuel))
-                ->orderBy('model')
-                ->orderBy('year_from')
-                ->orderBy('engine')
-                ->paginate(25)
-                ->withQueryString();
-        }
+        $stats = VehicleStat::query()
+            ->when($selectedMake, fn ($q) => $q->where('make', 'like', "%{$selectedMake}%"))
+            ->when($selectedModel, fn ($q) => $q->where('model', 'like', "%{$selectedModel}%"))
+            ->when($selectedEngine, fn ($q) => $q->where('engine', $selectedEngine))
+            ->when($selectedFuel, fn ($q) => $q->where('fuel', $selectedFuel))
+            ->orderBy('make')
+            ->orderBy('model')
+            ->orderBy('year_from')
+            ->orderBy('engine')
+            ->paginate(25)
+            ->withQueryString();
 
         return view('owner.vehicle-stats.index', compact(
             'makes',
-            'models',
             'modelsByMake',
             'enginesByMakeModel',
             'stats',

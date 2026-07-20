@@ -30,8 +30,8 @@
             <aside class="hidden lg:flex lg:flex-col flex-shrink-0 w-64 bg-[#1e293b] border-r border-white/5">
                 <!-- Logo -->
                 <div class="flex items-center h-16 px-5 bg-black border-b border-white/5 flex-shrink-0">
-                    @if ($settings && $settings->logo_dark)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain">
+                    @if ($settings && ($settings->portal_logo || $settings->logo_dark || $settings->logo_light))
+                        <img src="{{ route('branding.logo') }}" alt="{{ $brandName }}" class="h-8 max-w-[160px] object-contain">
                     @else
                         <span class="text-white font-semibold text-lg tracking-tight">{{ $brandName }}</span>
                     @endif

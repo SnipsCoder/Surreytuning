@@ -23,8 +23,8 @@
 <body>
 <div class="wrapper">
     <div class="header">
-        @if ($settings && $settings->logo_dark)
-            <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}">
+        @if ($settings && ($settings->portal_logo || $settings->logo_dark))
+            <img src="{{ route('branding.logo') }}" alt="{{ $brandName }}">
         @else
             <h1>{{ $brandName }}</h1>
         @endif

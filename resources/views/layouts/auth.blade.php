@@ -18,8 +18,10 @@
         <div class="w-full max-w-md">
             <div class="mb-8 flex justify-center">
                 @php $settings = \App\Models\Setting::first(); $brandName = \App\Models\Setting::brandName(); @endphp
-                @if ($settings && $settings->logo_dark)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('r2')->url($settings->logo_dark) }}" alt="{{ $brandName }}" class="h-12 object-contain">
+                @if ($settings && ($settings->portal_logo || $settings->logo_dark))
+                    <div class="bg-black rounded-xl px-6 py-4 inline-flex items-center justify-center">
+                        <img src="{{ route('branding.logo') }}" alt="{{ $brandName }}" class="h-12 object-contain">
+                    </div>
                 @else
                         <span class="text-2xl font-bold text-white">{{ $brandName }}</span>
                 @endif

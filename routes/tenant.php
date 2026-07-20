@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth;
+use App\Http\Controllers\BrandingController;
 use App\Http\Controllers\Client;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\Owner;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Webhooks;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -58,6 +59,9 @@ Route::middleware([
     // Public legal pages
     Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
     Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
+
+    // Public branding assets (needed pre-auth for the login page and in emails)
+    Route::get('/branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
 
     // Owner/admin portal (no prefix)
     Route::middleware(['auth', 'two_factor', 'owner'])->group(function () {
@@ -183,5 +187,5 @@ Route::middleware([
     // Stripe webhook (outside auth middleware, CSRF exempt)
     Route::post('/webhooks/stripe', [Webhooks\StripeWebhookController::class, 'handle'])
         ->name('webhooks.stripe')
-        ->withoutMiddleware([VerifyCsrfToken::class]);
+        ->withoutMiddleware([PreventRequestForgery::class]);
 });

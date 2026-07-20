@@ -9,7 +9,7 @@
 
     // Embed the tenant brand logo as a base64 data URI so DomPDF never needs network access.
     $logoData = null;
-    $logoKey = $settings->logo_dark ?: $settings->logo_light;
+    $logoKey = $settings->invoice_header ?: ($settings->portal_logo ?: ($settings->logo_dark ?: $settings->logo_light));
     if ($logoKey) {
         try {
             $disk = \Illuminate\Support\Facades\Storage::disk('r2');
