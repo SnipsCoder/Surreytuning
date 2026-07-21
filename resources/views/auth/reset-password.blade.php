@@ -1,4 +1,13 @@
 <x-auth-layout>
+    @if ($errors->any())
+        <div class="mb-4 rounded-md bg-red-500/10 border border-red-500/40 p-3">
+            <ul class="text-sm text-red-400 list-disc list-inside space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
