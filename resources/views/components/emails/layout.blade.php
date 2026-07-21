@@ -20,8 +20,8 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="header">
-        <img src="{{ url('/branding/logo') }}" alt="{{ $brandName }}" style="max-height:40px;max-width:220px;display:block;">
+    <div class="header" style="padding:0;background:#111827;">
+        <img src="{{ url('/branding/logo') }}" alt="{{ $brandName }}" style="width:100%;max-width:100%;display:block;">
     </div>
     <div class="body">
         {{ $slot }}
