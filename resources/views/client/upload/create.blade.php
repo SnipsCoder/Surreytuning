@@ -27,7 +27,18 @@
             removeDtc(index) {
                 this.dtcCodes.splice(index, 1);
             },
-            next() { if (this.step < 3) this.step++; },
+            next() {
+                // Only the current step's required (*) fields carry the HTML
+                // `required` constraint (bound via x-bind:required), so any
+                // :invalid control belongs to this step. Block advancing and
+                // surface the native prompt on the first empty one.
+                const invalid = this.$root.querySelector('input:invalid, select:invalid, textarea:invalid');
+                if (invalid) {
+                    invalid.reportValidity();
+                    return;
+                }
+                if (this.step < 3) this.step++;
+            },
             back() { if (this.step > 1) this.step--; },
         }"
         class="bg-white dark:bg-gray-800 rounded-lg shadow"
