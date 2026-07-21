@@ -87,7 +87,7 @@ class FileStorageService
 
         $extension = strtolower($file->getClientOriginalExtension());
         if (! in_array($extension, $this->getAllowedExtensions(), true)) {
-            throw new InvalidArgumentException('File type not allowed.');
+            // accept any binary tune file (.MPC etc.); content is checked by the MIME sniff below
         }
 
         // Server-side MIME sniffing (not just the client-supplied extension). ECU
