@@ -22,7 +22,7 @@ class NewFileRequestOwnerNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         $ref = $this->fileRequest->request_number_formatted;
-        $url = url('/owner/file-requests/'.$this->fileRequest->id);
+        $url = url('/file-requests/'.$this->fileRequest->id);
 
         return (new MailMessage)
             ->subject("New File Request — {$ref}")

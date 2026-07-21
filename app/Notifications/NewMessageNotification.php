@@ -23,7 +23,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
     {
         $fileRequest = $this->message->fileRequest;
         $ref = $fileRequest->request_number_formatted;
-        $url = url('/file-requests/'.$fileRequest->id);
+        $url = url((in_array($notifiable->role?->value, ['dealer_owner', 'dealer_user'], true) ? '/my/file-requests/' : '/file-requests/').$fileRequest->id);
 
         return (new MailMessage)
             ->subject("New Message on File Request {$ref}")
