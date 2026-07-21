@@ -14,23 +14,23 @@
 
         <x-brand-styles />
     </head>
-        @php $settings = \App\Models\Setting::first(); $brandName = \App\Models\Setting::brandName(); @endphp
+    @php $settings = \App\Models\Setting::first(); $brandName = \App\Models\Setting::brandName(); @endphp
     <body class="font-sans antialiased min-h-screen bg-[#0f172a] flex items-center justify-center p-4"
         @if ($settings && $settings->login_background)
-            style="background-image: linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.45)), url('{{ route('branding.login-background') }}?v={{ $settings->updated_at?->timestamp }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;"
+            style="background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), url('{{ route('branding.login-background') }}'); background-size: cover; background-position: center; background-attachment: fixed;"
         @endif>
-        <div class="w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-gray-700">
-            @if ($settings && ($settings->portal_logo || $settings->logo_dark))
-                <div class="bg-black px-6 py-6 flex items-center justify-center border-b border-gray-700">
-                    <img src="{{ route('branding.logo') }}?v={{ $settings->updated_at?->timestamp }}" alt="{{ $brandName }}" class="h-16 w-full object-contain">
-                </div>
-            @else
-                <div class="bg-black px-6 py-6 flex items-center justify-center border-b border-gray-700">
-                    <span class="text-2xl font-bold text-white">{{ $brandName }}</span>
-                </div>
-            @endif
+        <div class="w-full max-w-md">
+            <div class="mb-8 flex justify-center">
+                @if ($settings && ($settings->portal_logo || $settings->logo_dark))
+                    <div class="bg-black rounded-xl px-6 py-4 inline-flex items-center justify-center">
+                        <img src="{{ route('branding.logo') }}" alt="{{ $brandName }}" class="h-12 object-contain">
+                    </div>
+                @else
+                        <span class="text-2xl font-bold text-white">{{ $brandName }}</span>
+                @endif
+            </div>
 
-            <div class="bg-[#1e293b] p-8">
+            <div class="bg-[#1e293b] border border-gray-700 rounded-xl shadow-2xl p-8">
                 {{ $slot ?? '' }}
                 @yield('content')
             </div>

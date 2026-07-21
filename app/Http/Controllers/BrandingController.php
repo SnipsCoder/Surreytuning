@@ -28,6 +28,22 @@ class BrandingController extends Controller
         ]);
     }
 
+    public function loginBackground(): Response
+    {
+        $key = Setting::get()?->login_background;
+
+        abort_unless($key, 404);
+
+        $disk = Storage::disk('r2');
+
+        abort_unless($disk->exists($key), 404);
+
+        return response($disk->get($key), 200, [
+            'Content-Type' => $disk->mimeType($key) ?: 'image/jpeg',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
+    }
+
     public function productImage(Product $product): Response
     {
         abort_unless($product->image_path, 404);
