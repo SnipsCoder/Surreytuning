@@ -28,7 +28,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("New Message on File Request {$ref}")
             ->view('emails.new-message', [
-                'message' => $this->message,
+                'threadMessage' => $this->message,
                 'fileRequest' => $fileRequest,
                 'ref' => $ref,
                 'url' => $url,
