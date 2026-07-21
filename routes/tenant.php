@@ -81,6 +81,7 @@ Route::middleware([
         Route::post('/file-requests/{fileRequest}/credit', [Owner\FileRequestController::class, 'addCredit'])->name('owner.file-requests.credit');
         Route::post('/file-requests/{fileRequest}/void', [Owner\FileRequestController::class, 'void'])->name('owner.file-requests.void');
         Route::post('/file-requests/{fileRequest}/respond', [Owner\FileRequestController::class, 'respond'])->name('owner.file-requests.respond');
+        Route::get('/attachments/{attachment}/download', [Owner\FileRequestController::class, 'downloadAttachment'])->name('owner.attachments.download');
 
         // Messages
         Route::post('/file-requests/{fileRequest}/messages', [Owner\FileRequestMessageController::class, 'store'])->name('owner.messages.store');

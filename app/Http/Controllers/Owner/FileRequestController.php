@@ -87,6 +87,7 @@ class FileRequestController extends Controller
         ]);
     }
 
+    public function downloadAttachment(FileRequestAttachment $attachment, FileStorageService $fileStorageService) { $attachment->loadMissing('fileRequest'); $this->authorize('view', $attachment->fileRequest); return redirect()->away($fileStorageService->getTemporaryUrl($attachment->file_path, 30)); }
     public function update(Request $request, FileRequest $fileRequest)
     {
         $this->authorize('view', $fileRequest);

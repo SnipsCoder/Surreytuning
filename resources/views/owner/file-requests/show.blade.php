@@ -58,7 +58,7 @@
                             <ul class="space-y-1">
                                 @foreach ($fileRequest->attachments as $attachment)
                                     <li class="text-sm text-gray-700 dark:text-gray-300">
-                                        {{ $attachment->original_filename }}
+                                        <a href="{{ route('owner.attachments.download', $attachment) }}" class="text-brand hover:underline font-medium">{{ $attachment->original_filename }}</a>
                                         <span class="text-xs text-gray-400">({{ $attachment->attachment_type->value }} • {{ $attachment->uploader?->full_name }})</span>
                                     </li>
                                 @endforeach
