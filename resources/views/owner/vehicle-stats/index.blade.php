@@ -120,84 +120,64 @@
             <p class="text-xs text-slate-600 mt-1">Try adjusting or clearing your filters.</p>
         </div>
     @else
-        <div class="flex items-center justify-between mb-3">
-            <p class="text-sm text-slate-400">
-                {{ number_format($stats->total()) }} {{ \Illuminate\Support\Str::plural('result', $stats->total()) }}
-                @if ($selectedMake)
-                    for <span class="font-medium text-white">{{ $selectedMake }}</span>{{ $selectedModel ? ' · '.$selectedModel : '' }}{{ $selectedEngine ? ' · '.$selectedEngine : '' }}
-                @endif
-            </p>
-        </div>
-
-        <div class="rounded-xl border border-gray-700/50 bg-[#1e293b] overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-[#0d0d0d]/50 text-left text-xs uppercase tracking-wide text-slate-400">
-                        <tr>
-                            <th class="px-4 py-2 font-medium">Make</th>
-                            <th class="px-4 py-2 font-medium">Model</th>
-                            <th class="px-4 py-2 font-medium">Years</th>
-                            <th class="px-4 py-2 font-medium">Engine</th>
-                            <th class="px-4 py-2 font-medium">BHP</th>
-                            <th class="px-4 py-2 font-medium">Torque</th>
-                            <th class="px-4 py-2 font-medium text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700/50">
-                        @foreach ($stats as $v)
-                            <tr class="hover:bg-white/5">
-                                <td class="px-4 py-2 text-gray-300">{{ $v->make }}</td>
-                                <td class="px-4 py-2 text-white font-medium">
-                                    {{ $v->model }}
-                                    @if ($v->generation)
-                                        <span class="block text-xs font-normal text-slate-500">{{ $v->generation }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 text-slate-400 whitespace-nowrap">
-                                    @if ($v->year_from && $v->year_to)
-                                        {{ $v->year_from }}–{{ $v->year_to }}
-                                    @elseif ($v->year_from)
-                                        {{ $v->year_from }}+
-                                    @elseif ($v->year_to)
-                                        Up to {{ $v->year_to }}
-                                    @else
-                                        &mdash;
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 text-gray-300">
-                                    {{ $v->engine }}
-                                    @if ($v->stage)
-                                        <span class="ml-1 inline-block rounded bg-brand/15 text-brand text-xs px-1.5 py-0.5 align-middle">{{ $v->stage }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 text-gray-300 whitespace-nowrap">
-                                    {{ $v->bhp_before }} <span class="text-slate-500">→</span>
-                                    <span class="font-medium text-white">{{ $v->bhp_after }}</span>
-                                </td>
-                                <td class="px-4 py-2 text-gray-300 whitespace-nowrap">
-                                    {{ $v->torque_before_nm }} <span class="text-slate-500">→</span>
-                                    <span class="font-medium text-white">{{ $v->torque_after_nm }}</span>
-                                    <span class="text-xs text-slate-500">Nm</span>
-                                </td>
-                                <td class="px-4 py-2">
-                                    <div class="flex items-center justify-end gap-3">
-                                        <a href="{{ route('vehicle-stats.edit', $v) }}" class="text-brand hover:underline">Edit</a>
-                                        <form method="POST" action="{{ route('vehicle-stats.destroy', $v) }}" class="inline" onsubmit="return confirm('Delete this vehicle stat?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-400 hover:underline">Delete</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                <h3 class="text-base font-semibold text-slate-300 uppercase tracking-widest">Results</h3>
+                <span class="text-sm text-slate-400">{{ $stats->total() }} {{ \Illuminate\Support\Str::plural('match', $stats->total()) }}</span>
             </div>
-        </div>
 
-        <div class="mt-4">
-            {{ $stats->links() }}
+            <div class="divide-y divide-white/5">
+                @foreach ($stats as $v)
+                    <div class="px-6 py-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="min-w-0">
+                                <p class="text-4xl font-extrabold tracking-tight text-white">{{ $v->make }} {{ $v->model }}</p>
+                                <p class="text-lg text-slate-400 mt-2">
+                                    {{ $v->year_from }}–{{ $v->year_to }} · {{ $v->engine }} · {{ $v->fuel->label() }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <span class="inline-flex items-center rounded-md bg-brand/10 text-brand text-base font-semibold px-3 py-1.5">Stage {{ $v->stage }}</span>
+                                <a href="{{ route('vehicle-stats.edit', $v) }}" class="text-sm text-brand hover:underline">Edit</a>
+                                <form method="POST" action="{{ route('vehicle-stats.destroy', $v) }}" class="inline" onsubmit="return confirm('Delete this vehicle stat?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-sm text-red-400 hover:underline">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+                            <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-5 py-4">
+                                <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">BHP</p>
+                                <p class="text-3xl font-bold text-slate-200 mt-1.5">
+                                    {{ (int) $v->bhp_before }} <span class="text-slate-600">→</span>
+                                    <span class="text-brand">{{ (int) $v->bhp_after }}</span>
+                                    <span class="text-lg font-semibold text-slate-500">(+{{ (int) ($v->bhp_after - $v->bhp_before) }})</span>
+                                </p>
+                            </div>
+                            <div class="rounded-lg bg-[#0d0d0d] border border-white/5 px-5 py-4">
+                                <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">Torque (Nm)</p>
+                                <p class="text-3xl font-bold text-slate-200 mt-1.5">
+                                    {{ (int) $v->torque_before_nm }} <span class="text-slate-600">→</span>
+                                    <span class="text-brand">{{ (int) $v->torque_after_nm }}</span>
+                                    <span class="text-lg font-semibold text-slate-500">(+{{ (int) ($v->torque_after_nm - $v->torque_before_nm) }})</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        @if ($v->notes)
+                            <p class="text-base text-slate-400 mt-5">{{ $v->notes }}</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            @if ($stats->hasPages())
+                <div class="px-5 py-3 border-t border-white/5">
+                    {{ $stats->links() }}
+                </div>
+            @endif
         </div>
     @endif
 </x-layouts.owner>
