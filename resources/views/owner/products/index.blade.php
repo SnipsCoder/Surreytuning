@@ -11,7 +11,7 @@
             <tr class="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/60">
                 <td class="px-4 py-3 text-sm">
                     @if ($product->image_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->image_path) }}" alt="{{ $product->name }}" class="h-10 w-10 object-cover rounded-md">
+                        <img src="{{ route('products.image', $product) }}" alt="{{ $product->name }}" class="h-10 w-10 object-cover rounded-md">
                     @else
                         <div class="h-10 w-10 rounded-md bg-gray-200 dark:bg-gray-700"></div>
                     @endif

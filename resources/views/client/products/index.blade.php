@@ -10,7 +10,7 @@
             @foreach ($products as $product)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex flex-col">
                     @if ($product->image_path)
-                        <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}" class="rounded mb-3 h-32 object-cover">
+                        <img src="{{ route('products.image', $product) }}" alt="{{ $product->name }}" class="rounded mb-3 h-32 object-cover">
                     @endif
                     <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $product->name }}</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ $product->description }}</p>

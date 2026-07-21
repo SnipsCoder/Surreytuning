@@ -47,7 +47,7 @@
 <div>
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
     @if ($product?->image_path)
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->image_path) }}" alt="{{ $product->name }}" class="mt-2 h-16 w-16 object-cover rounded-md">
+        <img src="{{ route('products.image', $product) }}" alt="{{ $product->name }}" class="mt-2 h-16 w-16 object-cover rounded-md">
     @endif
     <input type="file" name="image" accept="image/*"
         class="mt-2 block w-full text-sm text-gray-700 dark:text-gray-300">

@@ -62,6 +62,7 @@ Route::middleware([
 
     // Public branding assets (needed pre-auth for the login page and in emails)
     Route::get('/branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
+    Route::get('/products/{product}/image', [BrandingController::class, 'productImage'])->name('products.image');
     Route::redirect('/owner/file-requests/{fileRequest}', '/file-requests/{fileRequest}');
     Route::get('/branding/login-background', [BrandingController::class, 'loginBackground'])->name('branding.login-background');
 
