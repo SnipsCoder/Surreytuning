@@ -29,11 +29,16 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:6,1')
         ->name('password.email');
 
+    // Exempt from 'guest' so invite / approval "set your password" links work
+    // even when a stale session is active (otherwise the user is bounced to a
+    // dashboard before the set-password form can load).
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+        ->withoutMiddleware('guest')
         ->name('password.reset');
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->middleware('throttle:6,1')
+        ->withoutMiddleware('guest')
         ->name('password.store');
 });
 
