@@ -26,4 +26,21 @@ class BrandingController extends Controller
             'Cache-Control' => 'public, max-age=3600',
         ]);
     }
+
+    public function loginBackground(): Response
+    {
+        $settings = Setting::get();
+        $key = $settings?->login_background;
+
+        abort_unless($key, 404);
+
+        $disk = Storage::disk('r2');
+
+        abort_unless($disk->exists($key), 404);
+
+        return response($disk->get($key), 200, [
+            'Content-Type' => $disk->mimeType($key) ?: 'image/png',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+    }
 }

@@ -62,6 +62,7 @@ Route::middleware([
 
     // Public branding assets (needed pre-auth for the login page and in emails)
     Route::get('/branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
+    Route::get('/branding/login-background', [BrandingController::class, 'loginBackground'])->name('branding.login-background');
 
     // Owner/admin portal (no prefix)
     Route::middleware(['auth', 'two_factor', 'owner'])->group(function () {
