@@ -150,7 +150,7 @@
                         @if ($settings->portal_logo)
                             <div class="mb-2">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Currently loaded:</p>
-                                <img src="{{ Storage::disk('r2')->url($settings->portal_logo) }}" alt="Current portal logo" class="max-h-20 max-w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white p-1 object-contain">
+                                <img src="{{ route('branding.logo') }}" alt="Current portal logo" class="max-h-20 max-w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white p-1 object-contain">
                             </div>
                         @endif
                         <input type="file" name="portal_logo" accept="image/*" class="w-full text-sm text-gray-700 dark:text-gray-300">

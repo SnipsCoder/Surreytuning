@@ -23,7 +23,7 @@ class BrandingController extends Controller
 
         return response($disk->get($key), 200, [
             'Content-Type' => $disk->mimeType($key) ?: 'image/png',
-            'Cache-Control' => 'public, max-age=3600',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
@@ -40,7 +40,7 @@ class BrandingController extends Controller
 
         return response($disk->get($key), 200, [
             'Content-Type' => $disk->mimeType($key) ?: 'image/png',
-            'Cache-Control' => 'public, max-age=3600',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 }
