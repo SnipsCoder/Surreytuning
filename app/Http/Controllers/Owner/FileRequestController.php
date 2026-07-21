@@ -237,13 +237,27 @@ class FileRequestController extends Controller
         return back()->with('success', 'Credit added.');
     }
 
-    public function void(Request $request, FileRequest $fileRequest)
+    public function void(Request $request, FileRequest $fileRequest, CreditService $creditService)
     {
         $this->authorize('void', $fileRequest);
 
         $validated = $request->validate([
             'void_reason' => ['required', 'string', 'max:500'],
         ]);
+
+        // If the dealer already paid for this job in file credits at submission,
+        // voiding it must refund them — otherwise they are charged for work that
+        // never happened. Clear is_charged so a re-void cannot double-refund.
+        if ($fileRequest->is_charged && (float) $fileRequest->price_gross > 0) {
+            $creditService->manualAdjustFileCredits(
+                $fileRequest->dealer,
+                (float) $fileRequest->price_gross,
+                "Refund for voided job {$fileRequest->request_number_formatted}",
+                $request->user(),
+            );
+
+            $fileRequest->update(['is_charged' => false]);
+        }
 
         $fileRequest->update([
             'status' => FileRequestStatus::Void,
