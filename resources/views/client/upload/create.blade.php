@@ -28,11 +28,12 @@
                 this.dtcCodes.splice(index, 1);
             },
             next() {
-                // Only the current step's required (*) fields carry the HTML
-                // `required` constraint (bound via x-bind:required), so any
-                // :invalid control belongs to this step. Block advancing and
-                // surface the native prompt on the first empty one.
-                const invalid = this.$root.querySelector('input:invalid, select:invalid, textarea:invalid');
+                // Validate only the fields visible on the current step. Hidden
+                // steps (display:none) and the hidden native file input have
+                // offsetParent === null, so they never block advancing — that
+                // was silently trapping step 1 even when it was complete.
+                const invalid = Array.from(this.$root.querySelectorAll('input, select, textarea'))
+                    .find(el => el.offsetParent !== null && !el.checkValidity());
                 if (invalid) {
                     invalid.reportValidity();
                     return;
