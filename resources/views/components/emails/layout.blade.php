@@ -21,7 +21,7 @@
 <body>
 <div class="wrapper">
     <div class="header">
-        <h1>{{ $brandName }}</h1>
+        <img src="{{ url('/branding/logo') }}" alt="{{ $brandName }}" style="max-height:40px;max-width:220px;display:block;">
     </div>
     <div class="body">
         {{ $slot }}
