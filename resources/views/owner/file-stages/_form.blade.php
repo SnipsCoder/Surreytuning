@@ -55,10 +55,8 @@
 </div>
 
 <div class="flex items-center gap-6">
-    <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-        <input type="checkbox" name="vat_applicable" value="1" @checked(old('vat_applicable', $fileStage?->vat_applicable ?? true))>
-        VAT Applicable
-    </label>
+    {{-- VAT toggle is hidden from the UI; carry the stage's current value forward so saving does not flip it. --}}
+    <input type="hidden" name="vat_applicable" value="{{ old('vat_applicable', $fileStage?->vat_applicable ?? true) ? 1 : 0 }}">
 
     <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
         <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $fileStage?->is_active ?? true))>
