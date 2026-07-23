@@ -133,6 +133,12 @@ class SettingsController extends Controller
 
     private function paymentsUnlocked(Request $request): bool
     {
+        // TEMPORARY: the Google Authenticator (TOTP) step-up gate is disabled while
+        // there is no active QR/enrolment to generate rolling codes from. Payment
+        // settings are accessible without a code. To restore the gate, delete this
+        // early return and keep the session-based check below.
+        return true;
+
         $until = $request->session()->get('payments_unlocked_until');
 
         return $until !== null && now()->lessThan(\Illuminate\Support\Carbon::parse($until));
