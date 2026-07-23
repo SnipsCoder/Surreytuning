@@ -33,9 +33,13 @@ class AuthenticatedSessionController extends Controller
 
         $user->updateLastLogin();
 
-        $redirect = in_array($user->role, [UserRole::DealerOwner, UserRole::DealerUser], true)
-            ? '/my/dashboard'
-            : '/dashboard';
+        // Tuners land on File Requests (their sole workspace); dealers on their
+        // own dashboard; the owner on the admin dashboard.
+        $redirect = match ($user->role) {
+            UserRole::DealerOwner, UserRole::DealerUser => '/my/dashboard',
+            UserRole::Tuner => '/file-requests',
+            default => '/dashboard',
+        };
 
         // Do NOT use redirect()->intended() here. If the guest was bounced to /login
         // from a protected route, Laravel stashes that URL as `url.intended` in the

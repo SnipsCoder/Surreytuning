@@ -259,8 +259,12 @@ class TwoFactorController extends Controller
 
     private function homeRoute($user): string
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Tuner])
-            ? route('owner.dashboard')
-            : route('client.dashboard');
+        // Tuners work only from File Requests and have no dashboard in their
+        // sidebar, so land them there rather than on the owner dashboard.
+        return match ($user->role) {
+            UserRole::Owner => route('owner.dashboard'),
+            UserRole::Tuner => route('file-requests.index'),
+            default => route('client.dashboard'),
+        };
     }
 }
