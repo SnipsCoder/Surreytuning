@@ -13,6 +13,7 @@ use App\Models\ProductOrder;
 use App\Models\User;
 use App\Models\WinolsBundle;
 use App\Services\CreditService;
+use App\Services\EvcService;
 use App\Services\InvoiceService;
 use App\Services\StripeService;
 use Illuminate\Database\QueryException;
@@ -29,6 +30,7 @@ class StripeWebhookController extends Controller
         private StripeService $stripeService,
         private CreditService $creditService,
         private InvoiceService $invoiceService,
+        private EvcService $evcService,
     ) {}
 
     public function handle(Request $request)
@@ -182,6 +184,11 @@ class StripeWebhookController extends Controller
 
             return $this->invoiceService->markPaid($invoice, $paymentIntentId);
         });
+
+        // Push the purchased credits onto the dealer's real EVC account. Done
+        // outside the DB transaction and never allowed to fail the purchase —
+        // if the reseller API isn't wired yet it just logs for manual action.
+        $this->evcService->allocateCredits($dealer, (float) $bundle->credits, "EVC bundle purchase: {$bundle->name}");
 
         PaymentConfirmed::dispatch($invoice, $dealer);
     }

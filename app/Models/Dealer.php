@@ -19,6 +19,7 @@ class Dealer extends Model
         'invoice_address',
         'file_credit_balance',
         'evc_credit_balance',
+        'evc_number',
         'discount_percentage',
         'status',
         'approved_at',

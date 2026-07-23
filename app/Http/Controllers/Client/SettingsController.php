@@ -39,6 +39,7 @@ class SettingsController extends Controller
             'company_name' => ['required', 'string', 'max:255'],
             'country' => ['required', 'string', 'max:100'],
             'invoice_address' => ['nullable', 'string', 'max:1000'],
+            'evc_number' => ['nullable', 'string', 'max:50'],
         ]);
 
         $request->user()->dealer->update($data);

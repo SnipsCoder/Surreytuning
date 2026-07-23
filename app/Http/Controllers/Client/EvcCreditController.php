@@ -35,6 +35,13 @@ class EvcCreditController extends Controller
         ]);
 
         $dealer = $request->user()->dealer;
+
+        // EVC credits can only be purchased once the dealer has linked their EVC
+        // number — otherwise there is no account to allocate the credits to.
+        if (blank($dealer->evc_number)) {
+            return back()->with('error', 'Please add your EVC WinOLS number in Settings before purchasing EVC credits.');
+        }
+
         $bundle = WinolsBundle::where('is_active', true)->findOrFail($validated['winols_bundle_id']);
 
         $session = $this->stripeService->createCheckoutSession(

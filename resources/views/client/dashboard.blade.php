@@ -172,6 +172,13 @@
                                 </a>
                             </div>
                             <p class="text-2xl font-bold text-white">{{ number_format($stats['evc_balance']) }}</p>
+                            @if (filled($dealer?->evc_number))
+                                <p class="mt-1 text-xs text-slate-500">EVC Number: <span class="text-slate-300">{{ $dealer->evc_number }}</span></p>
+                            @else
+                                <a href="{{ route('client.settings.index') }}" class="mt-2 inline-block text-xs text-amber-400 hover:text-amber-300 hover:underline">
+                                    Link your EVC number to purchase EVC credits &rarr;
+                                </a>
+                            @endif
                         </div>
 
                         <div class="border-t border-white/5 pt-4">

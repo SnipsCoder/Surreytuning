@@ -45,6 +45,13 @@
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">{{ old('invoice_address', $dealer->invoice_address) }}</textarea>
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">EVC WinOLS Number</label>
+                    <input type="text" name="evc_number" value="{{ old('evc_number', $dealer->evc_number) }}" placeholder="Your EVC user number"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 text-sm shadow-sm">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter your EVC user number so purchased EVC credits can be added to your WinOLS account.</p>
+                </div>
+
                 <div class="pt-2">
                     <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Save Changes</button>
                 </div>

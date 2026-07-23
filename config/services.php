@@ -41,4 +41,12 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    // EVC WinOLS reseller integration. Leave EVC_API_URL blank until EVC's
+    // reseller API details are known — while blank, credit allocations are
+    // logged for manual action rather than pushed automatically.
+    'evc' => [
+        'api_url' => env('EVC_API_URL'),
+        'allocate_path' => env('EVC_ALLOCATE_PATH', 'reseller/credits/allocate'),
+    ],
+
 ];

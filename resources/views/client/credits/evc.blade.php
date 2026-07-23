@@ -8,6 +8,13 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Available Bundles</h3>
 
+        @if (blank($dealer->evc_number))
+            <div class="mb-4 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+                Link your <strong>EVC WinOLS number</strong> before buying EVC credits, so purchased credits can be added to your account.
+                <a href="{{ route('client.settings.index') }}" class="font-medium underline">Add it in Settings</a>.
+            </div>
+        @endif
+
         @if ($bundles->isEmpty())
             <p class="text-sm text-gray-500 dark:text-gray-400">No EVC bundles are currently available.</p>
         @else
@@ -19,7 +26,7 @@
                         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $bundle->name }}</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ $bundle->credits }} credits</p>
                         <p class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">£{{ number_format($bundle->price_net, 2) }}</p>
-                        <x-primary-button type="submit" class="mt-auto">Purchase</x-primary-button>
+                        <x-primary-button type="submit" class="mt-auto" :disabled="blank($dealer->evc_number)">Purchase</x-primary-button>
                     </form>
                 @endforeach
             </div>
