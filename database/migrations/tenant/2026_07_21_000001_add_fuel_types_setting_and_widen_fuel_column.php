@@ -23,11 +23,21 @@ return new class extends Migration
 
         // Fuel is now an owner-managed free-text list, so the column can no
         // longer be a fixed ENUM. Widen it to VARCHAR, preserving existing rows.
+        // MODIFY COLUMN is MySQL-only syntax; SQLite (test suite) does not enforce
+        // ENUM/length constraints, so the column is already effectively free-text.
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("ALTER TABLE file_requests MODIFY COLUMN fuel VARCHAR(50) NOT NULL");
     }
 
     public function down(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Best-effort revert: rows with custom fuel values that are not in the
         // original enum set will be coerced by MySQL, which is acceptable for a
         // rollback.
