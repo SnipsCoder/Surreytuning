@@ -1,0 +1,20 @@
+diff --git a/resources/views/client/dashboard.blade.php b/resources/views/client/dashboard.blade.php
+index 5a0423f..c06b159 100644
+--- a/resources/views/client/dashboard.blade.php
++++ b/resources/views/client/dashboard.blade.php
+@@ -7,12 +7,12 @@
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+             </svg>
+             <div class="flex-1">
+-                <p class="text-sm font-semibold text-amber-300">{{ $notice->title }}</p>
++                <p class="text-base font-semibold text-amber-300">{{ $notice->title }}</p>
+                 @if ($notice->body)
+-                    <p class="text-sm text-amber-100/80 mt-1 whitespace-pre-line">{{ $notice->body }}</p>
++                    <p class="text-sm text-amber-200 mt-1 whitespace-pre-line">{{ $notice->body }}</p>
+                 @endif
+                 @if ($notice->show_until)
+-                    <p class="text-xs text-amber-200/60 mt-2">Until {{ $notice->show_until->format('j M Y') }}</p>
++                    <p class="text-xs font-medium text-amber-300 mt-2">Until {{ $notice->show_until->format('j M Y') }}</p>
+                 @endif
+             </div>
+         </div>
