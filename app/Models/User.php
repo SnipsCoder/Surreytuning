@@ -89,7 +89,7 @@ class User extends Authenticatable
 
     public function scopeOwnerTeam($query)
     {
-        return $query->whereIn('role', [UserRole::Owner, UserRole::Technician]);
+        return $query->whereIn('role', [UserRole::Owner, UserRole::Technician, UserRole::Tuner]);
     }
 
     public function scopeClients($query)

@@ -7,7 +7,7 @@
                 via {{ auth()->user()->two_factor_method === 'totp' ? 'authenticator app' : 'email code' }}.
             @else
                 Two-factor authentication is <strong class="text-gray-500">not enabled</strong>.
-                @if (in_array(auth()->user()->role, [\App\Enums\UserRole::Owner, \App\Enums\UserRole::Technician]))
+                @if (in_array(auth()->user()->role, [\App\Enums\UserRole::Owner, \App\Enums\UserRole::Technician, \App\Enums\UserRole::Tuner]))
                     It is required for your account.
                 @endif
             @endif

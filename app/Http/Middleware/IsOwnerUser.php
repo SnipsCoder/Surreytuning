@@ -15,7 +15,7 @@ class IsOwnerUser
             return redirect()->guest(route('login'));
         }
 
-        if (! in_array($request->user()->role, [UserRole::Owner, UserRole::Technician], true)) {
+        if (! in_array($request->user()->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true)) {
             abort(403);
         }
 

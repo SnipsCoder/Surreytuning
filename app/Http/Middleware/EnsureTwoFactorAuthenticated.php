@@ -27,7 +27,7 @@ class EnsureTwoFactorAuthenticated
             return $next($request);
         }
 
-        $isOwnerTeam = in_array($user->role, [UserRole::Owner, UserRole::Technician]);
+        $isOwnerTeam = in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner]);
 
         // Owner/technician: 2FA is mandatory — force setup if not confirmed
         if ($isOwnerTeam && ! $user->two_factor_confirmed_at) {

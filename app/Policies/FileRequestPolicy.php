@@ -10,12 +10,12 @@ class FileRequestPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Technician], true);
+        return in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true);
     }
 
     public function view(User $user, FileRequest $fileRequest): bool
     {
-        if (in_array($user->role, [UserRole::Owner, UserRole::Technician], true)) {
+        if (in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true)) {
             return true;
         }
 
@@ -24,12 +24,12 @@ class FileRequestPolicy
 
     public function respond(User $user, FileRequest $fileRequest): bool
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Technician], true);
+        return in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true);
     }
 
     public function addCharge(User $user, FileRequest $fileRequest): bool
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Technician], true);
+        return in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true);
     }
 
     public function addCredit(User $user, FileRequest $fileRequest): bool
@@ -44,6 +44,6 @@ class FileRequestPolicy
 
     public function viewInternalNotes(User $user): bool
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Technician], true);
+        return in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner], true);
     }
 }

@@ -28,7 +28,7 @@ class PortalUserController extends Controller
             'last_name' => $request->validated('last_name'),
             'email' => $request->validated('email'),
             'password' => Str::password(32),
-            'role' => UserRole::Owner,
+            'role' => UserRole::from($request->validated('role')),
             'status' => UserStatus::Active,
         ]);
 
