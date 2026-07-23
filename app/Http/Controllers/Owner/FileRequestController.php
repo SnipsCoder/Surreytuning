@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Owner;
 
 use App\Enums\AttachmentType;
 use App\Enums\FileRequestStatus;
-use App\Enums\InvoiceType;
 use App\Enums\MessageType;
 use App\Events\FileRequestStatusChanged;
 use App\Events\NewMessagePosted;
@@ -17,10 +16,10 @@ use App\Models\FileRequest;
 use App\Models\FileRequestAttachment;
 use App\Models\FileRequestMessage;
 use App\Models\FileStage;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\CreditService;
 use App\Services\FileStorageService;
-use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 
 class FileRequestController extends Controller
@@ -166,28 +165,33 @@ class FileRequestController extends Controller
         return back()->with('success', 'Technician assigned.');
     }
 
-    public function addCharge(AddChargeRequest $request, FileRequest $fileRequest, InvoiceService $invoiceService)
+    public function addCharge(AddChargeRequest $request, FileRequest $fileRequest, CreditService $creditService)
     {
         $this->authorize('addCharge', $fileRequest);
 
         $applyVat = $request->boolean('apply_vat');
+        $net = (float) $request->validated('amount_net');
+        $vat = $applyVat ? round($net * ((float) Setting::get()->vat_rate) / 100, 2) : 0.0;
+        $gross = round($net + $vat, 2);
 
-        $invoice = $invoiceService->createInvoice(
+        // An ad-hoc charge draws the cost down from the dealer's prepaid file
+        // credit balance rather than raising a separate invoice. A manual
+        // adjustment (not deductFileCredits) is used deliberately so the owner
+        // can always record the charge even if it pushes the balance negative;
+        // the dealer settles up by topping their credits back.
+        $creditService->manualAdjustFileCredits(
             $fileRequest->dealer,
-            $request->validated('description'),
-            (float) $request->validated('amount_net'),
-            InvoiceType::Manual,
+            -$gross,
+            'Charge: '.$request->validated('description'),
             $request->user(),
             $fileRequest->id,
-            FileRequest::class,
-            $applyVat,
         );
 
         FileRequestMessage::create([
             'file_request_id' => $fileRequest->id,
             'sender_user_id' => $request->user()->id,
             'type' => MessageType::ChargeEvent,
-            'body' => "Charge added: {$request->validated('description')} (£".number_format((float) $request->validated('amount_net'), 2).')',
+            'body' => "Charge added: {$request->validated('description')} (£".number_format($gross, 2).' drawn from file credits)',
             'is_internal' => false,
         ]);
 
@@ -195,12 +199,12 @@ class FileRequestController extends Controller
             'file_request.charge_added',
             $request->user(),
             $fileRequest,
-            (float) $request->validated('amount_net'),
+            $gross,
             $request->validated('description'),
-            ['invoice_id' => $invoice->id, 'apply_vat' => $applyVat],
+            ['apply_vat' => $applyVat, 'method' => 'file_credits'],
         );
 
-        return back()->with('success', 'Charge added.');
+        return back()->with('success', 'Charge added — £'.number_format($gross, 2).' drawn from file credits.');
     }
 
     public function addCredit(AddCreditRequest $request, FileRequest $fileRequest, CreditService $creditService)

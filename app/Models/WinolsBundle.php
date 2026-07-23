@@ -12,6 +12,7 @@ class WinolsBundle extends Model
         'credits',
         'price_net',
         'is_active',
+        'image_path',
     ];
 
     protected function casts(): array

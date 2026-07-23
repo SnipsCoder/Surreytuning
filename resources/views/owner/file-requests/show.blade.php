@@ -17,7 +17,7 @@
                         <div><dt class="text-gray-500 dark:text-gray-400">VIN</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->vin_number ?? '—' }}</dd></div>
                         <div><dt class="text-gray-500 dark:text-gray-400">Engine</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->engine ?? '—' }} {{ $fileRequest->engine_code }}</dd></div>
                         <div><dt class="text-gray-500 dark:text-gray-400">Year</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->year ?? '—' }}</dd></div>
-                        <div><dt class="text-gray-500 dark:text-gray-400">Fuel</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->fuel?->value ?? '—' }}</dd></div>
+                        <div><dt class="text-gray-500 dark:text-gray-400">Fuel</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->fuel ?? '—' }}</dd></div>
                         <div><dt class="text-gray-500 dark:text-gray-400">Transmission</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->transmission?->value ?? '—' }}</dd></div>
                         <div><dt class="text-gray-500 dark:text-gray-400">BHP / Torque (before)</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->bhp_before ?? '—' }} bhp / {{ $fileRequest->torque_before_nm ?? '—' }} Nm</dd></div>
                         <div><dt class="text-gray-500 dark:text-gray-400">Tool</dt><dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->tool?->name ?? '—' }}</dd></div>
@@ -142,6 +142,7 @@
                                     <input type="checkbox" name="apply_vat" value="1" checked class="rounded border-gray-300 dark:border-[#2a2a2a]">
                                     Apply VAT
                                 </label>
+                                <p class="text-xs text-gray-400">The total (net + VAT) is drawn from the dealer's file credit balance.</p>
                                 <button type="submit" class="w-full px-4 py-2 rounded-md bg-[#0d0d0d] dark:bg-gray-700 text-white text-sm font-medium hover:bg-[#1a1a1a]">Add Charge</button>
                             </form>
                         </div>

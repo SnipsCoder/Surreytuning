@@ -110,6 +110,7 @@ class ProductController extends Controller
                         $request->user(),
                         $order->id,
                         ProductOrder::class,
+                        (bool) $product->vat_applicable,
                     );
                     $this->invoiceService->markPaid($invoice);
                 });

@@ -109,9 +109,8 @@
                         <x-input-label for="fuel" value="Fuel Type *" />
                         <select id="fuel" name="fuel" x-bind:required="step === 1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-brand focus:ring-brand">
                             <option value="">Select...</option>
-                            @foreach (\App\Enums\FuelType::cases() as $fuel)
-                                @continue(in_array($fuel, [\App\Enums\FuelType::Electric, \App\Enums\FuelType::Hybrid]))
-                                <option value="{{ $fuel->value }}" @selected(old('fuel') === $fuel->value)>{{ $fuel->label() }}</option>
+                            @foreach (\App\Models\Setting::fuelTypes() as $fuelType)
+                                <option value="{{ $fuelType }}" @selected(old('fuel') === $fuelType)>{{ $fuelType }}</option>
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('fuel')" class="mt-1" />

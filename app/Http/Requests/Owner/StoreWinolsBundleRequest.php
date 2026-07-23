@@ -18,6 +18,7 @@ class StoreWinolsBundleRequest extends FormRequest
             'credits' => ['required', 'integer', 'min:1'],
             'price_net' => ['required', 'numeric', 'min:0'],
             'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:4096'],
         ];
     }
 }

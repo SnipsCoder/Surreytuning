@@ -64,9 +64,9 @@ class CreditService
         });
     }
 
-    public function manualAdjustFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy): FileCreditTransaction
+    public function manualAdjustFileCredits(Dealer $dealer, float $amount, string $reason, User $performedBy, ?int $fileRequestId = null): FileCreditTransaction
     {
-        return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy) {
+        return DB::transaction(function () use ($dealer, $amount, $reason, $performedBy, $fileRequestId) {
             $dealer = Dealer::whereKey($dealer->id)->lockForUpdate()->firstOrFail();
 
             $balanceAfter = bcadd((string) $dealer->file_credit_balance, (string) $amount, 2);
@@ -76,7 +76,7 @@ class CreditService
             return FileCreditTransaction::create([
                 'dealer_id' => $dealer->id,
                 'user_id' => $performedBy->id,
-                'file_request_id' => null,
+                'file_request_id' => $fileRequestId,
                 'type' => $amount >= 0 ? FileCreditTransactionType::ManualCredit : FileCreditTransactionType::Deduction,
                 'amount' => $amount,
                 'reason' => $reason,

@@ -20,6 +20,7 @@
                     'branding' => 'Branding',
                     'dealer' => 'Dealer',
                     'invoice' => 'Invoice',
+                    'fuel_types' => 'Fuel Types',
                     'terms' => 'T&Cs',
                 ] as $key => $label)
                     <button
@@ -269,6 +270,57 @@
                     </a>
                 </div>
             </div>
+        </div>
+
+        {{-- Fuel Types Tab --}}
+        <div x-show="tab === 'fuel_types'" x-cloak>
+            <form method="POST" action="{{ route('owner.settings.fuel-types') }}"
+                  x-data="{ types: {{ \Illuminate\Support\Js::from(old('fuel_types', \App\Models\Setting::fuelTypes())) }} }"
+                  class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 space-y-4">
+                @csrf
+                @method('PATCH')
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Fuel Types</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        These are the fuel options a dealer can choose on the New File Request form. Add, rename, or remove them as needed.
+                    </p>
+                </div>
+
+                @error('fuel_types')
+                    <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+
+                <div class="space-y-2">
+                    <template x-for="(type, index) in types" :key="index">
+                        <div class="flex items-center gap-2">
+                            <input type="text" x-model="types[index]" name="fuel_types[]"
+                                   placeholder="e.g. Petrol"
+                                   class="block w-full max-w-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-brand focus:ring-brand text-sm">
+                            <button type="button" x-on:click="types.splice(index, 1)"
+                                    class="inline-flex items-center px-2 py-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    title="Remove">
+                                &times;
+                            </button>
+                        </div>
+                    </template>
+
+                    <p x-show="types.length === 0" x-cloak class="text-sm text-gray-500 dark:text-gray-400">
+                        No fuel types yet &mdash; add one below.
+                    </p>
+                </div>
+
+                <button type="button" x-on:click="types.push('')"
+                        class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    + Add Fuel Type
+                </button>
+
+                <div class="pt-2">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
+                        Save Fuel Types
+                    </button>
+                </div>
+            </form>
         </div>
 
         {{-- T&Cs Tab --}}

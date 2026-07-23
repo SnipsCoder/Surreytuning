@@ -64,6 +64,8 @@ Route::middleware([
     Route::get('/branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
     Route::get('/branding/login-background', [BrandingController::class, 'loginBackground'])->name('branding.login-background');
     Route::get('/products/{product}/image', [BrandingController::class, 'productImage'])->name('products.image');
+    Route::get('/winols-bundles/{winolsBundle}/image', [BrandingController::class, 'winolsBundleImage'])->name('winols-bundles.image');
+    Route::get('/file-stages/{fileStage}/image', [BrandingController::class, 'fileStageImage'])->name('file-stages.image');
     Route::redirect('/owner/file-requests/{fileRequest}', '/file-requests/{fileRequest}');
     Route::get('/branding/login-background', [BrandingController::class, 'loginBackground'])->name('branding.login-background');
 
@@ -127,6 +129,7 @@ Route::middleware([
         Route::patch('/settings', [Owner\SettingsController::class, 'update'])->name('owner.settings.update');
         Route::patch('/settings/opening-hours', [Owner\SettingsController::class, 'updateHours'])->name('owner.settings.hours');
         Route::patch('/settings/branding', [Owner\SettingsController::class, 'updateBranding'])->name('owner.settings.branding');
+        Route::patch('/settings/fuel-types', [Owner\SettingsController::class, 'updateFuelTypes'])->name('owner.settings.fuel-types');
         Route::get('/settings/test-invoice', [Owner\SettingsController::class, 'previewInvoice'])->name('owner.settings.test-invoice');
 
         // Portal status

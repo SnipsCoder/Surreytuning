@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\FileRequestStatus;
-use App\Enums\FuelType;
 use App\Enums\TransmissionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,7 +50,8 @@ class FileRequest extends Model
     {
         return [
             'status' => FileRequestStatus::class,
-            'fuel' => FuelType::class,
+            // 'fuel' is an owner-managed free-text list (see Setting::fuelTypes),
+            // so it is a plain string rather than a fixed enum cast.
             'transmission' => TransmissionType::class,
             'price_net' => 'decimal:2',
             'vat_amount' => 'decimal:2',

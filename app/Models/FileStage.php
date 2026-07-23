@@ -17,6 +17,7 @@ class FileStage extends Model
         'turnaround_hours',
         'sort_order',
         'is_active',
+        'image_path',
     ];
 
     protected function casts(): array

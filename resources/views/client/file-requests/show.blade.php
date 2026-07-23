@@ -31,7 +31,7 @@
                     </div>
                     <div>
                         <dt class="text-gray-500 dark:text-gray-400">Fuel / Transmission</dt>
-                        <dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->fuel->label() }} / {{ $fileRequest->transmission->label() }}</dd>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ $fileRequest->fuel }} / {{ $fileRequest->transmission->label() }}</dd>
                     </div>
                     <div>
                         <dt class="text-gray-500 dark:text-gray-400">BHP Before</dt>

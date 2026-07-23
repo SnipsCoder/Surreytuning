@@ -23,6 +23,10 @@ class ProductController extends Controller
         $data = $request->validated();
         unset($data['image']);
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        // Unchecked checkboxes submit nothing, so validated() omits them. Coerce
+        // explicitly so unticking VAT / Active actually persists as false.
+        $data['vat_applicable'] = $request->boolean('vat_applicable');
+        $data['is_active'] = $request->boolean('is_active');
 
         if ($request->hasFile('image')) {
             $data['image_path'] = $request->file('image')->store('products', 'public');
@@ -38,6 +42,10 @@ class ProductController extends Controller
         $data = $request->validated();
         unset($data['image']);
         $data['sort_order'] = $data['sort_order'] ?? 0;
+        // Unchecked checkboxes submit nothing, so validated() omits them. Coerce
+        // explicitly so unticking VAT / Active actually persists as false.
+        $data['vat_applicable'] = $request->boolean('vat_applicable');
+        $data['is_active'] = $request->boolean('is_active');
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {

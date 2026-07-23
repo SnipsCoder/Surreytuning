@@ -3,7 +3,9 @@
 namespace App\Http\Requests\FileRequest;
 
 use App\Enums\TransmissionType;
+use App\Models\Setting;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreFileRequestRequest extends FormRequest
@@ -20,7 +22,7 @@ class StoreFileRequestRequest extends FormRequest
             'model' => ['required', 'string', 'max:100'],
             'year' => ['required', 'integer', 'min:1990', 'max:2030'],
             'engine' => ['required', 'string', 'max:50'],
-            'fuel' => ['required', 'in:petrol,diesel'],
+            'fuel' => ['required', 'string', Rule::in(Setting::fuelTypes())],
             'transmission' => ['required', new Enum(TransmissionType::class)],
             'file_stage_id' => ['required', 'exists:file_stages,id'],
             'tool_id' => ['required', 'exists:tuning_tools,id'],

@@ -32,13 +32,20 @@ class Setting extends Model
         'evc_account_number',
         'evc_password',
         'whatsapp_business_number',
+        'fuel_types',
     ];
+
+    /**
+     * Default fuel types used when none have been configured yet.
+     */
+    public const DEFAULT_FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'Hybrid'];
 
     protected function casts(): array
     {
         return [
             'vat_rate' => 'decimal:2',
             'dealer_auto_onboard' => 'boolean',
+            'fuel_types' => 'array',
         ];
     }
 
@@ -52,6 +59,7 @@ class Setting extends Model
                 'invoice_start_number' => 10000,
                 'invoice_reference_prefix' => 'INV',
                 'theme_colour' => '#e63012',
+                'fuel_types' => static::DEFAULT_FUEL_TYPES,
             ]);
         }
 
@@ -61,6 +69,26 @@ class Setting extends Model
     public static function clearCache(): void
     {
         static::$instance = null;
+    }
+
+    /**
+     * The owner-managed list of fuel types a dealer can pick on the New File
+     * Request form. Falls back to the built-in defaults when unset (e.g. before
+     * the settings migration has seeded the column).
+     *
+     * @return array<int, string>
+     */
+    public static function fuelTypes(): array
+    {
+        try {
+            $types = static::get()->fuel_types;
+        } catch (\Throwable $e) {
+            return static::DEFAULT_FUEL_TYPES;
+        }
+
+        return is_array($types) && count($types) > 0
+            ? array_values($types)
+            : static::DEFAULT_FUEL_TYPES;
     }
 
     /**

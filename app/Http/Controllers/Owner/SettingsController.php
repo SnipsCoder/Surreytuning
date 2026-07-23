@@ -6,6 +6,7 @@ use App\Enums\InvoiceStatus;
 use App\Enums\InvoiceType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Owner\UpdateBrandingRequest;
+use App\Http\Requests\Owner\UpdateFuelTypesRequest;
 use App\Http\Requests\Owner\UpdateOpeningHoursRequest;
 use App\Http\Requests\Owner\UpdateSettingsRequest;
 use App\Models\Dealer;
@@ -50,6 +51,16 @@ class SettingsController extends Controller
         return back()
             ->with('success', 'Opening hours updated.')
             ->with('active_tab', 'hours');
+    }
+
+    public function updateFuelTypes(UpdateFuelTypesRequest $request)
+    {
+        Setting::get()->update(['fuel_types' => $request->validated('fuel_types')]);
+        Setting::clearCache();
+
+        return back()
+            ->with('success', 'Fuel types updated.')
+            ->with('active_tab', 'fuel_types');
     }
 
     public function updateBranding(UpdateBrandingRequest $request)

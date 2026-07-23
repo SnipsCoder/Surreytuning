@@ -24,6 +24,7 @@ class StoreFileStageRequest extends FormRequest
             'turnaround_hours' => ['required', 'integer', 'min:0'],
             'sort_order' => ['nullable', 'integer'],
             'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'max:4096'],
         ];
     }
 }

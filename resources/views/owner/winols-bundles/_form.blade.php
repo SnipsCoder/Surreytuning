@@ -18,6 +18,15 @@
     </div>
 </div>
 
+<div>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image</label>
+    @if ($winolsBundle?->image_path)
+        <img src="{{ route('winols-bundles.image', $winolsBundle) }}" alt="{{ $winolsBundle->name }}" class="mt-2 h-16 w-16 object-cover rounded-md">
+    @endif
+    <input type="file" name="image" accept="image/*"
+        class="mt-2 block w-full text-sm text-gray-700 dark:text-gray-300">
+</div>
+
 <div class="flex items-center gap-6">
     <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
         <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $winolsBundle?->is_active ?? true))>

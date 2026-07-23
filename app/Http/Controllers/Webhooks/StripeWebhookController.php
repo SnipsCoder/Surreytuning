@@ -220,6 +220,7 @@ class StripeWebhookController extends Controller
                 $user,
                 $order->id,
                 ProductOrder::class,
+                (bool) $product->vat_applicable,
             );
 
             return $this->invoiceService->markPaid($invoice, $paymentIntentId);

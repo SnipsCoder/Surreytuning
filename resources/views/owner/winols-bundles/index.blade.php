@@ -31,7 +31,7 @@
             </tr>
 
             <x-modal id="edit-winols-bundle-{{ $winolsBundle->id }}" title="Edit Bundle">
-                <form method="POST" action="{{ route('winols-bundles.update', $winolsBundle) }}" class="space-y-4">
+                <form method="POST" action="{{ route('winols-bundles.update', $winolsBundle) }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @method('PUT')
                     @include('owner.winols-bundles._form', ['winolsBundle' => $winolsBundle])
@@ -45,7 +45,7 @@
     </x-data-table>
 
     <x-modal id="create-winols-bundle" title="Add Bundle">
-        <form method="POST" action="{{ route('winols-bundles.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('winols-bundles.store') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @include('owner.winols-bundles._form', ['winolsBundle' => null])
         </form>

@@ -40,7 +40,7 @@
     {{-- Edit modals live outside the table: a <div> inside <tbody> is invalid HTML and gets hoisted out by the browser. --}}
     @foreach ($fileStages as $fileStage)
         <x-modal id="edit-file-stage-{{ $fileStage->id }}" title="Edit File Stage">
-            <form method="POST" action="{{ route('file-stages.update', $fileStage) }}" class="space-y-4">
+            <form method="POST" action="{{ route('file-stages.update', $fileStage) }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 @method('PUT')
                 @include('owner.file-stages._form', ['fileStage' => $fileStage])
@@ -49,7 +49,7 @@
     @endforeach
 
     <x-modal id="create-file-stage" title="Add File Stage">
-        <form method="POST" action="{{ route('file-stages.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('file-stages.store') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @include('owner.file-stages._form', ['fileStage' => null])
         </form>
