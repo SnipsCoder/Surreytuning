@@ -27,9 +27,9 @@ class EnsureTwoFactorAuthenticated
             return $next($request);
         }
 
-        $isOwnerTeam = in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner]);
+        $isOwnerTeam = in_array($user->role, [UserRole::Owner, UserRole::Tuner]);
 
-        // Owner/technician: 2FA is mandatory — force setup if not confirmed
+        // Owner/tuner: 2FA is mandatory — force setup if not confirmed
         if ($isOwnerTeam && ! $user->two_factor_confirmed_at) {
             return redirect()->route('two-factor.setup')
                 ->with('info', 'You must set up two-factor authentication before accessing the portal.');

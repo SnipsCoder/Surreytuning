@@ -259,7 +259,7 @@ class TwoFactorController extends Controller
 
     private function homeRoute($user): string
     {
-        return in_array($user->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner])
+        return in_array($user->role, [UserRole::Owner, UserRole::Tuner])
             ? route('owner.dashboard')
             : route('client.dashboard');
     }

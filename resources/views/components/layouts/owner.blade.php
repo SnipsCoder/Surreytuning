@@ -74,10 +74,11 @@
                         // unless a route is added to this allow-list.
                         if (auth()->user()?->role === \App\Enums\UserRole::Tuner) {
                             $tunerAllowedRoutes = [
-                                'owner.dashboard',
                                 'file-requests.index',
                                 'owner.file-requests.archive',
                                 'dealers.index',
+                                'vehicle-stats.index',
+                                'owner.dtc-search.index',
                             ];
 
                             $navSections = collect($navSections)

@@ -23,7 +23,7 @@ class InvitePortalUserRequest extends FormRequest
             'role' => [
                 'required',
                 new Enum(UserRole::class),
-                Rule::in([UserRole::Owner->value, UserRole::Technician->value, UserRole::Tuner->value]),
+                Rule::in([UserRole::Owner->value, UserRole::Tuner->value]),
             ],
         ];
     }
