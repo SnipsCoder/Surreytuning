@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\EncryptedSafe;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
@@ -29,8 +30,11 @@ class Setting extends Model
         'terms_and_conditions',
         'stripe_public_key',
         'stripe_secret_key',
+        'stripe_webhook_secret',
         'evc_account_number',
         'evc_password',
+        'paypal_client_id',
+        'paypal_secret',
         'whatsapp_business_number',
         'fuel_types',
     ];
@@ -46,6 +50,11 @@ class Setting extends Model
             'vat_rate' => 'decimal:2',
             'dealer_auto_onboard' => 'boolean',
             'fuel_types' => 'array',
+            // Payment secrets are encrypted at rest.
+            'stripe_secret_key' => EncryptedSafe::class,
+            'stripe_webhook_secret' => EncryptedSafe::class,
+            'evc_password' => EncryptedSafe::class,
+            'paypal_secret' => EncryptedSafe::class,
         ];
     }
 
@@ -69,6 +78,21 @@ class Setting extends Model
     public static function clearCache(): void
     {
         static::$instance = null;
+    }
+
+    /**
+     * The masked tail of a secret for display (e.g. "••••••ab12"), or null when
+     * unset. Never renders the whole secret to the browser.
+     */
+    public function maskedSecret(string $attribute): ?string
+    {
+        $value = $this->{$attribute};
+
+        if (blank($value)) {
+            return null;
+        }
+
+        return '••••••'.substr($value, -4);
     }
 
     /**

@@ -70,7 +70,7 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                 <select name="role" required
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
-                    @foreach ([\App\Enums\UserRole::Owner, \App\Enums\UserRole::Technician, \App\Enums\UserRole::Tuner] as $roleOption)
+                    @foreach ([\App\Enums\UserRole::Owner, \App\Enums\UserRole::Tuner] as $roleOption)
                         <option value="{{ $roleOption->value }}" @selected(old('role', \App\Enums\UserRole::Owner->value) === $roleOption->value)>
                             {{ $roleOption->label() }}
                         </option>

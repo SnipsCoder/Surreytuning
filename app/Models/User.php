@@ -67,6 +67,33 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Whether this user has a Google Authenticator (TOTP) secret set up.
+     */
+    public function hasAuthenticator(): bool
+    {
+        return $this->two_factor_method === 'totp' && filled($this->two_factor_secret);
+    }
+
+    /**
+     * Verify a Google Authenticator (TOTP) code against this user's secret.
+     * Used for step-up authentication on sensitive areas (e.g. payment keys).
+     */
+    public function verifyTotpCode(string $code): bool
+    {
+        if (! $this->hasAuthenticator()) {
+            return false;
+        }
+
+        try {
+            $secret = decrypt($this->two_factor_secret);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return (bool) (new \PragmaRX\Google2FA\Google2FA)->verifyKey($secret, $code);
+    }
+
     public function dealer(): BelongsTo
     {
         return $this->belongsTo(Dealer::class);

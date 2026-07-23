@@ -11,6 +11,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div x-data="{ tab: '{{ session('active_tab', 'account') }}' }">
         <div class="border-b border-gray-200 dark:border-[#2a2a2a] mb-6">
             <nav class="-mb-px flex space-x-6 overflow-x-auto">
@@ -20,6 +26,7 @@
                     'branding' => 'Branding',
                     'dealer' => 'Dealer',
                     'invoice' => 'Invoice',
+                    'payments' => 'Payments',
                     'fuel_types' => 'Fuel Types',
                     'terms' => 'T&Cs',
                 ] as $key => $label)
@@ -270,6 +277,154 @@
                     </a>
                 </div>
             </div>
+        </div>
+
+        {{-- Payments Tab (gated behind a Google Authenticator code) --}}
+        <div x-show="tab === 'payments'" x-cloak>
+            @if (! $paymentsUnlocked)
+                <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-6 max-w-md">
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">🔒 Payment settings are locked</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        For security, enter your Google Authenticator code to view or change payment keys. Access stays unlocked for 15 minutes.
+                    </p>
+                    <form method="POST" action="{{ route('owner.settings.payments.unlock') }}" class="space-y-3">
+                        @csrf
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Authenticator code</label>
+                            <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" required
+                                class="w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm tracking-widest">
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Unlock</button>
+                    </form>
+                </div>
+            @else
+                <p class="text-xs text-gray-400 mb-4">🔓 Unlocked. Secrets are encrypted at rest and never shown in full — leave a secret field blank to keep the current value.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {{-- Stripe --}}
+                    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Stripe</h4>
+                            <x-status-badge :status="$settings->stripe_secret_key ? 'Configured' : 'Not set'" :colour="$settings->stripe_secret_key ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" />
+                        </div>
+                        <dl class="text-xs text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+                            <div class="flex justify-between gap-2"><dt>Publishable</dt><dd class="text-gray-800 dark:text-gray-200 truncate max-w-[9rem]">{{ $settings->stripe_public_key ?: '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Secret</dt><dd class="text-gray-800 dark:text-gray-200">{{ $settings->maskedSecret('stripe_secret_key') ?? '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Webhook</dt><dd class="text-gray-800 dark:text-gray-200">{{ $settings->maskedSecret('stripe_webhook_secret') ?? '—' }}</dd></div>
+                        </dl>
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-stripe-keys' }))"
+                            class="mt-auto px-3 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c92a0f]">Edit</button>
+                    </div>
+
+                    {{-- EVC WinOLS --}}
+                    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">EVC WinOLS</h4>
+                            <x-status-badge :status="$settings->evc_password ? 'Configured' : 'Not set'" :colour="$settings->evc_password ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" />
+                        </div>
+                        <dl class="text-xs text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+                            <div class="flex justify-between gap-2"><dt>Account</dt><dd class="text-gray-800 dark:text-gray-200 truncate max-w-[9rem]">{{ $settings->evc_account_number ?: '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Password</dt><dd class="text-gray-800 dark:text-gray-200">{{ $settings->maskedSecret('evc_password') ?? '—' }}</dd></div>
+                        </dl>
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-evc-keys' }))"
+                            class="mt-auto px-3 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c92a0f]">Edit</button>
+                    </div>
+
+                    {{-- PayPal --}}
+                    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">PayPal</h4>
+                            <x-status-badge :status="$settings->paypal_secret ? 'Configured' : 'Not set'" :colour="$settings->paypal_secret ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" />
+                        </div>
+                        <dl class="text-xs text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+                            <div class="flex justify-between gap-2"><dt>Client ID</dt><dd class="text-gray-800 dark:text-gray-200 truncate max-w-[9rem]">{{ $settings->paypal_client_id ?: '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Secret</dt><dd class="text-gray-800 dark:text-gray-200">{{ $settings->maskedSecret('paypal_secret') ?? '—' }}</dd></div>
+                        </dl>
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-paypal-keys' }))"
+                            class="mt-auto px-3 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c92a0f]">Edit</button>
+                    </div>
+                </div>
+
+                {{-- Stripe modal --}}
+                <x-modal id="edit-stripe-keys" title="Edit Stripe Keys">
+                    <form method="POST" action="{{ route('owner.settings.payments') }}" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 text-xs text-blue-700 dark:text-blue-300">
+                            Keys are encrypted and stored securely. Leave a secret blank to keep the current value.
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Publishable Key</label>
+                            <input type="text" name="stripe_public_key" value="{{ $settings->stripe_public_key }}" placeholder="pk_live_..."
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret Key @if ($settings->stripe_secret_key)<span class="text-xs text-green-500">(configured)</span>@endif</label>
+                            <input type="password" name="stripe_secret_key" autocomplete="new-password" placeholder="{{ $settings->stripe_secret_key ? 'Leave blank to keep current' : 'sk_live_...' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Webhook Signing Secret @if ($settings->stripe_webhook_secret)<span class="text-xs text-green-500">(configured)</span>@endif</label>
+                            <input type="password" name="stripe_webhook_secret" autocomplete="new-password" placeholder="{{ $settings->stripe_webhook_secret ? 'Leave blank to keep current' : 'whsec_...' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Encrypt &amp; Save</button>
+                        </div>
+                    </form>
+                </x-modal>
+
+                {{-- EVC modal --}}
+                <x-modal id="edit-evc-keys" title="Edit EVC WinOLS Keys">
+                    <form method="POST" action="{{ route('owner.settings.payments') }}" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 text-xs text-blue-700 dark:text-blue-300">
+                            Keys are encrypted and stored securely. Leave the password blank to keep the current value.
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Account Number</label>
+                            <input type="text" name="evc_account_number" value="{{ $settings->evc_account_number }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password @if ($settings->evc_password)<span class="text-xs text-green-500">(configured)</span>@endif</label>
+                            <input type="password" name="evc_password" autocomplete="new-password" placeholder="{{ $settings->evc_password ? 'Leave blank to keep current' : '' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Encrypt &amp; Save</button>
+                        </div>
+                    </form>
+                </x-modal>
+
+                {{-- PayPal modal --}}
+                <x-modal id="edit-paypal-keys" title="Edit PayPal Keys">
+                    <form method="POST" action="{{ route('owner.settings.payments') }}" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 text-xs text-blue-700 dark:text-blue-300">
+                            Keys are encrypted and stored securely. Leave the secret blank to keep the current value.
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Client ID</label>
+                            <input type="text" name="paypal_client_id" value="{{ $settings->paypal_client_id }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret @if ($settings->paypal_secret)<span class="text-xs text-green-500">(configured)</span>@endif</label>
+                            <input type="password" name="paypal_secret" autocomplete="new-password" placeholder="{{ $settings->paypal_secret ? 'Leave blank to keep current' : '' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Encrypt &amp; Save</button>
+                        </div>
+                    </form>
+                </x-modal>
+            @endif
         </div>
 
         {{-- Fuel Types Tab --}}

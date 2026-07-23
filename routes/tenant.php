@@ -130,6 +130,8 @@ Route::middleware([
         Route::patch('/settings/opening-hours', [Owner\SettingsController::class, 'updateHours'])->name('owner.settings.hours');
         Route::patch('/settings/branding', [Owner\SettingsController::class, 'updateBranding'])->name('owner.settings.branding');
         Route::patch('/settings/fuel-types', [Owner\SettingsController::class, 'updateFuelTypes'])->name('owner.settings.fuel-types');
+        Route::post('/settings/payments/unlock', [Owner\SettingsController::class, 'unlockPayments'])->name('owner.settings.payments.unlock');
+        Route::patch('/settings/payments', [Owner\SettingsController::class, 'updatePayments'])->name('owner.settings.payments');
         Route::get('/settings/test-invoice', [Owner\SettingsController::class, 'previewInvoice'])->name('owner.settings.test-invoice');
 
         // Portal status
