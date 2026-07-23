@@ -1,5 +1,23 @@
 <x-layouts.client>
 
+    <!-- Out-of-office / front-page notices -->
+    @foreach ($frontPageNotices as $notice)
+        <div class="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 flex items-start gap-4">
+            <svg class="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-amber-300">{{ $notice->title }}</p>
+                @if ($notice->body)
+                    <p class="text-sm text-amber-100/80 mt-1 whitespace-pre-line">{{ $notice->body }}</p>
+                @endif
+                @if ($notice->show_until)
+                    <p class="text-xs text-amber-200/60 mt-2">Until {{ $notice->show_until->format('j M Y') }}</p>
+                @endif
+            </div>
+        </div>
+    @endforeach
+
     <!-- Welcome banner -->
     <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div class="flex-1">

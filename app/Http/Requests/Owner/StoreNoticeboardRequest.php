@@ -22,6 +22,7 @@ class StoreNoticeboardRequest extends FormRequest
             'show_from' => ['nullable', 'date'],
             'show_until' => ['nullable', 'date', 'after_or_equal:show_from'],
             'is_active' => ['boolean'],
+            'show_on_front_page' => ['boolean'],
         ];
     }
 }

@@ -56,6 +56,9 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Notices flagged as an out-of-office banner across the top of the page.
+        $frontPageNotices = Noticeboard::frontPage()->get();
+
         $portalStatus = PortalStatus::find(1);
 
         $todayHours = OpeningHour::where('day_of_week', now()->dayOfWeek)->first();
@@ -76,6 +79,7 @@ class DashboardController extends Controller
             'spendLabels',
             'recentFileRequests',
             'notices',
+            'frontPageNotices',
             'portalStatus',
             'todayHours',
             'totalSpent',

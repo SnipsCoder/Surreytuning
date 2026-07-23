@@ -36,12 +36,19 @@
     </div>
 </div>
 
-<div class="flex items-center gap-6">
+<div class="flex flex-wrap items-center gap-6">
     <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
         <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $noticeboard?->is_active ?? true))>
         Active
     </label>
+    <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <input type="checkbox" name="show_on_front_page" value="1" @checked(old('show_on_front_page', $noticeboard?->show_on_front_page ?? false))>
+        Display on Front Page
+    </label>
 </div>
+<p class="-mt-2 text-xs text-gray-500 dark:text-gray-400">
+    Pins this notice as a prominent banner across the top of the dealer dashboard — use it for an out-of-office message (e.g. an extended holiday closure).
+</p>
 
 <div class="flex justify-end gap-3 pt-2">
     <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">

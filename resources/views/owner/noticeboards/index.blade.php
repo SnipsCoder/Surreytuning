@@ -15,11 +15,14 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $noticeboard->show_from?->format('d/m/Y') ?? '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $noticeboard->show_until?->format('d/m/Y') ?? '-' }}</td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3 text-sm space-x-1">
                     @if ($noticeboard->is_active)
                         <x-status-badge status="Active" colour="bg-green-100 text-green-800" />
                     @else
                         <x-status-badge status="Inactive" colour="bg-gray-100 text-gray-800" />
+                    @endif
+                    @if ($noticeboard->show_on_front_page)
+                        <x-status-badge status="Front Page" colour="bg-amber-100 text-amber-800" />
                     @endif
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $noticeboard->created_at->format('d/m/Y') }}</td>

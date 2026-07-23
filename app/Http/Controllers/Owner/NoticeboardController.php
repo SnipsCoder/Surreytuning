@@ -21,6 +21,9 @@ class NoticeboardController extends Controller
     {
         $data = $request->validated();
         $data['created_by_user_id'] = auth()->id();
+        // Unchecked checkboxes aren't sent — resolve them explicitly.
+        $data['is_active'] = $request->boolean('is_active');
+        $data['show_on_front_page'] = $request->boolean('show_on_front_page');
 
         Noticeboard::create($data);
 
@@ -29,7 +32,13 @@ class NoticeboardController extends Controller
 
     public function update(StoreNoticeboardRequest $request, Noticeboard $noticeboard): RedirectResponse
     {
-        $noticeboard->update($request->validated());
+        $data = $request->validated();
+        // Unchecked checkboxes aren't sent — resolve them explicitly so toggling
+        // Active / Display on Front Page off actually persists.
+        $data['is_active'] = $request->boolean('is_active');
+        $data['show_on_front_page'] = $request->boolean('show_on_front_page');
+
+        $noticeboard->update($data);
 
         return back()->with('success', 'Notice updated.');
     }
