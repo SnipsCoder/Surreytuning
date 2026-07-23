@@ -109,7 +109,7 @@ class SettingsController extends Controller
 
         // Public identifiers: update (or clear) only the ones actually submitted
         // — so editing one provider's card never wipes another's.
-        foreach (['stripe_public_key', 'evc_account_number', 'paypal_client_id'] as $field) {
+        foreach (['stripe_public_key', 'evc_account_number', 'paypal_client_id', 'whatsapp_phone_number_id', 'whatsapp_template_name', 'whatsapp_template_language'] as $field) {
             if ($request->has($field)) {
                 $settings->{$field} = $data[$field] ?: null;
             }
@@ -117,7 +117,7 @@ class SettingsController extends Controller
 
         // Secrets: only overwrite when a new value was typed (blank = keep the
         // existing one, which is never sent back to the browser).
-        foreach (['stripe_secret_key', 'stripe_webhook_secret', 'evc_password', 'paypal_secret'] as $secret) {
+        foreach (['stripe_secret_key', 'stripe_webhook_secret', 'evc_password', 'paypal_secret', 'whatsapp_access_token'] as $secret) {
             if ($request->filled($secret)) {
                 $settings->{$secret} = $data[$secret];
             }

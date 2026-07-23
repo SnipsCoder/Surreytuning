@@ -343,6 +343,21 @@
                         <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-paypal-keys' }))"
                             class="mt-auto px-3 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c92a0f]">Edit</button>
                     </div>
+
+                    {{-- WhatsApp (job-complete notifications) --}}
+                    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">WhatsApp</h4>
+                            <x-status-badge :status="$settings->whatsapp_access_token ? 'Configured' : 'Not set'" :colour="$settings->whatsapp_access_token ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" />
+                        </div>
+                        <dl class="text-xs text-gray-500 dark:text-gray-400 space-y-1 mb-4">
+                            <div class="flex justify-between gap-2"><dt>Phone number ID</dt><dd class="text-gray-800 dark:text-gray-200 truncate max-w-[9rem]">{{ $settings->whatsapp_phone_number_id ?: '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Access token</dt><dd class="text-gray-800 dark:text-gray-200">{{ $settings->maskedSecret('whatsapp_access_token') ?? '—' }}</dd></div>
+                            <div class="flex justify-between gap-2"><dt>Template</dt><dd class="text-gray-800 dark:text-gray-200 truncate max-w-[9rem]">{{ $settings->whatsapp_template_name ?: '—' }}</dd></div>
+                        </dl>
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'edit-whatsapp-keys' }))"
+                            class="mt-auto px-3 py-2 rounded-md text-sm font-medium text-white bg-brand hover:bg-[#c92a0f]">Edit</button>
+                    </div>
                 </div>
 
                 {{-- Stripe modal --}}
@@ -417,6 +432,43 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Secret @if ($settings->paypal_secret)<span class="text-xs text-green-500">(configured)</span>@endif</label>
                             <input type="password" name="paypal_secret" autocomplete="new-password" placeholder="{{ $settings->paypal_secret ? 'Leave blank to keep current' : '' }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                            <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">Encrypt &amp; Save</button>
+                        </div>
+                    </form>
+                </x-modal>
+
+                {{-- WhatsApp modal --}}
+                <x-modal id="edit-whatsapp-keys" title="Edit WhatsApp (Cloud API)">
+                    <form method="POST" action="{{ route('owner.settings.payments') }}" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 text-xs text-blue-700 dark:text-blue-300">
+                            Meta WhatsApp Cloud API. The access token is encrypted; leave it blank to keep the current value. The template must be an approved utility template with one body variable (the job reference), e.g. &ldquo;Job &#123;&#123;1&#125;&#125; is complete.&rdquo;
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number ID</label>
+                            <input type="text" name="whatsapp_phone_number_id" value="{{ $settings->whatsapp_phone_number_id }}" placeholder="e.g. 123456789012345"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Access Token @if ($settings->whatsapp_access_token)<span class="text-xs text-green-500">(configured)</span>@endif</label>
+                            <input type="password" name="whatsapp_access_token" autocomplete="new-password" placeholder="{{ $settings->whatsapp_access_token ? 'Leave blank to keep current' : 'Meta permanent access token' }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Template Name</label>
+                                <input type="text" name="whatsapp_template_name" value="{{ $settings->whatsapp_template_name }}" placeholder="e.g. job_complete"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Template Language</label>
+                                <input type="text" name="whatsapp_template_language" value="{{ $settings->whatsapp_template_language ?: 'en_GB' }}" placeholder="en_GB"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-[#2a2a2a] dark:bg-[#0d0d0d] dark:text-gray-100 text-sm shadow-sm">
+                            </div>
                         </div>
                         <div class="flex justify-end gap-3 pt-2">
                             <button type="button" x-on:click="open = false" class="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>

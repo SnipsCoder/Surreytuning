@@ -36,6 +36,10 @@ class Setting extends Model
         'paypal_client_id',
         'paypal_secret',
         'whatsapp_business_number',
+        'whatsapp_phone_number_id',
+        'whatsapp_access_token',
+        'whatsapp_template_name',
+        'whatsapp_template_language',
         'fuel_types',
     ];
 
@@ -55,6 +59,7 @@ class Setting extends Model
             'stripe_webhook_secret' => EncryptedSafe::class,
             'evc_password' => EncryptedSafe::class,
             'paypal_secret' => EncryptedSafe::class,
+            'whatsapp_access_token' => EncryptedSafe::class,
         ];
     }
 
