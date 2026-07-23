@@ -94,6 +94,15 @@ class User extends Authenticatable
         return (bool) (new \PragmaRX\Google2FA\Google2FA)->verifyKey($secret, $code);
     }
 
+    /**
+     * Send the branded password reset notification instead of Laravel's
+     * stock template, so the email matches the rest of the portal's mail.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
     public function dealer(): BelongsTo
     {
         return $this->belongsTo(Dealer::class);

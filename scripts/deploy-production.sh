@@ -43,5 +43,5 @@ echo "== 6. Bring the app back up =="
 sudo -u user php artisan up
 
 echo "== Done. Now verify: =="
-echo "curl -fsS https://surreytuning.co.uk/healthz"
+echo "curl -fsS https://srv1799606.hstgr.cloud/healthz"
 echo "sudo -u user php artisan queue:failed"
