@@ -1,5 +1,5 @@
 <x-layouts.owner>
-    <x-page-header title="Portal Users" subtitle="Owner and technician accounts">
+    <x-page-header title="Portal Users" subtitle="Owner and tuner accounts">
         <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'create-portal-user' }))"
             class="px-4 py-2 rounded-md bg-brand text-white text-sm font-medium hover:bg-[#c92a0f]">
             Invite User

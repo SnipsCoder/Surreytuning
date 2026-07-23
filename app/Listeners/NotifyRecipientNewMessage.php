@@ -20,7 +20,7 @@ class NotifyRecipientNewMessage implements ShouldQueue
             return;
         }
 
-        $isOwnerSender = in_array($sender->role, [UserRole::Owner, UserRole::Technician, UserRole::Tuner]);
+        $isOwnerSender = in_array($sender->role, [UserRole::Owner, UserRole::Tuner]);
 
         if ($isOwnerSender) {
             // Notify dealer primary contact
