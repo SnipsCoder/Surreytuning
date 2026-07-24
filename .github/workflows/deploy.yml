@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]              # must match `name:` in ci.yml
+    types: [completed]
+  workflow_dispatch: {}          # manual re-deploy of branch tip (break-glass / testing)
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false      # never kill a deploy mid-flight; queue instead
+
+env:
+  DEPLOYER_VERSION: "7.5.12"     # pin; bump deliberately
+  DEPLOYER_SHA256: "b55c6609653e888c672d327c407f8bba6324b9c9cc24f9dcfb3f4b3922760632"
+  DEPLOY_HOST: srv1799606.hstgr.cloud   # not secret — plain env
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    # Gate: CI green, push event, master, and the enable switch is on.
+    if: >
+      vars.DEPLOY_ENABLED == 'true' &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'master'
+        )
+      )
+    steps:
+      - name: Resolve commit to deploy
+        id: rev
+        run: echo "sha=${{ github.event.workflow_run.head_sha || github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout (for deploy.php only)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.rev.outputs.sha }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install Deployer (pinned phar)
+        run: |
+          curl -fsSL -o dep "https://github.com/deployphp/deployer/releases/download/v${DEPLOYER_VERSION}/deployer.phar"
+          echo "${DEPLOYER_SHA256}  dep" | sha256sum -c -
+          chmod +x dep
+
+      - name: Load deploy key into ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Pin server host key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          HEALTH_CHECK_TOKEN: ${{ secrets.HEALTH_CHECK_TOKEN }}
+        run: ./dep deploy production --revision="${{ steps.rev.outputs.sha }}" -v

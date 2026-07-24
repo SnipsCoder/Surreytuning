@@ -45,15 +45,15 @@ Create `/etc/supervisor/conf.d/surreytuning-worker.conf`:
 ```ini
 [program:surreytuning-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/surreytuning/artisan queue:work --tries=3 --backoff=10 --max-time=3600 --sleep=3
+command=php /home/user/htdocs/tuning-portal/current/artisan queue:work --tries=3 --backoff=10 --max-time=3600 --sleep=3
 autostart=true
 autorestart=true
 stopasgroup=true
 killasgroup=true
-user=www-data
+user=user
 numprocs=2
 redirect_stderr=true
-stdout_logfile=/var/www/surreytuning/storage/logs/worker.log
+stdout_logfile=/home/user/htdocs/tuning-portal/shared/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
@@ -68,13 +68,15 @@ gives an in-flight job up to an hour to finish before it is killed.
 
 ### Deploys
 
-After every deploy, restart workers so they load new code:
+The automated pipeline runs `php artisan queue:restart` as a post-flip task on
+every deploy (and after every rollback), so workers pick up new code without
+manual intervention — see [deploy-runbook.md](deploy-runbook.md).
+
+For break-glass manual deploys, run it yourself from the live release:
 
 ```bash
-php artisan queue:restart
+cd /home/user/htdocs/tuning-portal/current && php artisan queue:restart
 ```
-
-Add this to the deploy script (see `docs/deploy-runbook.md`).
 
 ## Failed jobs
 
